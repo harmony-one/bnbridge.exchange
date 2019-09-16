@@ -5,8 +5,8 @@ const config = {
   password: "harmony",
 
   //Binance
-	api: "https://testnet-dex.binance.org/",
-	filePath: "/Users/dennis.won/.bnbcli/",
+  api: "https://testnet-dex.binance.org/",
+  filePath: "/Users/dennis.won/.bnbcli/",
   fileName: "tbnbcli",
   chainID: "Binance-Chain-Nile",
   nodeData: "data-seed-pre-2-s1.binance.org:80",
