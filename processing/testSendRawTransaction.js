@@ -2,10 +2,10 @@ var Web3 = require('web3');
 var config = require('./config')
 var web3 = new Web3(new Web3.providers.HttpProvider(''));
 
-const ADDRESS = ''
-const PRIVATE_KEY = ''
+const ADDRESS = '0x927270dd3e84a2dcedacfc6b2a9109833e149271'
+const PRIVATE_KEY = 'E820CF3B21F946EA2FDE6C00B52A6C2C3E105FA77A5D3ABF236D60E494E7F551'
 const TO = ''
-const ERC20_CONTRACT = ''
+const ERC20_CONTRACT = '0xd379255277e87e3636708a71f7a845a86f8c591d'
 
 let consumerContract = new web3.eth.Contract(config.erc20ABI, ERC20_CONTRACT);
 

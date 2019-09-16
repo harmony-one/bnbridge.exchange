@@ -10,7 +10,7 @@ const eth = require('./helpers/eth.js')
 const fs = require('fs');
 const async = require('async');
 
-const ERC20_CONTRACT = ''
+const ERC20_CONTRACT = '0xd379255277e87e3636708a71f7a845a86f8c591d'
 
 loadFile()
 

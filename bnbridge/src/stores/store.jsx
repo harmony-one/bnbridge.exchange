@@ -159,7 +159,7 @@ class Store {
       }
 
       // console.log(data)
-      this.setStore({ tokens: data.result })
+      this.setStore({ tokens: data || data.result })
       emitter.emit(TOKENS_UPDATED);
     });
   };
@@ -173,7 +173,7 @@ class Store {
         return
       }
 
-      this.setStore({ fees: data.result })
+      this.setStore({ fees: data || data.result })
       emitter.emit(FEES_UPDATED);
     });
   };
@@ -188,11 +188,11 @@ class Store {
       }
 
       if(data.success) {
-        emitter.emit(TOKEN_ISSUED, data.result);
+        emitter.emit(TOKEN_ISSUED, data || data.result);
       } else if (data.errorMsg) {
         emitter.emit(ERROR, data.errorMsg);
       } else {
-        emitter.emit(ERROR, data.result);
+        emitter.emit(ERROR, data || data.result);
       }
     });
   };
@@ -206,11 +206,11 @@ class Store {
       }
 
       if(data.success) {
-        emitter.emit(TOKEN_FINALIZED, data.result);
+        emitter.emit(TOKEN_FINALIZED, data || data.result);
       } else if (data.errorMsg) {
         emitter.emit(ERROR, data.errorMsg);
       } else {
-        emitter.emit(ERROR, data.result);
+        emitter.emit(ERROR, data || data.result);
       }
     });
   };
@@ -224,11 +224,11 @@ class Store {
       }
 
       if(data.success) {
-        emitter.emit(TOKEN_SWAPPED, data.result);
+        emitter.emit(TOKEN_SWAPPED, data || data.result);
       } else if (data.errorMsg) {
         emitter.emit(ERROR, data.errorMsg);
       } else {
-        emitter.emit(ERROR, data.result);
+        emitter.emit(ERROR, data || data.result);
       }
     });
   };
@@ -242,11 +242,11 @@ class Store {
       }
 
       if(data.success) {
-        emitter.emit(TOKEN_SWAP_FINALIZED, data.result);
+        emitter.emit(TOKEN_SWAP_FINALIZED, data || data.result);
       } else if (data.errorMsg) {
         emitter.emit(ERROR, data.errorMsg);
       } else {
-        emitter.emit(ERROR, data.result);
+        emitter.emit(ERROR, data || data.result);
       }
     });
   };
@@ -260,11 +260,11 @@ class Store {
       }
 
       if(data.success) {
-        emitter.emit(TOKEN_LISTED, data.result);
+        emitter.emit(TOKEN_LISTED, data || data.result);
       } else if (data.errorMsg) {
         emitter.emit(ERROR, data.errorMsg);
       } else {
-        emitter.emit(ERROR, data.result);
+        emitter.emit(ERROR, data || data.result);
       }
     });
   };
@@ -278,11 +278,11 @@ class Store {
       }
 
       if(data.success) {
-        emitter.emit(LIST_PROPOSAL_SUBMITTED, data.result);
+        emitter.emit(LIST_PROPOSAL_SUBMITTED, data || data.result);
       } else if (data.errorMsg) {
         emitter.emit(ERROR, data.errorMsg);
       } else {
-        emitter.emit(ERROR, data.result);
+        emitter.emit(ERROR, data || data.result);
       }
     });
   };
@@ -296,11 +296,11 @@ class Store {
       }
 
       if(data.success) {
-        emitter.emit(LIST_PROPOSAL_FINALIZED, data.result);
+        emitter.emit(LIST_PROPOSAL_FINALIZED, data || data.result);
       } else if (data.errorMsg) {
         emitter.emit(ERROR, data.errorMsg);
       } else {
-        emitter.emit(ERROR, data.result);
+        emitter.emit(ERROR, data || data.result);
       }
     });
   };
@@ -314,7 +314,7 @@ class Store {
         return
       }
 
-      emitter.emit(LIST_PROPOSAL_UPDATED, data.result);
+      emitter.emit(LIST_PROPOSAL_UPDATED, data || data.result);
     });
   };
 
@@ -328,11 +328,11 @@ class Store {
       }
 
       if(data.success) {
-        emitter.emit(BNB_BALANCES_UPDATED, data.result);
+        emitter.emit(BNB_BALANCES_UPDATED, data || data.result);
       } else if (data.errorMsg) {
         emitter.emit(ERROR, data.errorMsg);
       } else {
-        emitter.emit(ERROR, data.result);
+        emitter.emit(ERROR, data || data.result);
       }
     });
   };
@@ -346,7 +346,7 @@ class Store {
         return
       }
 
-      emitter.emit(ETH_BALANCES_UPDATED, data.result);
+      emitter.emit(ETH_BALANCES_UPDATED, data || data.result);
     });
   };
 
@@ -359,7 +359,7 @@ class Store {
         return
       }
 
-      emitter.emit(BNB_ACCOUNT_CREATED, data.result);
+      emitter.emit(BNB_ACCOUNT_CREATED, data || data.result);
     });
   };
 
@@ -372,7 +372,7 @@ class Store {
         return
       }
 
-      emitter.emit(BNB_KEYSTORE_DOWNLOADED, data.result);
+      emitter.emit(BNB_KEYSTORE_DOWNLOADED, data || data.result);
     });
   };
 
@@ -385,7 +385,7 @@ class Store {
         return
       }
 
-      emitter.emit(ERC20_INFO_UPDATED, data.result);
+      emitter.emit(ERC20_INFO_UPDATED, data || data.result);
     });
   }
 
@@ -402,10 +402,10 @@ class Store {
     fetch(call, {
       method: method,
       body: postData,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Basic ' + config.apiToken,
-      }
+      // headers: {
+      //   'Content-Type': 'application/json',
+      //   Authorization: 'Basic ' + config.apiToken,
+      // }
     })
       .then(res => {
         if (res.status === 401) {
@@ -413,11 +413,11 @@ class Store {
         }
 
         if (res.status === 400) {
-          return res.json()
+          return res.clone().json()
         }
 
         if (res.ok) {
-          return res.json();
+          return res.clone().json();
         } else {
           throw Error(res.statusText);
         }
@@ -439,10 +439,10 @@ class Store {
     fetch(call, {
       method: "POST",
       body: postData,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Basic ' + config.apiToken,
-      }
+      // headers: {
+      //   'Content-Type': 'application/json',
+      //   Authorization: 'Basic ' + config.apiToken,
+      // }
     })
     .then((response) => response.blob())
     .then(function(blob) {
@@ -452,7 +452,7 @@ class Store {
       fr.onload = function() {
           console.log(JSON.parse(this.result))
           const response = JSON.parse(this.result)
-    
+
           FileSaver.saveAs(blob, response.id+'_keystore.json');
 
           callback(null, response)

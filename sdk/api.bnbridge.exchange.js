@@ -6,6 +6,7 @@ const helmet = require('helmet')
 const https = require('https')
 const fs = require('fs')
 const auth = require('http-auth')
+const cors = require('cors')
 
 /*  ZTgwMTY1NjkzZjAyOTk1N2VjNDQ4MjBhNGRiODJiMGI1NjI5YjM2YjJkNjc1YjVhYjE0YmEwNTBhMDFiNDk3ZDpmYmM3MWMyOTRmOWE4N2VlM2QzMmVkZDVkNjExNTE4MTFlNDRmNzc0NDgzNzY4OWVmYWRkYmJiOWY3NjgxYzA5 */
 var basic = auth.basic({ realm: 'bnbridge.exchange' }, function (username, password, callback) {
@@ -13,7 +14,7 @@ var basic = auth.basic({ realm: 'bnbridge.exchange' }, function (username, passw
 })
 
 var app = express()
-
+app.use(cors())
 
 app.all('/*', function(req, res, next) {
   // CORS headers
