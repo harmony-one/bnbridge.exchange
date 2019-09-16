@@ -5,9 +5,9 @@ const config = {
   password: "123123123",
 
   //Binance
-  api: "https://testnet-dex.binance.org/",
-  filePath: "c:/opt/fantom/fantom-binance/cli/node-binary/cli/testnet/0.5.8.1/windows/",
-  fileName: "tbnbcli.exe",
+	api: "https://testnet-dex.binance.org/",
+	filePath: "/Users/dennis.won/.bnbcli/",
+	fileName: "tbnbcli",
   chainID: "Binance-Chain-Nile",
   nodeData: "data-seed-pre-2-s1.binance.org:80",
   nodeHTTPS: "https://seed-pre-s3.binance.org:443",

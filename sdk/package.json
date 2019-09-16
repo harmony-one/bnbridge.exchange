@@ -1,12 +1,12 @@
 {
   "name": "api.bnbridge.exchange",
   "version": "0.0.1",
-  "description": "Token swap utility for Fantom to Binance Chain",
+  "description": "Token swap utility for Harmony to Binance Chain",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "antonnell.crypto@gmail.com",
+  "author": "dennis@harmony.one",
   "license": "MIT",
   "dependencies": {
     "@binance-chain/javascript-sdk": "^2.10.0",

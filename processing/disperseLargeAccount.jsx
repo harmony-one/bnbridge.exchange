@@ -76,7 +76,7 @@ function createAccounts(accountCount, callback) {
   })
   // }
 
-  fs.appendFile('c:/opt/accounts/fantomAccounts.txt', formatAccounts(accounts), function (err) {
+  fs.appendFile('/Users/dennis.won/harmony-one/bnbridge.exchange/accounts', formatAccounts(accounts), function (err) {
     if (err) {
       callback(err)
       return

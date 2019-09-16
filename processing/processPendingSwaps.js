@@ -12,12 +12,12 @@ const bnb = require('./helpers/bnb.js')
 const eth = require('./helpers/eth.js')
 const async = require('async')
 
-const FANTOM_UUID = ""
+const HMY_UUID = ""
 
 getToken()
 
 function getToken() {
-  db.oneOrNone("select * from tokens where uuid = $1;", [FANTOM_UUID])
+  db.oneOrNone("select * from tokens where uuid = $1;", [HMY_UUID])
   .then((token) => {
     getClientAddresses((clients) => {
       // console.log(clients)

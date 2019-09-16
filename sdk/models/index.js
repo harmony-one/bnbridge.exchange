@@ -221,7 +221,8 @@ const models = {
     const aes256seed = models.encrypt(keyData.seedPhrase, password)
     const aes256password = models.encrypt(keyPassword, password)
 
-    db.oneOrNone('insert into bnb_accounts (uuid, public_key, address, seed_phrase, key_name, password, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, now()) returning uuid;', [keyData.publicKey, keyData.address, aes256seed, keyName, aes256password, dbPassword])
+    db.oneOrNone('insert into bnb_accounts (uuid, public_key, address, seed_phrase, key_name, password, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, now()) returning uuid;',
+      [keyData.publicKey, keyData.address, aes256seed, keyName, aes256password, dbPassword])
     .then((response) => {
       callback(null, response)
     })

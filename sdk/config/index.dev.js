@@ -1,13 +1,13 @@
 const config = {
-  host: "localhost",
+	host: "localhost",
   database: "bnbridge",
-  user: "postgres",
-  password: "123123123",
+  user: "harmonyone",
+  password: "harmony",
 
   //Binance
-  api: "https://testnet-dex.binance.org/",
-  filePath: "c:/opt/fantom/fantom-binance/cli/node-binary/cli/testnet/0.5.8.1/windows/",
-  fileName: "tbnbcli.exe",
+	api: "https://testnet-dex.binance.org/",
+	filePath: "/Users/dennis.won/.bnbcli/",
+  fileName: "tbnbcli",
   chainID: "Binance-Chain-Nile",
   nodeData: "data-seed-pre-2-s1.binance.org:80",
   nodeHTTPS: "https://seed-pre-s3.binance.org:443",
@@ -16,9 +16,8 @@ const config = {
   prefix: 'tbnb',
   network: 'testnet',
 
-  //Ethereum
-  provider: 'https://ropsten.infura.io/v3/2b1dbb61817f4ae6ac90d9b41662993b',
-
+	//Ethereum
+	provider: 'https://ropsten.infura.io/v3/27fa7a85f7994c8db191ffd943267b17',
 
   erc20ABI: [
   	{

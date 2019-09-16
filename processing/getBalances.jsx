@@ -10,16 +10,18 @@ const eth = require('./helpers/eth.js')
 const fs = require('fs');
 const async = require('async');
 
-const ERC20_CONTRACT =  ''
+const ERC20_CONTRACT = ''
 
 loadFile()
 
 function loadFile() {
-  var text = fs.readFileSync('C:/opt/fantomAccounts_final.txt','utf8')
+  var text = fs.readFileSync('/Users/dennis.won/harmony-one/bnbridge.exchange/accounts/hmyAccounts_test.txt','utf8')
   processFile(text)
 }
 
 function processFile(content) {
+
+  console.log('processFile')
 
   let lines = content.split("\r\n")
 
