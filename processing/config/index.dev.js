@@ -1,8 +1,8 @@
 const config = {
   host: "localhost",
   database: "bnbridge",
-  user: "postgres",
-  password: "123123123",
+	user: "harmonyone",
+	password: "harmony",
 
   //Binance
 	api: "https://testnet-dex.binance.org/",
