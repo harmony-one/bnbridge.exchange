@@ -1,19 +1,19 @@
 const config = {
-  host: "localhost",
-  database: "bnbridge_live", //live
-	user: "harmonyone",
-	password: "harmony",
+	host: "localhost",
+	database: "postgres", //live
+	user: "postgres",
+	password: "12345",
 
   //Binance
 	api: "https://dex.binance.org/", //live
 	filePath: "/Users/dennis.won/.bnbcli/",
 	fileName: "tbnbcli",
-  chainID: "Binance-Chain-Tigris", //live
-  nodeData: "https://dataseed5.defibit.io:443", //live
-  nodeHTTPS: "https://dataseed5.defibit.io:443", //live
-  keyPrepend: "LIVE_",
-  list_proposal_deposit: "100000000000",
-  prefix: 'bnb',
+	chainID: "Binance-Chain-Tigris", //live
+	nodeData: "https://dataseed5.defibit.io:443", //live
+	nodeHTTPS: "https://dataseed5.defibit.io:443", //live
+	keyPrepend: "LIVE_",
+	list_proposal_deposit: "100000000000",
+	prefix: 'bnb',
 
   //Ethereum
   provider: 'https://mainnet.infura.io/v3/2b1dbb61817f4ae6ac90d9b41662993b', //live
