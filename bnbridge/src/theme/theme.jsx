@@ -30,7 +30,7 @@ const bnbridgeTheme =  {
       }
     },
     MuiGrid: {
-      paddingLeft: '10px',
+      // paddingLeft: '10px',
     },
     MuiOutlinedInput: {
       input: {
