@@ -1,35 +1,18 @@
-import React, { Component } from "react";
-import PropTypes from 'prop-types';
+import { Grid, IconButton, SvgIcon, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  Grid,
-  Typography,
-  IconButton,
-  SvgIcon
-} from '@material-ui/core'
-import config from '../../config'
-
-import Input from '../common/input';
-import Button from '../common/button';
-import PageLoader from "../common/pageLoader";
-import Label from "../common/label";
-import AssetSelection from "../assetSelection";
-import Config from '../../config';
-
-import {
-  ERROR,
-  SWAP_TOKEN,
-  TOKEN_SWAPPED,
-  FINALIZE_SWAP_TOKEN,
-  TOKEN_SWAP_FINALIZED,
-  TOKENS_UPDATED,
-  GET_BNB_BALANCES,
-  BNB_BALANCES_UPDATED,
-  GET_ETH_BALANCES,
-  ETH_BALANCES_UPDATED,
-} from '../../constants'
-
+import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import { default as config, default as Config } from '../../config';
+import { BNB_BALANCES_UPDATED, ERROR, ETH_BALANCES_UPDATED, FINALIZE_SWAP_TOKEN, GET_BNB_BALANCES, GET_ETH_BALANCES, SWAP_TOKEN, TOKENS_UPDATED, TOKEN_SWAPPED, TOKEN_SWAP_FINALIZED } from '../../constants';
 import Store from "../../stores";
+import AssetSelection from "../assetSelection";
+import Button from '../common/button';
+import Input from '../common/input';
+import Label from "../common/label";
+import PageLoader from "../common/pageLoader";
+
+
+
 const dispatcher = Store.dispatcher
 const emitter = Store.emitter
 const store = Store.store
@@ -212,6 +195,7 @@ class Swap extends Component {
       bnbReceiveAddress,
       ethReceiveAddress
     } = this.state
+    console.log('minh4' , token, swapDirection, 'minh4', bnbReceiveAddress, ethReceiveAddress)
 
     const content =  {
       token_uuid: token,
@@ -280,9 +264,12 @@ class Swap extends Component {
   };
 
   onNext = (event) => {
+    console.log('minh3', this.state.page);
     switch (this.state.page) {
       case 0:
+        console.log('minh2')
         if(this.validateSwapToken()) {
+          console.log('minh1')
           this.callSwapToken()
         }
         break;
@@ -403,6 +390,7 @@ class Swap extends Component {
       }
       this.setState({ bnbBalances: null })
     } else {
+      // binance to ethereum --> harmony
       if(theToken.length > 0  && ethReceiveAddress && ethReceiveAddress !== "" && ethReceiveAddress.length === Config.erc20addressLength) {
         const content = {
           eth_address: ethReceiveAddress,

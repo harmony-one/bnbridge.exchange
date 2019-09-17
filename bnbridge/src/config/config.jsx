@@ -1,7 +1,8 @@
 import development from "./development.config";
-import production from "./production.config";
 import example from "./example.config";
-const env = process.env.APP_ENV || 'development';
+import production from "./production.config";
+// const env = process.env.APP_ENV || 'development';
+const env = 'development';
 
 const config = {
   example,

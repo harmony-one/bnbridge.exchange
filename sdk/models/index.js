@@ -498,6 +498,7 @@ const models = {
   * If not, we create a new address then return it.
   */
   swapToken(req, res, next) {
+    // swap token binance to ethereum.
     models.descryptPayload(req, res, next, (data) => {
       let result = models.validateSwap(data)
 
@@ -514,6 +515,8 @@ const models = {
       if(direction === 'EthereumToBinance') {
         models.swapEthereumToBinance(req, res, next, data)
       } else {
+        // binace
+        // then come here
         models.swapBinanceToEthereum(req, res, next, data)
       }
     })
@@ -628,6 +631,7 @@ const models = {
       eth_address
     } = data
 
+    // check postgres if there is a bnb address for the given eth_address
     models.getClientAccountForEthAddress(eth_address, (err, clientAccount) => {
       if(err) {
         console.log(err)
@@ -1826,6 +1830,7 @@ const models = {
   *  -- Get pending transfers that haven't been processed yet
   */
   getEthBalance(req, res, next) {
+    // minh come here1
     models.descryptPayload(req, res, next, (data) => {
       let result = models.validateGetEthbalances(data)
 

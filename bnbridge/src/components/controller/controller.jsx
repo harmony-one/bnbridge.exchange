@@ -1,23 +1,15 @@
-import React, { Component } from "react";
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  Tabs,
-  Tab
-} from '@material-ui/core';
-
-import {
-  GET_FEES,
-  FEES_UPDATED
-} from '../../constants'
-
-import Issue from "../issue";
-import List from "../list";
-import Swap from "../swap";
-import ErrorSnackbar from '../errorSnackbar';
-import CreateAccount from '../createAccount';
-
+import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import { FEES_UPDATED, GET_FEES } from '../../constants';
 import Store from "../../stores";
+import CreateAccount from '../createAccount';
+import ErrorSnackbar from '../errorSnackbar';
+import Issue from "../issue";
+import Swap from "../swap";
+
+
+
 const dispatcher = Store.dispatcher
 const emitter = Store.emitter
 const store = Store.store
@@ -143,11 +135,11 @@ class Controller extends Component {
 
     return (
       <React.Fragment>
-        <Tabs value={tabValue} onChange={this.handleChange} className={ classes.tabs } variant="fullWidth" indicatorColor="primary" textColor="inherit">
-          <Tab label="Swap" />
+        {/* <Tabs value={tabValue} onChange={this.handleChange} className={ classes.tabs } variant="fullWidth" indicatorColor="primary" textColor="inherit"> */}
+          {/* <Tab label="Swapminh" /> */}
           {/* <Tab label="List" />
           <Tab label="Issue" /> */}
-        </Tabs>
+        {/* </Tabs> */}
         {tabValue === 0 && <Swap onIssue={ this.onIssue } showError={ this.showError } onCreateAccount={ this.onCreateAccount } />}
         {/* {tabValue === 1 && <List onIssue={ this.onIssue } showError={ this.showError } />}
         {tabValue === 2 && <Issue onBack={ this.onIssueBack }  issueFee={ issueFee } showError={ this.showError } />} */}
