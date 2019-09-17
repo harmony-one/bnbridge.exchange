@@ -15,7 +15,7 @@ const INIT_PRICE = '100000000000000000'
 const PROPOSAL_ID = '15'
 const SYMBOL = 'ANT-B90'
 const KEY_NAME = 'key'
-const PATH = "/Users/dennis.won/.bnbcli/"
+const PATH = "/Users/minhdoan/bin"
 const FILE = "tbnbcli"
 
 const PASSWORD = ""

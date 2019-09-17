@@ -6,7 +6,7 @@ const config = {
 
   //Binance
 	api: "https://dex.binance.org/", //live
-	filePath: "/Users/dennis.won/.bnbcli/",
+	filePath: "/Users/minhdoan/bin",
 	fileName: "tbnbcli",
 	chainID: "Binance-Chain-Tigris", //live
 	nodeData: "https://dataseed5.defibit.io:443", //live

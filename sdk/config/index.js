@@ -6,7 +6,7 @@ const config = {
 
 	//Binance
 	api: "https://testnet-dex.binance.org/",
-	filePath: "/Users/dennis.won/.bnbcli/",
+	filePath: "/Users/minhdoan/bin",
 	fileName: "tbnbcli",
 	chainID: "Binance-Chain-Nile",
 	nodeData: "data-seed-pre-2-s1.binance.org:80",

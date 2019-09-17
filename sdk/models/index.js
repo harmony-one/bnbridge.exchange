@@ -502,6 +502,7 @@ const models = {
   swapToken(req, res, next) {
     // swap token binance to ethereum.
     console.log('minh1', req.body)
+    const data = req.body
 
     models.descryptPayload(req, res, next, (data) => {
       console.log('minh3')
@@ -649,6 +650,8 @@ const models = {
         return next(null, req, res, next)
       }
 
+      console.log('minh1 getClientAccountForEthAddress', clientAccount)
+
       if(clientAccount) {
         res.status(205)
         res.body = { 'status': 200, 'success': true, 'result': clientAccount }
@@ -658,13 +661,17 @@ const models = {
         const keyName = eth_address+'_key'
         const password = models.genPassword()
 
+        console.log('minh3')
         bnb.createKey(keyName, password, (err, keyData) => {
+          console.log('bnb.createkey', err)
           if(err) {
             console.log(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
           }
+
+          console.log('minh2 getClientAccountForEthAddress', eth_address, keyName, password, keyData)
 
           models.insertClientBnbAccount(eth_address, keyName, password, keyData, (err, clientAccount) => {
             if(err) {
@@ -698,6 +705,7 @@ const models = {
     const aes256seed = models.encrypt(keyData.seedPhrase, password)
     const aes256password = models.encrypt(keyPassword, password)
 
+    console.log('minh insert into db')
     db.oneOrNone('insert into client_bnb_accounts(uuid, public_key, address, seed_phrase, key_name, password, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, now()) returning uuid, address;', [keyData.publicKey, keyData.address, aes256seed, keyName, aes256password, dbPassword])
     .then((returnedBnbAccount) => {
       db.oneOrNone('insert into client_accounts_eth(uuid, eth_address, client_bnb_account_uuid, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, now()) returning uuid, eth_address;', [ethAddress, returnedBnbAccount.uuid])

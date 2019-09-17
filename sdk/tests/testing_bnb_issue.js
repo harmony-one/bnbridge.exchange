@@ -15,7 +15,7 @@ const TOKEN_NAME = "TEST TOKEN"
 const TOTAL_SUPPLY = "100000000000000"
 const SYMBOL = 'TST'
 const KEY_NAME = 'key'
-const PATH = "/Users/dennis.won/.bnbcli/"
+const PATH = "/Users/minhdoan/bin"
 const FILE = "tbnbcli"
 const PASSWORD = ""
 

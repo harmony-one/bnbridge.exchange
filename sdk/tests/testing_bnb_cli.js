@@ -11,7 +11,7 @@ var ptyProcess = pty.spawn(shell, [], {
   env: process.env
 });
 
-const PATH = "/Users/dennis.won/.bnbcli/"
+const PATH = "/Users/minhdoan/bin"
 const FILE = "tbnbcli"
 
 ptyProcess.on('data', function(data) {

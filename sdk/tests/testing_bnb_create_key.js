@@ -13,7 +13,7 @@ var ptyProcess = pty.spawn(shell, [], {
 
 const KEY_NAME = "key"
 const PASSWORD = ""
-const PATH = "/Users/dennis.won/.bnbcli/"
+const PATH = "/Users/minhdoan/bin"
 const FILE = "tbnbcli"
 
 ptyProcess.on('data', function(data) {

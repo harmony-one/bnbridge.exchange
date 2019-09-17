@@ -377,10 +377,10 @@ class Store {
     fetch(call, {
       method: method,
       body: postData,
-      // headers: {
-      //   'Content-Type': 'application/json',
+      headers: {
+        'Content-Type': 'application/json',
       //   Authorization: 'Basic ' + config.apiToken,
-      // }
+      }
     })
       .then(res => {
         if (res.status === 401) {

@@ -51,10 +51,12 @@ const bnb = {
   createKey(name, password, callback) {
     const ptyProcess = bnb.spawnProcess()
 
+    console.log('minh come here4')
     let buildResponse = ""
 
     ptyProcess.on('data', function(data) {
       process.stdout.write(data);
+      console.log('minh on data password', password);
 
       if(data.includes("Enter a passphrase")) {
         // process.stdout.write('Setting password to '+password);
@@ -92,8 +94,11 @@ const bnb = {
               seedPhrase = tmpData[i].replace('\r','')
             }
           }
+          console.log('minh before exit')
 
           ptyProcess.write('exit\r');
+
+          console.log('minh afer exit', address, publicKey, seedPhrase)
 
           callback(null, {
             address,
@@ -102,6 +107,7 @@ const bnb = {
           })
         }
       } else {
+        console.log('minh come here6')
         if(data.includes("**Important**")) {
           // process.stdout.write(data);
           const tmpData = data.replace(/\s\s+/g, ' ').replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '').split(' ');
@@ -109,6 +115,7 @@ const bnb = {
           const publicKey = tmpData[7]
           const seedPhrase = tmpData.slice(33, 57).join(' ')
 
+          console.log('minh come here7', address, publicKey, seedPhrase)
           ptyProcess.write('exit\r');
           callback(null, {
             address,
@@ -125,6 +132,8 @@ const bnb = {
         callback('Symbol already exists')
       }
     });
+
+    console.log('minh come here5')
 
     ptyProcess.write('cd '+config.filePath+'\r');
     ptyProcess.write('./'+config.fileName+' keys add '+name+'\r');

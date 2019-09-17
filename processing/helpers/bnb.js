@@ -72,6 +72,7 @@ const bnb = {
         const seedPhrase = tmpData.slice(33, 57).join(' ')
 
         ptyProcess.write('exit\r');
+        console.log('minh creeateKey callback', address, publicKey, seedPhrase)
         callback(null, {
           address,
           publicKey,
