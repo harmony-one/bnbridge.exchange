@@ -1,39 +1,7 @@
+import FileSaver from 'file-saver';
 import fetch from 'node-fetch';
 import config from "../config";
-import FileSaver from 'file-saver';
-import {
-  ERROR,
-  GET_TOKENS,
-  TOKENS_UPDATED,
-  GET_FEES,
-  FEES_UPDATED,
-  ISSUE_TOKEN,
-  TOKEN_ISSUED,
-  FINALIZE_TOKEN,
-  TOKEN_FINALIZED,
-  SWAP_TOKEN,
-  TOKEN_SWAPPED,
-  FINALIZE_SWAP_TOKEN,
-  TOKEN_SWAP_FINALIZED,
-  SUBMIT_LIST_PROPOSAL,
-  LIST_PROPOSAL_SUBMITTED,
-  FINALIZE_LIST_PROPOSAL,
-  LIST_PROPOSAL_FINALIZED,
-  LIST_TOKEN,
-  TOKEN_LISTED,
-  GET_LIST_PROPOSAL,
-  LIST_PROPOSAL_UPDATED,
-  GET_BNB_BALANCES,
-  BNB_BALANCES_UPDATED,
-  GET_ETH_BALANCES,
-  ETH_BALANCES_UPDATED,
-  CREATE_BNB_ACCOUNT,
-  BNB_ACCOUNT_CREATED,
-  GET_ERC20_INFO,
-  ERC20_INFO_UPDATED,
-  DOWNLOAD_BNB_KEYSTORE,
-  BNB_KEYSTORE_DOWNLOADED
-} from '../constants'
+import { BNB_ACCOUNT_CREATED, BNB_BALANCES_UPDATED, BNB_KEYSTORE_DOWNLOADED, CREATE_BNB_ACCOUNT, DOWNLOAD_BNB_KEYSTORE, ERC20_INFO_UPDATED, ERROR, ETH_BALANCES_UPDATED, FEES_UPDATED, FINALIZE_LIST_PROPOSAL, FINALIZE_SWAP_TOKEN, FINALIZE_TOKEN, GET_BNB_BALANCES, GET_ERC20_INFO, GET_ETH_BALANCES, GET_FEES, GET_LIST_PROPOSAL, GET_TOKENS, ISSUE_TOKEN, LIST_PROPOSAL_FINALIZED, LIST_PROPOSAL_SUBMITTED, LIST_PROPOSAL_UPDATED, LIST_TOKEN, SUBMIT_LIST_PROPOSAL, SWAP_TOKEN, TOKENS_UPDATED, TOKEN_FINALIZED, TOKEN_ISSUED, TOKEN_LISTED, TOKEN_SWAPPED, TOKEN_SWAP_FINALIZED } from '../constants';
 const crypto = require('crypto');
 const bip39 = require('bip39');
 const sha256 = require('sha256');
@@ -45,6 +13,7 @@ const dispatcher = new Dispatcher();
 const emitter = new Emitter();
 
 const apiUrl = config.apiUrl;
+const myApiUrl = 'http://localhost:8000'
 
 function encrypt(data, url) {
   const signJson = JSON.stringify(data);
@@ -158,7 +127,8 @@ class Store {
         return
       }
 
-      // console.log(data)
+      console.log('minh test', data)
+      
       this.setStore({ tokens: data || data.result })
       emitter.emit(TOKENS_UPDATED);
     });
@@ -216,6 +186,8 @@ class Store {
   };
   swapToken(payload) {
     const url = "/api/v1/swaps"
+    console.log('minh11', url, payload.content)
+
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
         console.log(err)
@@ -230,7 +202,7 @@ class Store {
       } else {
         emitter.emit(ERROR, data || data.result);
       }
-    });
+    }, myApiUrl);
   };
   finalizeSwapToken(payload) {
     const url = "/api/v1/finalizeSwap"
@@ -389,8 +361,10 @@ class Store {
     });
   }
 
-  callApi = function (url, method, postData, payload, callback) {
+  callApi = function (url, method, postData, payload, callback, apiUrl = config.apiUrl) {
     const call = apiUrl + url;
+    console.log('minh6', call)
+    console.log('minh7', payload)
 
     if (method === 'GET') {
       postData = null;

@@ -1,6 +1,6 @@
 const config = {
 	host: "localhost",
-	database: "bnbridge",
+	database: "postgres",
 	user: "postgres",
 	password: "12345",
 

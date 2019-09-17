@@ -127,7 +127,7 @@ class Swap extends Component {
     selectedToken: null,
     bnbBalances: null,
     ethBalances: null,
-    swapDirection: 'EthereumToBinance'
+    swapDirection: 'BinanceToEthereum'
   };
 
   componentWillMount() {

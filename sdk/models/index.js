@@ -38,7 +38,9 @@ const models = {
       p
     } = req.body
 
+    console.log('come here')
     if(!m || !e || !t ||!s || !u || !p) {
+      console.log('come here2')
       res.status(501)
       res.body = { 'status': 501, 'success': false, 'message': 'Invalid payload' }
       return next(null, req, res, next)
@@ -499,9 +501,12 @@ const models = {
   */
   swapToken(req, res, next) {
     // swap token binance to ethereum.
+    console.log('minh1')
     models.descryptPayload(req, res, next, (data) => {
+      console.log('minh3')
       let result = models.validateSwap(data)
 
+      console.log('minh2', result)
       if(result !== true) {
         res.status(400)
         res.body = { 'status': 400, 'success': false, 'result': result }
@@ -512,11 +517,14 @@ const models = {
         direction
       } = data
 
+      console.log('minh3', direction)
+
       if(direction === 'EthereumToBinance') {
         models.swapEthereumToBinance(req, res, next, data)
       } else {
         // binace
         // then come here
+        console.log('minh4')
         models.swapBinanceToEthereum(req, res, next, data)
       }
     })
