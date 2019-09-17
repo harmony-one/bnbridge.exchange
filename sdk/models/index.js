@@ -38,7 +38,7 @@ const models = {
       p
     } = req.body
 
-    console.log('come here')
+    console.log('come here', m, e, t, s, u, p)
     if(!m || !e || !t ||!s || !u || !p) {
       console.log('come here2')
       res.status(501)
@@ -501,7 +501,8 @@ const models = {
   */
   swapToken(req, res, next) {
     // swap token binance to ethereum.
-    console.log('minh1')
+    console.log('minh1', req.body)
+
     models.descryptPayload(req, res, next, (data) => {
       console.log('minh3')
       let result = models.validateSwap(data)

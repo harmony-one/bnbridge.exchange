@@ -369,8 +369,9 @@ class Store {
     if (method === 'GET') {
       postData = null;
     } else {
-      console.log(postData)
+      console.log('minh8', postData)
       postData = encrypt(postData, url);
+      console.log('minh9', postData)
     }
 
     fetch(call, {
