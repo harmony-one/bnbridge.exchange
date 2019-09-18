@@ -351,9 +351,13 @@ class Swap extends Component {
       ethReceiveAddress,
     } = this.state
 
+    console.log('minh6', value)
+    console.log('minh8', tokens)
     let theToken = tokens.filter((tok) => {
+      console.log('minh8', tok.uuid)
       return tok.uuid === value
     })
+    console.log('minh7', theToken)
 
     if(theToken.length < 1) {
       this.setState({ token: value, selectedToken: null })
@@ -404,6 +408,7 @@ class Swap extends Component {
   };
 
   onChange = (event) => {
+    console.log('minh', event.target)
     let val = []
     val[event.target.id] = event.target.value
     this.setState(val)
@@ -431,11 +436,14 @@ class Swap extends Component {
         selectedToken,
       } = this.state
 
+      console.log('minh4', selectedToken)
+
       if(selectedToken  && event.target.value && event.target.value !== "" && event.target.value.length === Config.erc20addressLength) {
         const content = {
           eth_address: event.target.value,
           token_uuid: selectedToken.uuid
         }
+        console.log('minh5', content)
         dispatcher.dispatch({type: GET_ETH_BALANCES, content })
         this.setState({ loading: true })
       }

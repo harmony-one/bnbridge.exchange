@@ -1,19 +1,11 @@
-import React, { Component } from "react";
-import PropTypes from 'prop-types';
+import { Grid } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  Grid
-} from '@material-ui/core'
-
-import Select from '../common/select';
-// import Button from '../common/button';
-
-import {
-  TOKENS_UPDATED,
-  GET_TOKENS
-} from '../../constants'
-
+import PropTypes from 'prop-types';
+import React, { Component } from "react";
 import Store from "../../stores";
+import Select from '../common/select';
+
+
 const dispatcher = Store.dispatcher
 const emitter = Store.emitter
 const store = Store.store
@@ -32,16 +24,17 @@ const styles = theme => ({
 class AssetSelection extends Component {
   state = {
     tokens: null,
-    tokenOptions: []
+    tokenOptions: [],
+    token: 'Harmoy ONE Token',
   };
 
   componentWillMount() {
-    emitter.on(TOKENS_UPDATED, this.tokensUpdated);
-    dispatcher.dispatch({type: GET_TOKENS, content: {} })
+    // emitter.on(TOKENS_UPDATED, this.tokensUpdated);
+    // dispatcher.dispatch({type: GET_TOKENS, content: {} })
   };
 
   componentWillUnmount() {
-    emitter.removeListener(TOKENS_UPDATED, this.tokensUpdated);
+    // emitter.removeListener(TOKENS_UPDATED, this.tokensUpdated);
   };
 
   tokensUpdated = () => {
@@ -95,6 +88,8 @@ class AssetSelection extends Component {
       token,
       tokenError
     } = this.state
+
+    console.log('minh asset', token)
 
     return (
       <Grid container className={ classes.root }>

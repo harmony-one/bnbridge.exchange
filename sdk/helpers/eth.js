@@ -168,11 +168,11 @@ const eth = {
     try {
       var receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
       console.log(receipt)
-      if (receipt.toString().includes('error')) {
-        callback(receipt, null)
-      } else {
-      callback(null, receipt.toString())
-      }
+      // if (receipt.toString().includes('error')) {
+      //   callback(receipt, null)
+      // } else {
+      //   callback(null, receipt.toString())
+      // }
     } catch(err) {
       return err
     }
@@ -213,7 +213,7 @@ const to = '0x13a2C4b33794bCCc69898B3e2c188ce47916dE84'
 const amount = 100
 
 eth.sendTransaction(contractAddress, privateKey, from, to, amount, function(err, result) {
-  // console.log(err, result)
+  console.log(err, result)
   if (err) {
     console.log(err)
   } else {
