@@ -1,9 +1,9 @@
 /*
   DISPERSE LARGE ACCOUNT:
-  1. Get the FTM balance of the account
-  2. Divide that amount by the max amount per account (3 000 000 FTM)
+  1. Get the HMY balance of the account
+  2. Divide that amount by the max amount per account (3 000 000 HMY)
   3. Create an account for the number returned above
-  4. Transfer max amount (3 000 000 FTM) to each account
+  4. Transfer max amount (3 000 000 HMY) to each account
 */
 
 const config = require('./config')
@@ -76,7 +76,7 @@ function createAccounts(accountCount, callback) {
   })
   // }
 
-  fs.appendFile('c:/opt/accounts/fantomAccounts.txt', formatAccounts(accounts), function (err) {
+  fs.appendFile('/Users/dennis.won/harmony-one/bnbridge.exchange/accounts/harmonyAccounts.txt', formatAccounts(accounts), function (err) {
     if (err) {
       callback(err)
       return

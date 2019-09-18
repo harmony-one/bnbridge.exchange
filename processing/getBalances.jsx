@@ -15,7 +15,7 @@ const ERC20_CONTRACT =  ''
 loadFile()
 
 function loadFile() {
-  var text = fs.readFileSync('C:/opt/fantomAccounts_final.txt','utf8')
+  var text = fs.readFileSync('/Users/dennis.won/harmony-one/bnbridge.exchange/accounts/harmonyAccounts_final.txt','utf8')
   processFile(text)
 }
 

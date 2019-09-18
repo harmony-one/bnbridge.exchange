@@ -22,3 +22,4 @@ sdk/!.elasticbeanstalk/*.cfg.yml
 sdk/!.elasticbeanstalk/*.global.yml
 
 cli/node-binary
+accounts/

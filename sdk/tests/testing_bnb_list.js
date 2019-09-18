@@ -15,8 +15,8 @@ const INIT_PRICE = '100000000000000000'
 const PROPOSAL_ID = '15'
 const SYMBOL = 'ANT-B90'
 const KEY_NAME = 'key'
-const PATH = "c:/opt/fantom/fantom-binance/cli/node-binary/cli/testnet/0.5.8.1/windows/"
-const FILE = "tbnbcli.exe"
+const PATH = "/Users/dennis.won/harmony-one/bnbridge.exchange/cli/node-binary/"
+const FILE = "tbnbcli"
 
 const PASSWORD = ""
 

@@ -15,8 +15,8 @@ const TOKEN_NAME = "TEST TOKEN"
 const TOTAL_SUPPLY = "100000000000000"
 const SYMBOL = 'TST'
 const KEY_NAME = 'key'
-const PATH = "c:/opt/fantom/fantom-binance/cli/node-binary/cli/testnet/0.5.8.1/windows/"
-const FILE = "tbnbcli.exe"
+const PATH = "/Users/dennis.won/harmony-one/bnbridge.exchange/cli/node-binary/"
+const FILE = "tbnbcli"
 const PASSWORD = ""
 
 ptyProcess.on('data', function(data) {
