@@ -1,7 +1,7 @@
 const config = {
-  host: "localhost",
-  database: "harmony",
-  user: "dennis.won",
+	host: "localhost",
+	database: "harmonyone",
+	user: "dennis.won",
 	password: "harmony",
 
   //Binance
