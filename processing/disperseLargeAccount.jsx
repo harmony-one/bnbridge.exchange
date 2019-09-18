@@ -12,10 +12,7 @@ const fs = require('fs');
 
 
 const AVG_AMOUNT = 3500000
-// const ERC20_CONTRACT =  ''
-// const ADDRESS = ''
-// const PRIVATE_KEY = ''
-const ERC20_CONTRACT =  ''
+const ERC20_CONTRACT = '0xd379255277e87e3636708a71f7a845a86f8c591d'
 const ADDRESS = ''
 const PRIVATE_KEY = ''
 

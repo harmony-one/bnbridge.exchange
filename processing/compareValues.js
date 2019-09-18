@@ -13,7 +13,7 @@ const eth = require('./helpers/eth.js')
 const async = require('async')
 
 const HMY_UUID = "ONE_uuid"
-const HMY_ERC = ""
+const HMY_ERC = "0xd379255277e87e3636708a71f7a845a86f8c591d"
 
 process()
 

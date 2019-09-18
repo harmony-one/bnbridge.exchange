@@ -5,7 +5,7 @@ var web3 = new Web3(new Web3.providers.HttpProvider(''));
 const ADDRESS = ''
 const PRIVATE_KEY = ''
 const TO = ''
-const ERC20_CONTRACT = ''
+const ERC20_CONTRACT = '0xd379255277e87e3636708a71f7a845a86f8c591d'
 
 let consumerContract = new web3.eth.Contract(config.erc20ABI, ERC20_CONTRACT);
 
