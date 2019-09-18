@@ -17,7 +17,7 @@ const config = {
 	network: 'testnet',
 
 	//Ethereum
-	provider: 'ropsten.infura.io/v3/4a1a3bdd85e7423a86c6031a792a9e63',
+	provider: 'https://ropsten.infura.io/v3/4a1a3bdd85e7423a86c6031a792a9e63',
 
 	erc20ABI: [
 		{

@@ -694,6 +694,7 @@ const models = {
   getClientAccountForEthAddress(ethAddress, callback) {
     db.oneOrNone('select ca.uuid, ca.eth_address, cba.address as bnb_address from client_accounts_eth ca left join client_bnb_accounts cba on cba.uuid = ca.client_bnb_account_uuid where ca.eth_address = $1;', [ethAddress])
     .then((response) => {
+      console.log('found an item', response)
       callback(null, response)
     })
     .catch(callback)
@@ -902,6 +903,7 @@ const models = {
             return next(null, req, res, next)
           }
 
+          // checks if the balane in bnb was transferred.
           if(!info[0].data || !info[0].data.tx) {
             res.status(400)
             res.body = { 'status': 400, 'success': false, 'result': 'Unable to find a deposit' }
