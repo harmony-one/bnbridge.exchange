@@ -148,17 +148,41 @@ const eth = {
     // const rawTx = signed.rawTransaction
 
     var rawTx = new Tx.Transaction(tx, { chain: 'ropsten', hardfork: 'petersburg' });
-    const privKey = new Buffer(privateKey, 'hex');
+    const privKey = Buffer.from(privateKey, 'hex');
     rawTx.sign(privKey);
     var serializedTx = rawTx.serialize();
     // Comment out these four lines if you don't really want to send the TX right now
     console.log(`Attempting to send signed tx:  ${serializedTx.toString('hex')}\n------------------------`);
-    var receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
-    // The receipt info of transaction, Uncomment for debug
-    console.log(`Receipt info: \n${JSON.stringify(receipt, null, '\t')}\n------------------------`);
-    // The balance may not be updated yet, but let's check
-    balance = await contract.methods.balanceOf(myAddress).call();
-    console.log(`Balance after send: ${financialMfil(balance)} MFIL`);
+
+    // First approach
+    // var receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), function(err, hash) {
+    //   if (err) {
+    //     callback(err, null)
+    //   }
+    //   callback(null, hash.toString())
+    // })
+    // console.log(receipt)
+
+
+    // Second
+    try {
+      var receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
+      console.log(receipt)
+      if (receipt.toString().includes('error')) {
+        callback(receipt, null)
+      } else {
+      callback(null, receipt.toString())
+      }
+    } catch(err) {
+      return err
+    }
+
+
+    // // The receipt info of transaction, Uncomment for debug
+    // console.log(`Receipt info: \n${JSON.stringify(receipt, null, '\t')}\n------------------------`);
+    // // The balance may not be updated yet, but let's check
+    // balance = await contract.methods.balanceOf(myAddress).call();
+    // console.log(`Balance after send: ${financialMfil(balance)} MFIL`);
 
 
     // const sendRawTx = rawTx =>
