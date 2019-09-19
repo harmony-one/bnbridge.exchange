@@ -1853,6 +1853,7 @@ const models = {
     models.descryptPayload(req, res, next, (data) => {
       let result = models.validateGetEthbalances(data)
 
+      console.log('get eth balance', result)
       if(result !== true) {
         res.status(400)
         res.body = { 'status': 400, 'success': false, 'result': result }

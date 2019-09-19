@@ -63,7 +63,7 @@ const eth = {
 
     myContract.methods.balanceOf(address).call({ from: address })
     .then((balance) => {
-      console.log(balance);
+      console.log('minh', balance);
       const theBalance = web3.utils.fromWei(balance.toString(), 'ether')
 
       callback(null, theBalance)
@@ -154,28 +154,28 @@ const eth = {
     // Comment out these four lines if you don't really want to send the TX right now
     console.log(`Attempting to send signed tx:  ${serializedTx.toString('hex')}\n------------------------`);
 
-    // First approach
-    // var receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), function(err, hash) {
-    //   if (err) {
-    //     callback(err, null)
-    //   }
-    //   callback(null, hash.toString())
-    // })
-    // console.log(receipt)
+    // First approach: working
+    var receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), function(err, hash) {
+      if (err) {
+        callback(err, null)
+      }
+      callback(null, hash.toString())
+    })
+    console.log(receipt)
 
 
-    // Second
-    try {
-      var receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
-      console.log(receipt)
-      // if (receipt.toString().includes('error')) {
-      //   callback(receipt, null)
-      // } else {
-      //   callback(null, receipt.toString())
-      // }
-    } catch(err) {
-      return err
-    }
+    // second approach: working too
+    // try {
+    //   var receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
+    //   console.log(receipt)
+    //   // if (receipt.toString().includes('error')) {
+    //   //   callback(receipt, null)
+    //   // } else {
+    //   //   callback(null, receipt.toString())
+    //   // }
+    // } catch(err) {
+    //   return err
+    // }
 
 
     // // The receipt info of transaction, Uncomment for debug
@@ -212,13 +212,22 @@ const from = '0x927270dd3E84a2DcEdaCfc6b2a9109833e149271'
 const to = '0x13a2C4b33794bCCc69898B3e2c188ce47916dE84'
 const amount = 100
 
-eth.sendTransaction(contractAddress, privateKey, from, to, amount, function(err, result) {
-  console.log(err, result)
-  if (err) {
-    console.log(err)
-  } else {
-    console.log('no error')
-  }
-  console.log('woohoo')
-})
+// eth.sendTransaction(contractAddress, privateKey, from, to, amount, function(err, result) {
+//   console.log(err, result)
+//   if (err) {
+//     console.log(err)
+//   } else {
+//     console.log('no error')
+//   }
+//   console.log('woohoo')
+// })
+
+
+// eth.getERC20Balance(to, contractAddress, function(err, balance) {
+//   if (err) {
+//     console.log(err)
+//   } else {
+//     console.log('hello')
+//   }
+// })
 module.exports = eth
