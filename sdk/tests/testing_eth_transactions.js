@@ -3,10 +3,9 @@ const config = require('../config')
 
 var web3 = new Web3(new Web3.providers.HttpProvider(config.provider));
 
-
-const contractAddress = '0x4E15361FD6b4BB609Fa63C81A2be19d873717870'
-const accountAddress = '0x1e321be460b5b056e861f682323fdf1511d275c7'
-const depositAddress = '0x29B169183b0281c9b838190847184f7F1D555fa4'
+const contractAddress = '0xD379255277e87E3636708A71F7A845A86f8c591d'
+const accountAddress = '0xBE2E9AAd36a3C3C0c189A9C1f2e4E73bCD472a57'
+const depositAddress = '0xBE2E9AAd36a3C3C0c189A9C1f2e4E73bCD472a57'
 
 function getTransactions(contractAddress, accountAddress, depositAddress, callback) {
 

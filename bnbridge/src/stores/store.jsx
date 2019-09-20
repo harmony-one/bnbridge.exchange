@@ -188,6 +188,7 @@ class Store {
       }
 
       if(data.success) {
+        console.log("TOKEN_ISSUED");
         emitter.emit(TOKEN_ISSUED, data.result);
       } else if (data.errorMsg) {
         emitter.emit(ERROR, data.errorMsg);
@@ -452,7 +453,7 @@ class Store {
       fr.onload = function() {
           console.log(JSON.parse(this.result))
           const response = JSON.parse(this.result)
-    
+
           FileSaver.saveAs(blob, response.id+'_keystore.json');
 
           callback(null, response)

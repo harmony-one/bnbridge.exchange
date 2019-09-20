@@ -22,9 +22,6 @@ console.log(privateKey)
 console.log(encryptedKey)
 console.log(decrypedKey)
 
-
-
-
 console.log("/*******************************************************/")
 console.log("  Insert this into the DB")
 console.log(" encr_key = '"+dbPassword+"'")

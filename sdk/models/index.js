@@ -1015,9 +1015,7 @@ const models = {
     models.getEthAccount(tokenInfo.eth_address, (err, address) => {
       if(err || !address) {
         console.log(err)
-        res.status(500)
-        res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve address' }
-        return next(null, req, res, next)
+        return callback(err)
       }
 
       async.map(swaps, (swap, callbackInner) => {
@@ -1099,12 +1097,11 @@ const models = {
     .catch(callback)
   },
 
-  updateWithTransferTransactionHash(uuid, hash,  callback) {
+  updateWithTransferTransactionHash(uuid, hash, callback) {
     db.none('update swaps set transfer_transaction_hash = $2 where uuid = $1;', [uuid, hash])
     .then(callback)
     .catch(callback)
   },
-
 
   validateFinalizeSwap(body) {
     const {

@@ -11,18 +11,10 @@ const bnbClient = new BnbApiClient(HTTP_API);
 bnbClient.chooseNetwork(NETWORK)
 
 const result = bnbClient.createAccountWithMneomnic()
-
 console.log(result)
 
 const keystore = BnbApiClient.crypto.generateKeyStore(result.privateKey, PASSWORD);
-
 console.log(keystore)
 
-
-
-
-
 const privateKey = BnbApiClient.crypto.getPrivateKeyFromKeyStore(keystore, PASSWORD)
-
-
 console.log(privateKey)

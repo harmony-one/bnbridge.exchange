@@ -1,23 +1,22 @@
 const config = {
-  host: "localhost",
-  database: "harmonyone",
-  user: "dennis.won",
+	host: "localhost",
+	database: "harmonyone",
+	user: "dennis.won",
 	password: "harmony",
 
-  //Binance
+	//Binance
 	api: "https://testnet-dex.binance.org/",
 	filePath: "/Users/dennis.won/harmony-one/bnbridge.exchange/cli/node-binary/",
-  fileName: "tbnbcli",
-  chainID: "Binance-Chain-Nile",
-  nodeData: "data-seed-pre-2-s1.binance.org:80",
-  nodeHTTPS: "https://seed-pre-s3.binance.org:443",
-  keyPrepend: "TEST_",
-  list_proposal_deposit: "200000000000",
-  prefix: 'tbnb',
+	fileName: "tbnbcli",
+	chainID: "Binance-Chain-Nile",
+	nodeData: "data-seed-pre-2-s1.binance.org:80",
+	nodeHTTPS: "https://seed-pre-s3.binance.org:443",
+	keyPrepend: "TEST_",
+	list_proposal_deposit: "200000000000",
+	prefix: 'tbnb',
 
-  //Ethereum
-  provider: 'https://ropsten.infura.io/v3/2b1dbb61817f4ae6ac90d9b41662993b',
-
+	//Ethereum
+	provider: 'https://ropsten.infura.io/v3/27fa7a85f7994c8db191ffd943267b17',
 
   erc20ABI: [
   	{

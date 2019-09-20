@@ -10,9 +10,9 @@ const config = require('./config')
 const eth = require('./helpers/eth.js')
 const fs = require('fs');
 
-
 const AVG_AMOUNT = 3500000
-const ERC20_CONTRACT = '0xd379255277e87e3636708a71f7a845a86f8c591d'
+// const ERC20_CONTRACT = '0xD379255277e87E3636708A71F7A845A86f8c591d'
+const ERC20_CONTRACT = '0x1Cc4610217cF242B1Fa2EC14541cca960cC554d3'
 const ADDRESS = ''
 const PRIVATE_KEY = ''
 

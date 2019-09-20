@@ -88,6 +88,8 @@ const bnb = {
 
     ptyProcess.write('cd '+config.filePath+'\r');
     ptyProcess.write('./'+config.fileName+' keys add '+name+'\r');
+    ptyProcess.write('source ~/.bash_profile'+'\r');
+    ptyProcess.write('cd ' + config.filePath + '\r');
   },
 
   issue(tokenName, totalSupply, symbol, mintable, keyName, password, callback) {
