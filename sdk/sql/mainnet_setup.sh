@@ -69,11 +69,11 @@ echo "bnbAddress = $bnbAddress"
 # # echo "clientBnbAddress = $clientBnbAddress"
 
 erc20_address=0x1Cc4610217cF242B1Fa2EC14541cca960cC554d3
-# eth_account_address=0xBE2E9AAd36a3C3C0c189A9C1f2e4E73bCD472a57
-# eth_private_key=2AF1AB17BB3E3316C53DDB76AF2068D6926508F0B98E16BDEF79B3F4360D3132
+eth_account_address=0xE25ABC3f7C3d5fB7FB81EAFd421FF1621A61107c
+eth_private_key=67c1f71ab0467e9d13a837736c035f2fbf2962d25b98676af697be2416d3f531
 echo "erc20_address = $erc20_address"
-# echo "eth_account_address = $eth_account_address"
-# echo "eth_private_key = $eth_private_key"
+echo "eth_account_address = $eth_account_address"
+echo "eth_private_key = $eth_private_key"
 
 # # set -o history
 
@@ -82,15 +82,13 @@ echo "erc20_address = $erc20_address"
 # # unset DBPASSWORD
 # # unset PRIVATE_KEY
 
-# psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
-#   insert into eth_accounts VALUES (
-#     'erc_account_uuid',
-#     '$eth_private_key',
-#     '$eth_account_address',
-#     now(),
-#     'erc_account_encr_key'
-#   );
-# "
+psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+  insert into eth_accounts (uuid, private_key, address) VALUES (
+    'erc_account_uuid',
+    '$eth_private_key',
+    '$eth_account_address'
+  );
+"
 
 # psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
 #   insert into client_accounts_eth VALUES (
@@ -157,6 +155,6 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
     '$erc20_address',
     'erc_account_uuid', 'bnb_account_uuid',
     true, true, 'list_proposal_uuid',
-    true, now(), true, 1000, 0, now(), true, false
+    true, now(), true, 0, 0, now(), true, false
   );
 "

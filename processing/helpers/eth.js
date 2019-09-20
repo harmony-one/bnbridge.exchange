@@ -1,6 +1,7 @@
-const Web3 = require('web3');
 const config = require('../config')
-const Tx = require('ethereumjs-tx').Transaction;
+
+const Tx = require('ethereumjs-tx');
+const Web3 = require('web3');
 
 var web3 = new Web3(new Web3.providers.HttpProvider(config.provider));
 
@@ -70,36 +71,46 @@ const eth = {
 
   async sendTransaction(contractAddress, privateKey, from, to, amount, callback) {
 
+    let sendAmount = web3.utils.toWei(amount.toString(), 'ether')
+
     const consumerContract = new web3.eth.Contract(config.erc20ABI, contractAddress);
-    const myData = consumerContract.methods.transfer(to, amount).encodeABI();
+    const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
+
+    const gasPriceGwei = 3;
+    const gasLimit = 3000000;
+
+    const [chainId, nonce] = await Promise.all([web3.eth.net.getId(), web3.eth.getTransactionCount(from, 'pending')]);
+    console.log('chainId: ' + chainId + ', nonce: ' + nonce);
 
     const tx = {
       from,
       to: contractAddress,
-      value: '0',
-      gasPrice: web3.utils.toWei('6', 'gwei'),
-      gas: 100000,
-      chainId: 1,
-      nonce: await web3.eth.getTransactionCount(from,'pending'),
+
+      gasPrice: web3.utils.toHex(gasPriceGwei * 1e9),
+      gasLimit: web3.utils.toHex(gasLimit),
+      value: '0x0',
+
+      gas: 0,
+      chainId: chainId,
+      nonce: nonce,
       data: myData
     }
 
-    const signed = await web3.eth.accounts.signTransaction(tx, privateKey)
-    const rawTx = signed.rawTransaction
+    const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
+    const privKey = Buffer.from(privateKey, 'hex');
+    rawTx.sign(privKey);
+    const serializedTx = rawTx.serialize();
 
-    const sendRawTx = rawTx =>
-      new Promise((resolve, reject) =>
-        web3.eth
-          .sendSignedTransaction(rawTx)
-          .on('transactionHash', resolve)
-          .on('error', reject)
-      )
+    console.log(`Attempting to send signed tx:  ${serializedTx.toString('hex')}\n------------------------`);
 
-    const result = await sendRawTx(rawTx)
-
-    console.log(result)
-
-    return result
+    const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'),
+      function (err, hash) {
+        if (err) {
+          callback(err, null)
+        }
+        callback(null, hash.toString())
+      })
+    console.log(receipt)
   },
 
   addAccount(account) {

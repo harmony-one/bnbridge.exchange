@@ -244,7 +244,8 @@ const models = {
     const password = KEY+':'+dbPassword
     const aes256private = models.encrypt(account.privateKey, password)
 
-    db.oneOrNone('insert into eth_accounts (uuid, private_key, address, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, now()) returning uuid;', [aes256private, account.address, dbPassword])
+    db.oneOrNone('insert into eth_accounts (uuid, private_key, address, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, now()) returning uuid;',
+      [aes256private, account.address, dbPassword])
     .then((response) => {
       callback(null, response)
     })

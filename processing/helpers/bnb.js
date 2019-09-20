@@ -9,13 +9,15 @@ const httpClient = axios.create({ baseURL: config.api });
 
 const bnb = {
   spawnProcess() {
-    return pty.spawn(shell, [], {
+    const ptyProcess = pty.spawn(shell, [], {
       name: 'xterm-color',
       cols: 8000,
       rows: 30,
       cwd: process.env.HOME,
       env: process.env
     });
+    ptyProcess.write('source ~/.bash_profile' + '\r');
+    return ptyProcess
   },
 
   test(callback) {
@@ -80,16 +82,15 @@ const bnb = {
       }
 
       if(data.includes("override the existing name")) {
-        ptyProcess.write('n\r');
-        ptyProcess.write('exit\r');
-        callback('Symbol already exists')
+        // ptyProcess.write('n\r');
+        // ptyProcess.write('exit\r');
+        // callback('Symbol already exists')
+        ptyProcess.write('y\r');
       }
     });
 
     ptyProcess.write('cd '+config.filePath+'\r');
     ptyProcess.write('./'+config.fileName+' keys add '+name+'\r');
-    ptyProcess.write('source ~/.bash_profile'+'\r');
-    ptyProcess.write('cd ' + config.filePath + '\r');
   },
 
   issue(tokenName, totalSupply, symbol, mintable, keyName, password, callback) {
