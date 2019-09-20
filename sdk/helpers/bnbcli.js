@@ -12,7 +12,8 @@ var ptyProcess = pty.spawn(shell, [], {
 });
 
 ptyProcess.write('source ' + process.env.HOME + '/.bash_profile\r');
-const PATH = process.env.HOME + "/harmony-one/bnbridge.exchange/cli/node-binary/"
+
+const PATH = process.env.HOME + "/bnbbridge/cli/node-binary/"
 const FILE = "tbnbcli"
 
 exports.ptyProcess = ptyProcess

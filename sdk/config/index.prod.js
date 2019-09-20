@@ -6,7 +6,7 @@ const config = {
 
 	//Binance
 	api: "https://dex.binance.org/", //live
-	filePath: "/Users/dennis.won/harmony-one/bnbridge.exchange/cli/node-binary/", //live
+	filePath: process.env.HOME + "/bnbbridge/cli/node-binary/", //live
 	fileName: "bnbcli", //live
 	chainID: "Binance-Chain-Tigris", //live
 	nodeData: "https://dataseed5.defibit.io:443", //live
