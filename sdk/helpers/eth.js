@@ -118,13 +118,14 @@ const eth = {
     // let decimals = web3.toBigNumber(18);
     // let value = web3.toBigNumber(amount);
     // let sendAmount = value.times(web3.toBigNumber(10).pow(decimals));
-
+    // sendAmount = '100'
 
     const consumerContract = new web3.eth.Contract(config.erc20ABI, contractAddress);
     const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
 
-    var gasPriceGwei = 3;
-    var gasLimit = 3000000;
+
+    var gasPriceGwei = 20;
+    var gasLimit = 51000;
 
 
     const tx = {
@@ -139,7 +140,8 @@ const eth = {
 
       // gasPrice: web3.utils.toWei('25', 'gwei'),
       // gas: 60000,
-      chainId: 3,
+      chainId: 1,
+      // chainId: 3,
       nonce: await web3.eth.getTransactionCount(from,'pending'),
       data: myData
     }
@@ -147,7 +149,8 @@ const eth = {
     // const signed = await web3.eth.accounts.signTransaction(tx, privateKey)
     // const rawTx = signed.rawTransaction
 
-    var rawTx = new Tx.Transaction(tx, { chain: 'ropsten', hardfork: 'petersburg' });
+    // var rawTx = new Tx.Transaction(tx, { chain: 'ropsten', hardfork: 'petersburg' });
+    var rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
     const privKey = Buffer.from(privateKey, 'hex');
     rawTx.sign(privKey);
     var serializedTx = rawTx.serialize();
@@ -159,10 +162,12 @@ const eth = {
       if (err) {
         callback(err, null)
       }
-      callback(null, hash.toString())
+      callback(null, hash)
+    }).catch(err => {
+      console.log('minh error')
+      console.log(err)
     })
     console.log(receipt)
-
 
     // second approach: working too
     // try {
@@ -204,23 +209,77 @@ const eth = {
     // }
 
   },
+
+  // async sendTransaction(contractAddress, privateKey, from, to, amount, callback) {
+
+  //   let sendAmount = web3.utils.toWei(amount, 'ether')
+
+  //   const consumerContract = new web3.eth.Contract(config.erc20ABI, contractAddress);
+  //   const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
+
+  //   const tx = {
+  //     from,
+  //     to: contractAddress,
+  //     value: '0',
+  //     gasPrice: web3.utils.toWei('25', 'gwei'),
+  //     gas: 60000,
+  //     chainId: 1,
+  //     nonce: await web3.eth.getTransactionCount(from, 'pending'),
+  //     data: myData
+  //   }
+
+  //   const signed = await web3.eth.accounts.signTransaction(tx, privateKey)
+  //   const rawTx = signed.rawTransaction
+
+  //   const sendRawTx = rawTx =>
+  //     new Promise((resolve, reject) =>
+  //       web3.eth
+  //         .sendSignedTransaction(rawTx)
+  //         .on('transactionHash', resolve)
+  //         .on('error', reject)
+  //     )
+
+  //   const result = await sendRawTx(rawTx).catch((err) => {
+  //     return err
+  //   })
+
+  //   if (result.toString().includes('error')) {
+  //     callback(result, null)
+  //   } else {
+  //     callback(null, result.toString())
+  //   }
+
+  // },
+
 }
 
-const contractAddress = '0xD379255277e87E3636708A71F7A845A86f8c591d'
-const privateKey = 'E820CF3B21F946EA2FDE6C00B52A6C2C3E105FA77A5D3ABF236D60E494E7F551'
-const from = '0x927270dd3E84a2DcEdaCfc6b2a9109833e149271'
-const to = '0x13a2C4b33794bCCc69898B3e2c188ce47916dE84'
-const amount = 100
+// ropsten setup
+// const contractAddress = '0xD379255277e87E3636708A71F7A845A86f8c591d'
+// const privateKey = 'E820CF3B21F946EA2FDE6C00B52A6C2C3E105FA77A5D3ABF236D60E494E7F551'
+// const from = '0x927270dd3E84a2DcEdaCfc6b2a9109833e149271'
+// const to = '0x13a2C4b33794bCCc69898B3e2c188ce47916dE84'
+// const amount = 100
 
-// eth.sendTransaction(contractAddress, privateKey, from, to, amount, function(err, result) {
-//   console.log(err, result)
-//   if (err) {
-//     console.log(err)
-//   } else {
-//     console.log('no error')
-//   }
-//   console.log('woohoo')
-// })
+
+// mainnet setup
+const contractAddress = '0x799a4202c12ca952cb311598a024c80ed371a41e'
+const privateKey = '67c1f71ab0467e9d13a837736c035f2fbf2962d25b98676af697be2416d3f531'
+const from = '0xE25ABC3f7C3d5fB7FB81EAFd421FF1621A61107c'
+const to = '0xBE2E9AAd36a3C3C0c189A9C1f2e4E73bCD472a57'
+const amount = '100'
+
+
+// 0x799a4202c12ca952cb311598a024c80ed371a41e
+
+eth.sendTransaction(contractAddress, privateKey, from, to, amount, function(err, result) {
+  console.log(err, result)
+  if (err) {
+    console.log(err)
+  } else {
+    console.log('no error')
+  }
+  console.log('woohoo')
+})
 
 
 // eth.getERC20Balance(to, contractAddress, function(err, balance) {
