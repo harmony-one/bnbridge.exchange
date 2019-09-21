@@ -6,7 +6,7 @@ const ADDRESS = ''
 const PRIVATE_KEY = ''
 const TO = ''
 // const ERC20_CONTRACT = '0xD379255277e87E3636708A71F7A845A86f8c591d'
-const ERC20_CONTRACT = '0x1Cc4610217cF242B1Fa2EC14541cca960cC554d3'
+const ERC20_CONTRACT = '0x799a4202c12ca952cb311598a024c80ed371a41e'
 
 let consumerContract = new web3.eth.Contract(config.erc20ABI, ERC20_CONTRACT);
 

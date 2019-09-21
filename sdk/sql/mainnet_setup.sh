@@ -68,7 +68,7 @@ echo "bnbAddress = $bnbAddress"
 # # echo "clientBnbPubKey = $clientBnbPubKey"
 # # echo "clientBnbAddress = $clientBnbAddress"
 
-erc20_address=0x1Cc4610217cF242B1Fa2EC14541cca960cC554d3
+erc20_address=0x799a4202c12ca952cb311598a024c80ed371a41e
 eth_account_address=0xE25ABC3f7C3d5fB7FB81EAFd421FF1621A61107c
 eth_private_key=67c1f71ab0467e9d13a837736c035f2fbf2962d25b98676af697be2416d3f531
 echo "erc20_address = $erc20_address"

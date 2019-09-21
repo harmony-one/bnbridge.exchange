@@ -160,7 +160,7 @@ const eth = {
 
 module.exports = eth
 
-const contractAddress = '0x1Cc4610217cF242B1Fa2EC14541cca960cC554d3'
+const contractAddress = '0x799a4202c12ca952cb311598a024c80ed371a41e'
 const privateKey = '67c1f71ab0467e9d13a837736c035f2fbf2962d25b98676af697be2416d3f531'
 const from = '0xE25ABC3f7C3d5fB7FB81EAFd421FF1621A61107c'
 const to = '0xBE2E9AAd36a3C3C0c189A9C1f2e4E73bCD472a57'
