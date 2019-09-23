@@ -117,7 +117,7 @@ class Instructions extends Component {
             <li><Typography className={ classes.action }>Launch BEP2 assets</Typography></li>
             <li><Typography className={ classes.action }>List tokens on Binance DEX</Typography></li>
           </div>
-          <div className={ classes.root } >
+          {/* <div className={ classes.root } >
             <Typography className={ classes.header }>Bnbridge fees:</Typography>
               <Grid
                 container
@@ -125,7 +125,7 @@ class Instructions extends Component {
                 alignItems="flex-end">
                 { this.renderFees() }
             </Grid>
-          </div>
+          </div> */}
         </Grid>
       </Grid>
     )
