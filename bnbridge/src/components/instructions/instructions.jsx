@@ -114,8 +114,6 @@ class Instructions extends Component {
           <div style={{"marginRight":"50px"}} className={ classes.root } >
             <Typography className={ classes.header }>With bnbridge you can:</Typography>
             <li><Typography className={ classes.action }>Swap between ERC20 and BEP2 tokens</Typography></li>
-            <li><Typography className={ classes.action }>Launch BEP2 assets</Typography></li>
-            <li><Typography className={ classes.action }>List tokens on Binance DEX</Typography></li>
           </div>
           {/* <div className={ classes.root } >
             <Typography className={ classes.header }>Bnbridge fees:</Typography>
