@@ -3,7 +3,7 @@
 ![Image of Harmony BNBridge](https://lh3.googleusercontent.com/Sga-OYWgE4f-Gqsu_qOp9ROswSh2IhZnfI0xWsW6dV9YbJZ87sCQbga3OnAPfcCJY_ulPTnLW5BNA54UhT0p5ez-9aVawyI6lzIYNNgOhWCDbvyuKXAqp7hLCeQ8BJFx9YICqJA61_RPEiR4n1DIk5V4qUHcmCeQdyoWuL74X0iOKBXeluvAsY973oF4v5eyrqcq2cOgMtlaykDMemhFPwYMBAMOJE8BChJOkiPZ2yOLV-gn1DCJu6-bbX61jL6Vopc0UJVc_cR3-DMdPKfqsdWi5wKh2Pd-QTNbP-FpV_JZR00jbJ7Vt-wBrF_M4AfzXmhBktZzK6J89vRV19-kbHHzJfCOtdAME3UckagvwiV1sFOWwMZIGu2VKaeDrU1c81hVjldYy9gf3Iog_EwsYhbaZ9JnXEYBHepiL7FkI0fBHyfBmcVz1BKiffiKqrEBtNvpGHgfDT2s3pySo77_yVcP6TUaBpzy9pCtV3aPRjMKVzFcwtMWlUv24LFBE-sOp-DzRJVpSb2pe_iIsvVl_o0SNAHgzJ1Trtt6q63atYjSxwLTig4NOOiKLjye3SN1tUzdBmquSTRhvQyRgyG5cEqWPSMdP5aBQSJ1YfGucZkI7ixuTH0ZlyxifBkLSqoGsUwnTbbL3AL46DQX8qt91o9QWZ-wO40w7MOv_7BQIn8NJB-mIvkI=w914-h448-no)
 
 ### Features:
-- [x] Swap a token from BEP2 to ERC20 for Harmony.One (ONE).
+- [x] Token swap from BEP2 to ERC20 for Harmony.One (ONE).
 - [x] Create a new BNB account.
 
 ### Repository
