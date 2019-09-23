@@ -706,7 +706,7 @@ class Swap extends Component {
     return (
       <React.Fragment>
         <Label label={ 'Swap direction' } overrideStyle={ { marginTop: '12px' } } />
-        <Grid item xs={ 5 } onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
+        <Grid item xs={ 5 } onClick={ this.onSwapDirectionClick } className={ classes.gridClick } >
           <div className={ classes.icon }>
             <img
               alt=""
