@@ -44,36 +44,25 @@ sudo -u $DBUSER createdb -O $DBUSER $DBNAME
 sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -f ${PWD}/setup.sql
 
 
-# # Gen encryption keys and encrypted password
+# Gen encryption keys and encrypted password
 var=$(ISTESTNET=0 PRIVATE_KEY=$PRIVATE_KEY KEY=$KEY CLIPASSWORD=$CLIPASSWORD node keygen.js)
-bnbPubKey=bnb_pub_key #$(echo $var | cut -d, -f1)
-bnbAddress=bnb1a03uvqmnqzl85csnxnsx2xy28m76gkkht46f2l #$(echo $var | cut -d, -f2) # bnb1a03uvqmnqzl85csnxnsx2xy28m76gkkht46f2l
-bnbEncrSeed=bnb_encr_seed #$(echo $var | cut -d, -f3)
-bnbEncrKey=bnb_encr_key #$(echo $var | cut -d, -f4)
+bnbPubKey=$(echo $var | cut -d, -f1)
+bnbAddress=$(echo $var | cut -d, -f2)
+bnbEncrSeed=$(echo $var | cut -d, -f3)
+bnbEncrKey=$(echo $var | cut -d, -f4)
 echo "bnbEncrSeed = $bnbEncrSeed"
 echo "bnbEncrClipassword = $bnbEncrClipassword"
 echo "bnbEncrKey = $bnbEncrKey"
 echo "bnbPubKey = $bnbPubKey"
 echo "bnbAddress = $bnbAddress"
 
-# # Gen encryption keys and encrypted password
-# # var=$(ISTESTNET=1 PRIVATE_KEY=$CLIENT_PRIVATE_KEY KEY=$CLIENT_KEY CLIPASSWORD=$CLIENT_CLIPASSWORD node keygen.js)
-# # clientBnbPubKey=$(echo $var | cut -d, -f1)
-# # clientBnbAddress=$(echo $var | cut -d, -f2)
-# # clientBnbEncrSeed=$(echo $var | cut -d, -f3)
-# # clientBnbEncrKey=$(echo $var | cut -d, -f4)
-# # echo "clientBnbEncrSeed = $clientBnbEncrSeed"
-# # echo "clientBnbEncrClipassword = $clientBnbEncrClipassword"
-# # echo "clientBnbEncrKey = $clientBnbEncrKey"
-# # echo "clientBnbPubKey = $clientBnbPubKey"
-# # echo "clientBnbAddress = $clientBnbAddress"
+export ERC20_ADDRESS=0x799a4202c12ca952cb311598a024c80ed371a41e
+export ETH_ACCOUNT_ADDRESS=0x05C6651BF91B37184fE340F61dD76D41034e9922
+export ETH_PRIVATE_KEY=CF537CCDAE79533663D062AF1C6FFA04B811EE0E9282F2413B1EBD07F733E80D
 
-erc20_address=0x799a4202c12ca952cb311598a024c80ed371a41e
-eth_account_address=0xE25ABC3f7C3d5fB7FB81EAFd421FF1621A61107c
-eth_private_key=67c1f71ab0467e9d13a837736c035f2fbf2962d25b98676af697be2416d3f531
-echo "erc20_address = $erc20_address"
-echo "eth_account_address = $eth_account_address"
-echo "eth_private_key = $eth_private_key"
+echo "erc20_address = " ${ERC20_ADDRESS}
+echo "eth_account_address = ${ETH_ACCOUNT_ADDRESS}"
+echo "eth_private_key = ${ETH_PRIVATE_KEY}"
 
 # # set -o history
 
@@ -85,15 +74,15 @@ echo "eth_private_key = $eth_private_key"
 psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
   insert into eth_accounts (uuid, private_key, address) VALUES (
     'erc_account_uuid',
-    '$eth_private_key',
-    '$eth_account_address'
+    '$ETH_PRIVATE_KEY',
+    '$ETH_ACCOUNT_ADDRESS'
   );
 "
 
 # psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
 #   insert into client_accounts_eth VALUES (
 #     'erc_account_uuid',
-#     '$eth_account_address',
+#     '$ETH_ACCOUNT_ADDRESS',
 #     'bnb_account_uuid_client',
 #     now()
 #   );
@@ -110,6 +99,21 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
     now()
   );
 "
+
+# CLIENT_PRIVATE_KEY=8769cd9e48c5dade144a143556a9f3c6808ddbd21f72865f7e0b0b6f958790a6
+# CLIENT_KEY=hmy_client
+
+# Gen encryption keys and encrypted password
+# var=$(ISTESTNET=1 PRIVATE_KEY=$CLIENT_PRIVATE_KEY KEY=$CLIENT_KEY CLIPASSWORD=$CLIENT_CLIPASSWORD node keygen.js)
+# clientBnbPubKey=$(echo $var | cut -d, -f1)
+# clientBnbAddress=$(echo $var | cut -d, -f2)
+# clientBnbEncrSeed=$(echo $var | cut -d, -f3)
+# clientBnbEncrKey=$(echo $var | cut -d, -f4)
+# echo "clientBnbEncrSeed = $clientBnbEncrSeed"
+# echo "clientBnbEncrClipassword = $clientBnbEncrClipassword"
+# echo "clientBnbEncrKey = $clientBnbEncrKey"
+# echo "clientBnbPubKey = $clientBnbPubKey"
+# echo "clientBnbAddress = $clientBnbAddress"
 
 # psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
 #   INSERT INTO client_bnb_accounts VALUES (
@@ -152,7 +156,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
     eth_to_bnb_enabled
   ) values (
     '$token_uuid', 'Harmony.One', 'ONE', 'ONE-5F9', 12600000000.00000000,
-    '$erc20_address',
+    '$ERC20_ADDRESS',
     'erc_account_uuid', 'bnb_account_uuid',
     true, true, 'list_proposal_uuid',
     true, now(), true, 0, 0, now(), true, false

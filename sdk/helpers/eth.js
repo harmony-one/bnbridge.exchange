@@ -31,8 +31,8 @@ const eth = {
       return callback(null, returnEvents)
     })
     .catch((err) => {
-      console.log(err)
-      // callback(err)
+      console.error(err)
+      callback(err, null)
     });
   },
 
@@ -115,16 +115,13 @@ const eth = {
 
   async sendTransaction(contractAddress, privateKey, from, to, amount, callback) {
 
-    let sendAmount = web3.utils.toWei(amount.toString(), 'ether')
+    const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
 
     const consumerContract = new web3.eth.Contract(config.erc20ABI, contractAddress);
     const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
 
-    const gasPriceGwei = 3;
-    const gasLimit = 3000000;
-
-    const [chainId, nonce] = await Promise.all([web3.eth.net.getId(), web3.eth.getTransactionCount(from, 'pending')]);
-    console.log('chainId: ' + chainId + ', nonce: ' + nonce);
+    const gasPriceGwei = 20;
+    const gasLimit = 51000;
 
     const tx = {
       from,
@@ -134,45 +131,48 @@ const eth = {
       gasLimit: web3.utils.toHex(gasLimit),
       value: '0x0',
 
-      gas: 0,
-      chainId: chainId,
-      nonce: nonce,
+      chainId: 1,
+      nonce: await web3.eth.getTransactionCount(from, 'pending'),
       data: myData
     }
 
     const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
     const privKey = Buffer.from(privateKey, 'hex');
     rawTx.sign(privKey);
-    const serializedTx = rawTx.serialize();
-
+    var serializedTx = rawTx.serialize();
+    // Comment out these four lines if you don't really want to send the TX right now
     console.log(`Attempting to send signed tx:  ${serializedTx.toString('hex')}\n------------------------`);
 
-    const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'),
-      function (err, hash) {
-        if (err) {
-          callback(err, null)
-        }
-        callback(null, hash.toString())
-      })
+    // First approach: working
+    var receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), function (err, hash) {
+      if (err) {
+        callback(err, null)
+      }
+      callback(null, hash)
+    }).catch(err => {
+      console.log(err)
+    })
     console.log(receipt)
   },
 }
 
 module.exports = eth
 
-const contractAddress = '0x799a4202c12ca952cb311598a024c80ed371a41e'
-const privateKey = '67c1f71ab0467e9d13a837736c035f2fbf2962d25b98676af697be2416d3f531'
-const from = '0xE25ABC3f7C3d5fB7FB81EAFd421FF1621A61107c'
-const to = '0xBE2E9AAd36a3C3C0c189A9C1f2e4E73bCD472a57'
-const amount = 10
+// const contractAddress = '0x799a4202c12ca952cb311598a024c80ed371a41e'
+// const privateKey = process.env.PRIVATE_KEY
+// const from = process.env.ETH_ACCOUNT_ADDRESS
+// const to = '0xE25ABC3f7C3d5fB7FB81EAFd421FF1621A61107c'
+// const amount = 1.10
 
-eth.sendTransaction(contractAddress, privateKey, from, to, amount, function (err, result) {
-  console.log(err, result)
-  if (err) {
-    console.log(err)
-  } else {
-    console.log('no error')
-  }
-  console.log(result)
-})
+// console.log(process.env.PRIVATE_KEY);
+
+// eth.sendTransaction(contractAddress, privateKey, from, to, amount, function (err, result) {
+//   console.log(err, result)
+//   if (err) {
+//     console.log(err)
+//   } else {
+//     console.log('no error')
+//   }
+//   console.log(result)
+// })
 

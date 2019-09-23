@@ -17,7 +17,7 @@ const config = {
 	network: 'mainnet',
 
 	//Ethereum
-	provider: 'https://mainnet.infura.io/v3/2b1dbb61817f4ae6ac90d9b41662993b', //live
+	provider: 'https://mainnet.infura.io/v3/981292667b474eb593bfce7d7cffe047', //live
 
   erc20ABI: [
   	{

@@ -36,7 +36,7 @@ app.use(compression())
 
 app.use('/', routes)
 
-function handleData(req, res) {
+function handleData(req, res, next) {
   if (res.statusCode === 205) {
     if (res.body) {
       if (res.body.length === 0) {
@@ -88,7 +88,7 @@ function handleData(req, res) {
   }
 }
 app.use(handleData)
-app.use(function(err, req, res) {
+app.use(function(err, req, res, next) {
   if (err) {
     if (res.statusCode == 500) {
       res.status(250)
