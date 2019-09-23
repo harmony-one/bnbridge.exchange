@@ -157,22 +157,3 @@ const eth = {
 }
 
 module.exports = eth
-
-// const contractAddress = '0x799a4202c12ca952cb311598a024c80ed371a41e'
-// const privateKey = process.env.PRIVATE_KEY
-// const from = process.env.ETH_ACCOUNT_ADDRESS
-// const to = '0xE25ABC3f7C3d5fB7FB81EAFd421FF1621A61107c'
-// const amount = 1.10
-
-// console.log(process.env.PRIVATE_KEY);
-
-// eth.sendTransaction(contractAddress, privateKey, from, to, amount, function (err, result) {
-//   console.log(err, result)
-//   if (err) {
-//     console.log(err)
-//   } else {
-//     console.log('no error')
-//   }
-//   console.log(result)
-// })
-

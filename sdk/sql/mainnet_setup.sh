@@ -1,30 +1,25 @@
 #!/bin/bash
 
-export DBUSER="dennis.won"
 if [[ -z $DBUSER ]]; then
   echo "Export DBUSER to environment variable"
   exit
 fi
 
-export DBPASSWORD=harmony
 if [[ -z $DBPASSWORD ]]; then
   echo "Export DBPASSWORD to environment variable"
   exit
 fi
 
-export DBNAME=harmonyone
 if [[ -z $DBNAME ]]; then
   echo "Export DBNAME to environment variable"
   exit
 fi
 
-export KEY=hmy
 if [[ -z $KEY ]]; then
   echo "Export KEY to environment variable"
   exit
 fi
 
-export PRIVATE_KEY=e6a7016972d3ab51c4badf3dc1ea759a38910886c98756e1b9a6951af2aba2d2
 if [[ -z $PRIVATE_KEY ]]; then
   echo "Export PRIVATE_KEY to environment variable"
   exit
@@ -58,7 +53,7 @@ echo "bnbAddress = $bnbAddress"
 
 export ERC20_ADDRESS=0x799a4202c12ca952cb311598a024c80ed371a41e
 export ETH_ACCOUNT_ADDRESS=0x05C6651BF91B37184fE340F61dD76D41034e9922
-export ETH_PRIVATE_KEY=CF537CCDAE79533663D062AF1C6FFA04B811EE0E9282F2413B1EBD07F733E80D
+export ETH_PRIVATE_KEY=
 
 echo "erc20_address = " ${ERC20_ADDRESS}
 echo "eth_account_address = ${ETH_ACCOUNT_ADDRESS}"
@@ -100,7 +95,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
   );
 "
 
-# CLIENT_PRIVATE_KEY=8769cd9e48c5dade144a143556a9f3c6808ddbd21f72865f7e0b0b6f958790a6
+# CLIENT_PRIVATE_KEY=
 # CLIENT_KEY=hmy_client
 
 # Gen encryption keys and encrypted password

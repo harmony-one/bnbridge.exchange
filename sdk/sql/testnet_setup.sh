@@ -1,30 +1,25 @@
 #!/bin/bash
 
-export DBUSER="dennis.won"
 if [[ -z $DBUSER ]]; then
   echo "Export DBUSER to environment variable"
   exit
 fi
 
-export DBPASSWORD=harmony
 if [[ -z $DBPASSWORD ]]; then
   echo "Export DBPASSWORD to environment variable"
   exit
 fi
 
-export DBNAME=harmonyone
 if [[ -z $DBNAME ]]; then
   echo "Export DBNAME to environment variable"
   exit
 fi
 
-export KEY=hmy
 if [[ -z $KEY ]]; then
   echo "Export KEY to environment variable"
   exit
 fi
 
-export PRIVATE_KEY=e6a7016972d3ab51c4badf3dc1ea759a38910886c98756e1b9a6951af2aba2d2
 if [[ -z $PRIVATE_KEY ]]; then
   echo "Export PRIVATE_KEY to environment variable"
   exit
@@ -70,7 +65,7 @@ echo "bnbAddress = $bnbAddress"
 
 erc20_address=0xD379255277e87E3636708A71F7A845A86f8c591d
 eth_account_address=0xBE2E9AAd36a3C3C0c189A9C1f2e4E73bCD472a57
-eth_private_key=2AF1AB17BB3E3316C53DDB76AF2068D6926508F0B98E16BDEF79B3F4360D3132
+eth_private_key=
 echo "erc20_address = $erc20_address"
 echo "eth_account_address = $eth_account_address"
 echo "eth_private_key = $eth_private_key"
