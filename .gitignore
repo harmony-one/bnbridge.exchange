@@ -23,3 +23,8 @@ sdk/!.elasticbeanstalk/*.global.yml
 
 cli/node-binary
 accounts/
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
