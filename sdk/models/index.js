@@ -649,20 +649,14 @@ const models = {
         const keyName = eth_address+'_key_eth'
         const password = models.genPassword()
 
-        console.log('getClientAccountForEthAddress', keyName, password);
-
         bnb.createKey(keyName, password, (err, keyData) => {
-          console.log("createKey hello");
           if(err) {
-            console.log("createKeycreateKey", err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
           }
 
-          console.log("insertClientBnbAccount")
           models.insertClientBnbAccount(eth_address, keyName, password, keyData, (err, clientAccount) => {
-            console.log("insertClientBnbAccount res", err)
             if(err) {
               console.log(err)
               res.status(500)
@@ -670,7 +664,8 @@ const models = {
               return next(null, req, res, next)
             }
 
-            console.log("insertClientBnbAccount clientAccount", clientAccount)
+            console.log("inserted client bnb account", clientAccount)
+
             res.status(205)
             res.body = { 'status': 200, 'success': true, 'result': clientAccount }
             return next(null, req, res, next)
@@ -695,13 +690,9 @@ const models = {
     const aes256seed = models.encrypt(keyData.seedPhrase, password)
     const aes256password = models.encrypt(keyPassword, password)
 
-    console.log('insertClientBnbAccount: dbPassword', dbPassword, 'password ', password, 'aes256seed', aes256seed, 'aes256password', aes256password);
-
     db.oneOrNone('insert into client_bnb_accounts(uuid, public_key, address, seed_phrase, key_name, password, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, now()) returning uuid, address;',
       [keyData.publicKey, keyData.address, aes256seed, keyName, aes256password, dbPassword])
     .then((returnedBnbAccount) => {
-      console.log('returnedBnbAccount: ', returnedBnbAccount);
-
       db.oneOrNone('insert into client_accounts_eth(uuid, eth_address, client_bnb_account_uuid, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, now()) returning uuid, eth_address;',
         [ethAddress, returnedBnbAccount.uuid])
       .then((clientAccount) => {
