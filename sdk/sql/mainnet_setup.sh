@@ -53,7 +53,7 @@ echo "bnbAddress = $bnbAddress"
 
 export ERC20_ADDRESS=0x799a4202c12ca952cb311598a024c80ed371a41e
 export ETH_ACCOUNT_ADDRESS=0x05C6651BF91B37184fE340F61dD76D41034e9922
-export ETH_PRIVATE_KEY=
+# export ETH_PRIVATE_KEY=
 
 echo "erc20_address = " ${ERC20_ADDRESS}
 echo "eth_account_address = ${ETH_ACCOUNT_ADDRESS}"

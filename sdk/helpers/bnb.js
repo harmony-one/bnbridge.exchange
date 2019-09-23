@@ -50,13 +50,15 @@ const bnb = {
   },
 
   createKey(name, password, callback) {
-    console.log('createKey spawnProcess', name, password);
     const ptyProcess = bnb.spawnProcess()
 
     let buildResponse = ""
 
     ptyProcess.on('data', function(data) {
-      process.stdout.write(data);
+      // hack for dennis.won local environment
+      if (data.indexOf("parse_git_branch") != -1) {
+        return;
+      }
 
       if(data.includes("Enter a passphrase")) {
         // process.stdout.write('Setting password to '+password);
@@ -70,10 +72,11 @@ const bnb = {
 
       if(os.platform() !== 'win32') {
         buildResponse = buildResponse + data
-        // process.stdout.write('echo $$ ???????????????? ' + data.split(' ').length + ' +++++++++++++ ' + buildResponse + ' !!!!!!!!!!!!!!!!!' + '\r');
 
-        if(data.split(' ').length == 24) {
-          // ptyProcess.write('echo $$ createKey length == 24[]' + buildResponse);
+        // indicates bnbcli finish data
+        if(data.split(' ').length == 46) {
+          process.stdout.write(data)
+
           const tmpData = buildResponse.split('\n');
 
           let publicKey = ''
@@ -86,7 +89,6 @@ const bnb = {
               let arr = tmpData[i+1].split('\t').filter(Boolean)
               address = arr[2].replace('\r','')
               publicKey = arr[3].replace('\r','')
-              // process.stdout.write("for(var i = 0; i < tmpData.length; i++) {" + arr.length)
             }
 
             if(tmpData[i].split(" ").length == 24) {
@@ -94,7 +96,6 @@ const bnb = {
             }
           }
 
-          // ptyProcess.write('echo createKey exit. address:' + address + " publicKey: " + publicKey + " seedPhrase: " + seedPhrase);
           ptyProcess.write('exit\r');
 
           callback(null, {
@@ -129,7 +130,6 @@ const bnb = {
       }
     });
 
-    console.log("RUN BNBNBNBNB");
     ptyProcess.write('cd '+config.filePath+'\r');
     ptyProcess.write('./'+config.fileName+' keys add '+name+'\r');
   },
