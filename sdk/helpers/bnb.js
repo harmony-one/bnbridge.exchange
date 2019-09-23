@@ -50,13 +50,16 @@ const bnb = {
   },
 
   createKey(name, password, callback) {
-    console.log('createKey spawnProcess', name, password);
     const ptyProcess = bnb.spawnProcess()
 
     let buildResponse = ""
 
     ptyProcess.on('data', function(data) {
-      process.stdout.write(data);
+      if (data.indexOf("parse_git_branch") != -1) {
+        return;
+      }
+
+      process.stdout.write("data: " + data + " length: " + data.split(' ').length + "\n");
 
       if(data.includes("Enter a passphrase")) {
         // process.stdout.write('Setting password to '+password);
@@ -72,7 +75,8 @@ const bnb = {
         buildResponse = buildResponse + data
         // process.stdout.write('echo $$ ???????????????? ' + data.split(' ').length + ' +++++++++++++ ' + buildResponse + ' !!!!!!!!!!!!!!!!!' + '\r');
 
-        if(data.split(' ').length == 24) {
+        if(data.split(' ').length == 46) {
+          process.stdout.write("DONE: " + data)
           // ptyProcess.write('echo $$ createKey length == 24[]' + buildResponse);
           const tmpData = buildResponse.split('\n');
 
@@ -128,6 +132,10 @@ const bnb = {
         ptyProcess.write('y\r');
       }
     });
+
+    // setTimeout(function () {
+    //   ptyProcess.kill()
+    // }, 5000)
 
     console.log("RUN BNBNBNBNB");
     ptyProcess.write('cd '+config.filePath+'\r');
