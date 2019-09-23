@@ -12,8 +12,9 @@ const bnb = require('./helpers/bnb.js')
 const eth = require('./helpers/eth.js')
 const async = require('async')
 
-const FANTOM_UUID = ""
-const FANTOM_ERC = ""
+const HMY_UUID = "ONE_uuid"
+// const HMY_ERC = "0xD379255277e87E3636708A71F7A845A86f8c591d"
+const HMY_ERC = "0x799a4202c12ca952cb311598a024c80ed371a41e"
 
 process()
 
@@ -71,23 +72,23 @@ function process() {
         //   }
         //   // console.log(bnbAddressesBalances)
         //
-        //   const ftmBalances = bnbAddressesBalances.map((bnbAddressBalance) => {
+        //   const hmyBalances = bnbAddressesBalances.map((bnbAddressBalance) => {
         //
-        //     let ftmBalance = bnbAddressBalance.filter((balance) => {
-        //       return balance.symbol === 'FTM-585'
+        //     let hmyBalance = bnbAddressBalance.filter((balance) => {
+        //       return balance.symbol === 'hmy-585'
         //     }).map((balance) => {
         //       return balance.free
         //     })
         //
-        //     return ftmBalance[0]
+        //     return hmyBalance[0]
         //   })
         //
-        //   const bnbTotals = ftmBalances.reduce((accumulator, currentValue) => {
+        //   const bnbTotals = hmyBalances.reduce((accumulator, currentValue) => {
         //     return parseFloat(currentValue) + accumulator
         //   }, 0)
         //
         //   console.log(bnbTotals)
-        //   console.log(ftmBalances.length)
+        //   console.log(hmyBalances.length)
         // })
       })
     })
@@ -103,18 +104,18 @@ function getClientAddresses(callback) {
 }
 
 function getSwapsInDb(callback) {
-  db.oneOrNone('select sum(amount::numeric), count(*) from swaps where token_uuid = $1 and deposit_transaction_hash is not null and client_account_uuid is not null;', [FANTOM_UUID])
+  db.oneOrNone('select sum(amount::numeric), count(*) from swaps where token_uuid = $1 and deposit_transaction_hash is not null and client_account_uuid is not null;', [HMY_UUID])
   .then(callback)
   .catch(error)
 }
 
 function getTransactionsForAddresses(clientAddresses, callback) {
-  eth.getTransactionsForAddress(FANTOM_ERC, clientAddresses, callback)
+  eth.getTransactionsForAddress(HMY_ERC, clientAddresses, callback)
 }
 
 function getBalancesForAddresses(addresses, callback) {
   async.map(addresses, (address, callbackInner) => {
-    eth.getERC20Balance(address, FANTOM_ERC, callbackInner)
+    eth.getERC20Balance(address, HMY_ERC, callbackInner)
   }, (err, balances) => {
     if(err) {
       console.log(err)

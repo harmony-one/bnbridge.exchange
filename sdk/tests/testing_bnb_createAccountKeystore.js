@@ -4,9 +4,7 @@ const axios = require('axios');
 const HTTP_API = 'https://testnet-dex.binance.org';
 const NETWORK = 'testnet';
 const PREFIX = 'tbnb';
-
 const PASSWORD = '123123123'
-
 
 const bnbClient = new BnbApiClient(HTTP_API);
 bnbClient.chooseNetwork(NETWORK)

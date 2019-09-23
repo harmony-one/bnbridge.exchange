@@ -23,7 +23,8 @@ API used to interact with the CLI utility, Binance javascript SDK and Web3.js to
     cd ./sdk
 
     npm install
-    run ./sql/setup.sql to instantiate the DB.
+    run ./sdk/(testnet/mainnet)_setup.sh
+    this will internally ./sql/setup.sql to instantiate the DB.
     update ./config/index.js with
         - databse connection details.
         - Binance cli path.

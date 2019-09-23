@@ -1,23 +1,23 @@
 const config = {
-  host: "localhost",
-  database: "bnbridge_live", //live
-  user: "postgres",
-  password: "123123123",
+	host: "localhost",
+	database: "harmonyone",
+	user: "dennis.won",
+	password: "harmony",
 
-  //Binance
-  api: "https://dex.binance.org/", //live
-  filePath: "c:/opt/fantom/fantom-binance/cli/node-binary/cli/prod/0.5.8.1/windows/", //live
-  fileName: "bnbcli.exe", //live
-  chainID: "Binance-Chain-Tigris", //live
-  nodeData: "https://dataseed5.defibit.io:443", //live
-  nodeHTTPS: "https://dataseed5.defibit.io:443", //live
-  keyPrepend: "LIVE_",
-  list_proposal_deposit: "100000000000",
-  prefix: 'bnb',
-  network: 'mainnet',
+	//Binance
+	api: "https://dex.binance.org/", //live
+	filePath: process.env.HOME + "/bnbbridge/cli/node-binary/", //live
+	fileName: "bnbcli", //live
+	chainID: "Binance-Chain-Tigris", //live
+	nodeData: "https://dataseed5.defibit.io:443", //live
+	nodeHTTPS: "https://dataseed5.defibit.io:443", //live
+	keyPrepend: "LIVE_",
+	list_proposal_deposit: "100000000000",
+	prefix: 'bnb',
+	network: 'mainnet',
 
-  //Ethereum
-  provider: 'https://mainnet.infura.io/v3/2b1dbb61817f4ae6ac90d9b41662993b', //live
+	//Ethereum
+	provider: 'https://mainnet.infura.io/v3/981292667b474eb593bfce7d7cffe047', //live
 
   erc20ABI: [
   	{

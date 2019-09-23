@@ -10,12 +10,13 @@ const eth = require('./helpers/eth.js')
 const fs = require('fs');
 const async = require('async');
 
-const ERC20_CONTRACT =  ''
+// const ERC20_CONTRACT = '0xD379255277e87E3636708A71F7A845A86f8c591d'
+const ERC20_CONTRACT = '0x799a4202c12ca952cb311598a024c80ed371a41e'
 
 loadFile()
 
 function loadFile() {
-  var text = fs.readFileSync('C:/opt/fantomAccounts_final.txt','utf8')
+  var text = fs.readFileSync('/Users/dennis.won/harmony-one/bnbridge.exchange/accounts/harmonyAccounts_final.txt','utf8')
   processFile(text)
 }
 

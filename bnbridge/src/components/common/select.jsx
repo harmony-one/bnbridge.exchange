@@ -34,7 +34,7 @@ function StyledSelect(props) {
       <StyledLabel label={ label } />
       <Select
         native
-        value={ value }
+        value={ value || "" }
         onChange={ handleChange }
         disabled={ disabled }
         fullWidth
@@ -46,7 +46,7 @@ function StyledSelect(props) {
           />
         }
       >
-        <option value={null}>select</option>
+        <option value={""}>select</option>
         {
           options ? options.map((option) => {
             return <option key={option.value} value={option.value}>{option.description}</option>

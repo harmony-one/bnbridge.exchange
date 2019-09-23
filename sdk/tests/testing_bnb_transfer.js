@@ -17,7 +17,6 @@ bnbClient.chooseNetwork(NETWORK)
 const PRIVATE_KEY = BnbApiClient.crypto.getPrivateKeyFromMnemonic(MNEMONIC);
 const ADDRESS_FROM = BnbApiClient.crypto.getAddressFromPrivateKey(PRIVATE_KEY, PREFIX);
 
-
 console.log(ADDRESS_FROM)
 const httpClient = axios.create({ baseURL: HTTP_API });
 const sequenceURL = `${HTTP_API}/api/v1/account/${ADDRESS_FROM}/sequence`;

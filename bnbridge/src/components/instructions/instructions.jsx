@@ -111,7 +111,7 @@ class Instructions extends Component {
         justify="flex-start"
         alignItems="flex-end">
         <Grid item xs={12} align='left'>
-          <div style={{"margin-right":"50px"}} className={ classes.root } >
+          <div style={{"marginRight":"50px"}} className={ classes.root } >
             <Typography className={ classes.header }>With bnbridge you can:</Typography>
             <li><Typography className={ classes.action }>Swap between ERC20 and BEP2 tokens</Typography></li>
             <li><Typography className={ classes.action }>Launch BEP2 assets</Typography></li>

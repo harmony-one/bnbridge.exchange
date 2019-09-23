@@ -30,7 +30,7 @@ const bnbridgeTheme =  {
       }
     },
     MuiGrid: {
-      paddingLeft: '10px',
+      // paddingLeft: '10px',
     },
     MuiOutlinedInput: {
       input: {
@@ -56,13 +56,12 @@ const bnbridgeTheme =  {
         textTransform: "uppercase",
         fontWeight: 700,
       },
-      selected: {
-        color: colors.yellow
-      },
       root: {
-        borderBottom: "1px solid #dee2e6!important"
+        borderBottom: "1px solid #dee2e6!important",
+        "&$disabled": {
+          color: colors.yellow
+        }
       }
-
     },
   },
   palette: {

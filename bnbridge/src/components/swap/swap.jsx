@@ -586,7 +586,7 @@ class Swap extends Component {
           <Typography className={ classes.instructions }>
             to
           </Typography>
-          <Typography className={ classes.instructionBold }>
+          <Typography className={classes.instructionBold} component={'div'}>
             <div id='depositAddress'>{swapDirection === 'EthereumToBinance' ? ethDepositAddress : bnbDepositAddress}</div>
             <IconButton
               style={{

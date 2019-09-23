@@ -9,13 +9,14 @@ const httpClient = axios.create({ baseURL: config.api });
 
 const bnb = {
   spawnProcess() {
-    return pty.spawn(shell, [], {
+    const ptyProcess = pty.spawn(shell, [], {
       name: 'xterm-color',
       cols: 8000,
       rows: 30,
       cwd: process.env.HOME,
       env: process.env
     });
+    return ptyProcess
   },
 
   test(callback) {
@@ -49,6 +50,7 @@ const bnb = {
   },
 
   createKey(name, password, callback) {
+    console.log('createKey spawnProcess', name, password);
     const ptyProcess = bnb.spawnProcess()
 
     let buildResponse = ""
@@ -68,10 +70,10 @@ const bnb = {
 
       if(os.platform() !== 'win32') {
         buildResponse = buildResponse + data
+        // process.stdout.write('echo $$ ???????????????? ' + data.split(' ').length + ' +++++++++++++ ' + buildResponse + ' !!!!!!!!!!!!!!!!!' + '\r');
 
         if(data.split(' ').length == 24) {
-
-
+          // ptyProcess.write('echo $$ createKey length == 24[]' + buildResponse);
           const tmpData = buildResponse.split('\n');
 
           let publicKey = ''
@@ -84,8 +86,7 @@ const bnb = {
               let arr = tmpData[i+1].split('\t').filter(Boolean)
               address = arr[2].replace('\r','')
               publicKey = arr[3].replace('\r','')
-              console.log(arr)
-
+              // process.stdout.write("for(var i = 0; i < tmpData.length; i++) {" + arr.length)
             }
 
             if(tmpData[i].split(" ").length == 24) {
@@ -93,6 +94,7 @@ const bnb = {
             }
           }
 
+          // ptyProcess.write('echo createKey exit. address:' + address + " publicKey: " + publicKey + " seedPhrase: " + seedPhrase);
           ptyProcess.write('exit\r');
 
           callback(null, {
@@ -120,12 +122,14 @@ const bnb = {
 
 
       if(data.includes("override the existing name")) {
-        ptyProcess.write('n\r');
-        ptyProcess.write('exit\r');
-        callback('Symbol already exists')
+        // ptyProcess.write('n\r');
+        // ptyProcess.write('exit\r');
+        // callback('Symbol already exists')
+        ptyProcess.write('y\r');
       }
     });
 
+    console.log("RUN BNBNBNBNB");
     ptyProcess.write('cd '+config.filePath+'\r');
     ptyProcess.write('./'+config.fileName+' keys add '+name+'\r');
   },

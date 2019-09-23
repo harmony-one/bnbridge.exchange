@@ -5,9 +5,9 @@ var emailer = {
 
   sendMail: function(subject, text, callback) {
     var mailOptions = {
-      from: '"BNBridge" <bnbridge@fantom.foundation>',
-      to: 'anton.nell@fantom.foundation',
-      cc: 'andre.cronje@fantom.foundation',
+      from: '"BNBridge" <dennis@harmony.one>',
+      to: 'li@harmony.one',
+      cc: 'sahil@harmony.one',
       subject: subject,
       text: text
     }

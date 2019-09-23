@@ -1,21 +1,18 @@
 /*
   DISPERSE LARGE ACCOUNT:
-  1. Get the FTM balance of the account
-  2. Divide that amount by the max amount per account (3 000 000 FTM)
+  1. Get the HMY balance of the account
+  2. Divide that amount by the max amount per account (3 000 000 HMY)
   3. Create an account for the number returned above
-  4. Transfer max amount (3 000 000 FTM) to each account
+  4. Transfer max amount (3 000 000 HMY) to each account
 */
 
 const config = require('./config')
 const eth = require('./helpers/eth.js')
 const fs = require('fs');
 
-
 const AVG_AMOUNT = 3500000
-// const ERC20_CONTRACT =  ''
-// const ADDRESS = ''
-// const PRIVATE_KEY = ''
-const ERC20_CONTRACT =  ''
+// const ERC20_CONTRACT = '0xD379255277e87E3636708A71F7A845A86f8c591d'
+const ERC20_CONTRACT = '0x799a4202c12ca952cb311598a024c80ed371a41e'
 const ADDRESS = ''
 const PRIVATE_KEY = ''
 
@@ -76,7 +73,7 @@ function createAccounts(accountCount, callback) {
   })
   // }
 
-  fs.appendFile('c:/opt/accounts/fantomAccounts.txt', formatAccounts(accounts), function (err) {
+  fs.appendFile('/Users/dennis.won/harmony-one/bnbridge.exchange/accounts/harmonyAccounts.txt', formatAccounts(accounts), function (err) {
     if (err) {
       callback(err)
       return

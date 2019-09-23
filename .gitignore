@@ -1,11 +1,25 @@
+# IdeaIDE
+.idea
+
+#VsIDE
+.vscode
+
+# Executables
+*.pyc
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Mac
+.DS_Store
+
 sdk/node_modules/
-
 sdk/.elasticbeanstalk/*
-
 sdk/!.elasticbeanstalk/*.cfg.yml
-
 sdk/!.elasticbeanstalk/*.global.yml
 
-sdk/config/index.js 
-/sdk/config/index.js
-/processing/config/index.js
+cli/node-binary
+accounts/

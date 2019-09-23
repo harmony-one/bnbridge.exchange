@@ -11,12 +11,12 @@ const db = require('./helpers/db.js').db
 const config = require('./config')
 const bnb = require('./helpers/bnb.js')
 
-const FANTOM_UUID = ""
+const HMY_UUID = "ONE_uuid"
 
 getToken()
 
 function getToken() {
-  db.oneOrNone("select * from tokens where uuid = $1;", [FANTOM_UUID])
+  db.oneOrNone("select * from tokens where uuid = $1;", [HMY_UUID])
   .then((token) => {
     getAllTransactions(token)
   })
@@ -24,7 +24,7 @@ function getToken() {
 }
 
 function getAllTransactions(token) {
-  db.manyOrNone("select * from swaps where token_uuid = $1 and deposit_transaction_hash is not null and transfer_transaction_hash is null and processed is null;", [FANTOM_UUID])
+  db.manyOrNone("select * from swaps where token_uuid = $1 and deposit_transaction_hash is not null and transfer_transaction_hash is null and processed is null;", [HMY_UUID])
   .then((swaps) => {
     callTransfer(token, swaps)
   })
@@ -37,7 +37,7 @@ function error(err) {
 }
 
 function getKey(callback) {
-  db.oneOrNone('select bnb.* from tokens tok left join bnb_accounts bnb on tok.bnb_account_uuid = bnb.uuid where tok.uuid = $1;', [FANTOM_UUID])
+  db.oneOrNone('select bnb.* from tokens tok left join bnb_accounts bnb on tok.bnb_account_uuid = bnb.uuid where tok.uuid = $1;', [HMY_UUID])
   .then(callback)
   .catch(error)
 }
