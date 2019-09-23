@@ -1,9 +1,7 @@
 # BNBridge
 
 ### Features:
-- [x] Issue a new token on the Binance network.
-- [x] Swap a token from ERC20 to BEP2.
-- [x] List newly issued token on Binance DEX.
+- [x] Swap a token from BEP2 to ERC20 for Harmony.One (ONE).
 - [x] Create a new BNB account.
 
 ### Repository
