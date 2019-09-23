@@ -16,8 +16,10 @@ Binance CLI utility.
 ## ./sdk
 API used to interact with the CLI utility, Binance javascript SDK and Web3.js to enable BNB to ERC bridge utility.
 
-
 ### Installation
+    first, install bnbcli binaries following https://docs.binance.org/api-reference/cli.html#cli-installation
+    and place the binaries (bnbcli/tbnbcli) in cli/node-binary directory.
+    
     git clone the repo
 
     cd ./sdk
