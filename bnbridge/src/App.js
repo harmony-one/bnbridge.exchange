@@ -10,6 +10,7 @@ import bnbridgeTheme from './theme';
 // import Header from './components/header';
 import Instructions from './components/instructions';
 import Controller from './components/controller';
+import Swaps from './components/swaps';
 
 function App() {
   return (
@@ -26,6 +27,16 @@ function App() {
         </Grid>
         <Grid item align="left">
           <Controller />
+        </Grid>
+      </Grid>
+      <Grid
+        style={{ padding: '7.5rem 0' }}
+        container
+        justify="center"
+        alignItems="center"
+        direction="row">
+        <Grid item align="left">
+          <Swaps />
         </Grid>
       </Grid>
     </MuiThemeProvider>

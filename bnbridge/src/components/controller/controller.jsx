@@ -8,7 +8,7 @@ import {
 
 import {
   GET_FEES,
-  FEES_UPDATED
+  FEES_UPDATED,
 } from '../../constants'
 
 import Issue from "../issue";

@@ -645,7 +645,7 @@ class Swap extends Component {
     const totalAmount = transactions.reduce(reducer, 0)
 
     return (
-      <React.Fragment>
+      <React.Fragment key='totalAmount'>
         <Typography className={ classes.instructions }>
           You will receive another <b>{totalAmount} { swapDirection === 'EthereumToBinance' ? selectedToken.unique_symbol : (selectedToken.symbol+'-ERC20') }</b> in your address <b>{ swapDirection === 'EthereumToBinance' ? bnbReceiveAddress : ethReceiveAddress }</b>
         </Typography>
@@ -666,7 +666,7 @@ class Swap extends Component {
 
     return transactions.map((transaction) => {
       return (
-        <React.Fragment>
+        <React.Fragment key={transaction}>
           <Typography className={ classes.hash } onClick={ (event) => { this.onHashClick(transaction.deposit_transaction_hash); } }>
             <b>{transaction.amount} { swapDirection === 'EthereumToBinance' ? (selectedToken.symbol+'-ERC20') : selectedToken.unique_symbol }</b> from <b>{ swapDirection === 'EthereumToBinance' ? transaction.eth_address : transaction.bnb_address }</b>
           </Typography>

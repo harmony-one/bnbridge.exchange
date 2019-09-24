@@ -90,7 +90,7 @@ class Instructions extends Component {
 
       return {
         description: description,
-        price: fee.fee/100000000
+        price: fee.fee / 100000000
       }
     })
 
@@ -111,9 +111,9 @@ class Instructions extends Component {
         justify="flex-start"
         alignItems="flex-end">
         <Grid item xs={12} align='left'>
-          <div style={{"marginRight":"50px"}} className={ classes.root } >
-            <Typography className={ classes.header }>With bnbridge you can:</Typography>
-            <li><Typography className={ classes.action }>Swap BEP2 to ERC20 <br></br>Harmony.One (ONE) token</Typography></li>
+          <div style={{ "marginRight": "50px" }} className={classes.root} >
+            <Typography className={classes.header}>With bnbridge you can:</Typography>
+            <li><Typography className={classes.action}>Swap BEP2 to ERC20 <br></br>Harmony.One (ONE) token</Typography></li>
           </div>
           {/* <div className={ classes.root } >
             <Typography className={ classes.header }>Bnbridge fees:</Typography>
@@ -134,17 +134,17 @@ class Instructions extends Component {
       classes
     } = this.props;
 
-    if(!this.state.feesDisplay) {
+    if (!this.state.feesDisplay) {
       return null
     }
 
     return this.state.feesDisplay.map((fee) => {
       return (
         <React.Fragment key={fee.description}>
-          <Grid item xs={6} align='left' className={ classes.action }>
+          <Grid item xs={6} align='left' className={classes.action}>
             {fee.description}
           </Grid>
-          <Grid item xs={6} align='right' className={ classes.price }>
+          <Grid item xs={6} align='right' className={classes.price}>
             {fee.price} BNB
           </Grid>
         </React.Fragment>

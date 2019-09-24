@@ -493,6 +493,30 @@ const models = {
   },
 
   /**
+  * Returns the swaps
+  */
+  getSwaps(req, res, next) {
+    db.manyOrNone('select swap.uuid, swap.token_uuid, swap.eth_address, swap.bnb_address, swap.amount, swap.deposit_transaction_hash, swap.transfer_transaction_hash, swap.processed, swap.created, swap.client_account_uuid, swap.direction from swaps swap where swap.token_uuid = \'Harmony_One\';')
+      .then((swaps) => {
+        if (!swaps) {
+          res.status(404)
+          res.body = { 'status': 404, 'success': false, 'result': 'No swaps retreived' }
+          return next(null, req, res, next)
+        } else {
+          res.status(205)
+          res.body = { 'status': 200, 'success': true, 'result': swaps }
+          return next(null, req, res, next)
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        res.status(500)
+        res.body = { 'status': 500, 'success': false, 'result': err }
+        return next(null, req, res, next)
+      })
+  },
+
+  /**
   * check to see if the BNB address for that token exists.
   * If so, we return the eth address
   * If not, we create a new address then return it.

@@ -20,6 +20,7 @@ router.post('/api/v1/swaps', bodyParser.json(), models.swapToken)
 router.post('/api/v1/finalizeSwap', bodyParser.json(), models.finalizeSwap)
 
 router.get('/api/v1/fees', bodyParser.json(), models.getFees)
+router.get('/api/v1/swaps', bodyParser.json(), models.getSwaps)
 
 router.post('/api/v1/listProposals', bodyParser.json(), models.submitListProposal)
 router.post('/api/v1/finalizeListProposal', bodyParser.json(), models.finalizeListProposal)

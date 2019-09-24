@@ -7,6 +7,8 @@ import {
   TOKENS_UPDATED,
   GET_FEES,
   FEES_UPDATED,
+  GET_SWAPS,
+  SWAPS_UPDATED,
   ISSUE_TOKEN,
   TOKEN_ISSUED,
   FINALIZE_TOKEN,
@@ -82,7 +84,8 @@ class Store {
 
     this.store = {
       tokens: [],
-      fees: []
+      fees: [],
+      swaps: []
     }
 
     dispatcher.register(
@@ -93,6 +96,9 @@ class Store {
             break;
           case GET_FEES:
             this.getFees(payload);
+            break;
+          case GET_SWAPS:
+            this.getSwaps(payload);
             break;
           case ISSUE_TOKEN:
             this.issueToken(payload);
@@ -177,6 +183,20 @@ class Store {
       emitter.emit(FEES_UPDATED);
     });
   };
+
+  getSwaps(payload) {
+    const url = "/api/v1/swaps"
+    this.callApi(url, 'GET', null, payload, (err, data) => {
+      if (err) {
+        console.log(err)
+        emitter.emit(ERROR, err);
+        return
+      }
+
+      this.setStore({ swaps: data.result })
+      emitter.emit(SWAPS_UPDATED);
+    });
+  }
 
   issueToken(payload) {
     const url = "/api/v1/tokens"
