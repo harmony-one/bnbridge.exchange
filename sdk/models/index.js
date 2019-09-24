@@ -423,6 +423,7 @@ const models = {
    *  Returns a list of tokens
    */
   getTokens(req, res, next) {
+    console.log('getTokens called')
     db.manyOrNone('select tok.uuid, tok.name, tok.symbol, tok.unique_symbol, tok.total_supply, tok.minimum_swap_amount, tok.fee_per_swap, tok.listed, tok.listing_proposed, tok.listing_proposal_uuid, tok.erc20_address, tok.process_date, tok.eth_to_bnb_enabled, tok.bnb_to_eth_enabled, eth.address as eth_address from tokens tok left join eth_accounts eth on eth.uuid = tok.eth_account_uuid where processed is true;')
     .then((tokens) => {
       if (!tokens) {

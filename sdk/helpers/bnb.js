@@ -72,7 +72,7 @@ const bnb = {
 
       if(os.platform() !== 'win32') {
         buildResponse = buildResponse + data
-
+	process.stdout.write('length::::::' + data.split(' ').length)	
         // indicates bnbcli finish data
         if(data.split(' ').length == 46) {
           process.stdout.write(data)

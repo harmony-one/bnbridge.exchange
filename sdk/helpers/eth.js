@@ -121,7 +121,7 @@ const eth = {
     const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
 
     const gasPriceGwei = 20;
-    const gasLimit = 51000;
+    const gasLimit = 100000;
 
     const tx = {
       from,

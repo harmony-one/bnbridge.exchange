@@ -10,6 +10,9 @@ const cn = {
 }
 const db = pgp(cn)
 
+console.log('m1', cn.host)
+console.log('m2', db)
+
 module.exports = {
   pgp, db
 }

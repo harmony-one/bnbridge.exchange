@@ -66,8 +66,8 @@ echo "eth_private_key = ${ETH_PRIVATE_KEY}"
 # # unset DBPASSWORD
 # # unset PRIVATE_KEY
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
-  insert into eth_accounts (uuid, private_key, address) VALUES (
+psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@18.144.6.164/$DBNAME" -c "
+  insert into \"public.eth_accounts\" (uuid, private_key, address) VALUES (
     'erc_account_uuid',
     '$ETH_PRIVATE_KEY',
     '$ETH_ACCOUNT_ADDRESS'
@@ -83,7 +83,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
 #   );
 # "
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@18.144.6.164/$DBNAME" -c "
   INSERT INTO bnb_accounts VALUES (
     'bnb_account_uuid',
     '$bnbPubKey',
@@ -128,7 +128,7 @@ token_uuid=Harmony_One
 # "owner":"bnb1a03uvqmnqzl85csnxnsx2xy28m76gkkht46f2l","symbol":"ONE-5F9",
 # "total_supply":"12600000000.00000000"}
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@18.144.6.164/$DBNAME" -c "
   insert into tokens (
     uuid,
     name,

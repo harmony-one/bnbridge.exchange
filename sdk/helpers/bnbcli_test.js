@@ -25,7 +25,7 @@ var ptyProcess = pty.spawn(shell, [], {
   env: process.env
 });
 
-const password = 'password'
+const password = 'password_test'
 
 let running = false
 ptyProcess.on('data', function (data) {
@@ -33,7 +33,7 @@ ptyProcess.on('data', function (data) {
     return;
   }
 
-  process.stdout.write(':::::' + data);
+  process.stdout.write(':::::' + data + ' length: ' + data.split(' ').length);
 
   if (data.includes("Enter a passphrase")) {
     process.stdout.write('\nSetting password to ' + password + '\n');
@@ -51,7 +51,7 @@ ptyProcess.on('exit', function (exitCode, signal) {
 });
 
 const name = "key1"
-ptyProcess.write('cd /Users/dennis.won/bnbbridge/cli/node-binary/\r');
+ptyProcess.write('cd /home/ec2-user/bnbridge.exchange/cli/node-binary/\r');
 ptyProcess.write('./bnbcli keys add ' + name + '\r');
 ptyProcess.write('exit\r');
 running = true

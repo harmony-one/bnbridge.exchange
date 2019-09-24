@@ -1,12 +1,12 @@
 const config = {
-	host: "localhost",
+	host: "127.0.0.1",
 	database: "harmonyone",
-	user: "dennis.won",
-	password: "harmony",
+	user: "postgres",
+	password: "postgresharmony",
 
 	//Binance
 	api: "https://dex.binance.org/", //live
-	filePath: process.env.HOME + "/bnbbridge/cli/node-binary/", //live
+	filePath: process.env.HOME + "/bnbridge.exchange/cli/node-binary/", //live
 	fileName: "bnbcli", //live
 	chainID: "Binance-Chain-Tigris", //live
 	nodeData: "https://dataseed5.defibit.io:443", //live
