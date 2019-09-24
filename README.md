@@ -19,7 +19,11 @@ API used to interact with the CLI utility, Binance javascript SDK and Web3.js to
 ### Installation
     first, install bnbcli binaries following https://docs.binance.org/api-reference/cli.html#cli-installation
     and place the binaries (bnbcli/tbnbcli) in cli/node-binary directory.
-    
+
+    mkdir -p <root>/cli/node-binary;
+    git clone https://github.com/binance-chain/node-binary.git
+    cp */0.5.8.1/linux/*bnbcli <root>/cli/node-binary/.
+
     git clone the repo
 
     cd ./sdk

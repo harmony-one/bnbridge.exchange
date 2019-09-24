@@ -121,7 +121,9 @@ const eth = {
     const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
 
     const gasPriceGwei = 20;
-    const gasLimit = 51000;
+    const gasLimit = 100000;
+
+    const nonce = await web3.eth.getTransactionCount(from, 'pending');
 
     const tx = {
       from,
@@ -132,9 +134,11 @@ const eth = {
       value: '0x0',
 
       chainId: 1,
-      nonce: await web3.eth.getTransactionCount(from, 'pending'),
+      nonce: nonce,
       data: myData
     }
+
+    console.log(tx);
 
     const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
     const privKey = Buffer.from(privateKey, 'hex');

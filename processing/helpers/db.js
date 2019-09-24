@@ -2,7 +2,7 @@ const pgp = require('pg-promise')(/*options*/)
 const config = require('../config')
 
 const cn = {
-  host: config.host,
+  host: process.env.BNBRIDGE_DB_HOST || config.host,
   port: 5432,
   database: config.database,
   user: config.user,
