@@ -545,7 +545,7 @@ class Swap extends Component {
                 <Input
                   id='ethReceiveAddress'
                   fullWidth={ true }
-                  label="Eth Receive Address"
+                  label="Your ETH address (to receive ERC20 ONE tokens)"
                   placeholder="eg: 0x0dE0BCb0703ff8F1aEb8C892eDbE692683bD8030"
                   value={ ethReceiveAddress }
                   error={ ethReceiveAddressError }
@@ -711,7 +711,7 @@ class Swap extends Component {
     return (
       <React.Fragment>
         <Label label={ 'Swap direction' } overrideStyle={ { marginTop: '12px' } } />
-        <Grid item xs={ 5 } onClick={ this.onSwapDirectionClick } className={ classes.gridClick } >
+        <Grid item xs={ 5 } /* onClick={ this.onSwapDirectionClick } */ className={ classes.gridClick } >
           <div className={ classes.icon }>
             <img
               alt=""
@@ -723,10 +723,10 @@ class Swap extends Component {
             <Typography  variant='h5'>{ first ==='Binance' ? 'BEP2' : 'ERC20' }</Typography>
           </div>
         </Grid>
-        <Grid item xs={ 2 } onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
+        <Grid item xs={2} /* onClick={ this.onSwapDirectionClick } */ className={ classes.gridClick }>
           <SwapIcon className={ classes.swapDirection } />
         </Grid>
-        <Grid item xs={ 5 } align='left' onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
+        <Grid item xs={5} align='left' /* onClick={ this.onSwapDirectionClick } */ className={ classes.gridClick }>
           <div className={ classes.icon }>
             <img
               alt=""

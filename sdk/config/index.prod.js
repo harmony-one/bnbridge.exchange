@@ -6,7 +6,7 @@ const config = {
 
 	//Binance
 	api: "https://dex.binance.org/", //live
-	filePath: process.env.HOME + "/bnbbridge/cli/node-binary/", //live
+	filePath: process.env.HOME + "/bnbridge.exchange/cli/node-binary/", //live
 	fileName: "bnbcli", //live
 	chainID: "Binance-Chain-Tigris", //live
 	nodeData: "https://dataseed5.defibit.io:443", //live
@@ -17,7 +17,7 @@ const config = {
 	network: 'mainnet',
 
 	//Ethereum
-	provider: 'https://mainnet.infura.io/v3/981292667b474eb593bfce7d7cffe047', //live
+	provider: 'https://mainnet.infura.io/v3/4a1a3bdd85e7423a86c6031a792a9e63', //live
 
   erc20ABI: [
   	{

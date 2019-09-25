@@ -47,4 +47,4 @@ API used to interact with the CLI utility, Binance javascript SDK and Web3.js to
 
     npm install
     vi ./src/config.js
-    Modify config urls that the bnbridge.excahnge API is running at. (http://localhost:8000 by default)
+    Modify config urls that the bnbridge.excahnge API is running at. (http://localhost:5000 by default)

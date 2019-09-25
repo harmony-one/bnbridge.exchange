@@ -113,7 +113,7 @@ class Instructions extends Component {
         <Grid item xs={12} align='left'>
           <div style={{ "marginRight": "50px" }} className={classes.root} >
             <Typography className={classes.header}>With bnbridge you can:</Typography>
-            <li><Typography className={classes.action}>Swap BEP2 to ERC20 Harmony.One (ONE) token</Typography></li>
+            <Typography className={classes.action}>Swap your BEP2 ONE tokens to ERC20 ONE tokens</Typography>
           </div>
           {/* <div className={ classes.root } >
             <Typography className={ classes.header }>Bnbridge fees:</Typography>
