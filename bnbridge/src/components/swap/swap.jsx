@@ -524,7 +524,7 @@ class Swap extends Component {
                 <Input
                   id='ethReceiveAddress'
                   fullWidth={ true }
-                  label="Eth Receive Address"
+                  label="Your ETH address (to receive ERC20 ONE tokens)"
                   placeholder="eg: 0x0dE0BCb0703ff8F1aEb8C892eDbE692683bD8030"
                   value={ ethReceiveAddress }
                   error={ ethReceiveAddressError }

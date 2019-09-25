@@ -1,17 +1,12 @@
-import React, { Component } from "react";
-import PropTypes from 'prop-types';
+import { Grid, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  Typography,
-  Grid
-} from '@material-ui/core';
-import { colors } from '../../theme'
-
-import {
-  FEES_UPDATED
-} from '../../constants'
-
+import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import { FEES_UPDATED } from '../../constants';
 import Store from "../../stores";
+import { colors } from '../../theme';
+
+
 const emitter = Store.emitter
 const store = Store.store
 
@@ -113,7 +108,7 @@ class Instructions extends Component {
         <Grid item xs={12} align='left'>
           <div style={{"marginRight":"50px"}} className={ classes.root } >
             <Typography className={ classes.header }>With bnbridge you can:</Typography>
-            <li><Typography className={ classes.action }>Swap BEP2 to ERC20 <br></br>Harmony.One (ONE) token</Typography></li>
+            <Typography className={ classes.action }>Swap your BEP2 ONE tokens to ERC20 ONE tokens</Typography>
           </div>
           {/* <div className={ classes.root } >
             <Typography className={ classes.header }>Bnbridge fees:</Typography>

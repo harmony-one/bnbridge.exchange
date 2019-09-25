@@ -1847,6 +1847,7 @@ const models = {
 
       models.getTokenInfo(token_uuid, (err, tokenInfo) => {
         if(err) {
+          
           console.log(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
