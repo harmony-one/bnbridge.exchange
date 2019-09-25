@@ -9,6 +9,10 @@ import {
 } from '@material-ui/core'
 import config from '../../config'
 
+import {
+  GET_SWAPS,
+} from '../../constants/constants'
+
 import Input from '../common/input';
 import Button from '../common/button';
 import PageLoader from "../common/pageLoader";
@@ -337,6 +341,7 @@ class Swap extends Component {
       bnbBalances: null,
       ethBalances: null,
     })
+    dispatcher.dispatch({ type: GET_SWAPS, content: {} })
   };
 
   onBack = (event) => {
