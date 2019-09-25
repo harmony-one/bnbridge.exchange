@@ -496,7 +496,7 @@ const models = {
   * Returns the swaps
   */
   getSwaps(req, res, next) {
-    db.manyOrNone('select swap.uuid, swap.token_uuid, swap.eth_address, swap.bnb_address, swap.amount, swap.deposit_transaction_hash, swap.transfer_transaction_hash, swap.processed, swap.created, swap.client_account_uuid, swap.direction from swaps swap where swap.token_uuid = \'Harmony_One\';')
+    db.manyOrNone('select swap.uuid, swap.token_uuid, swap.eth_address, swap.bnb_address, swap.amount, swap.deposit_transaction_hash, swap.transfer_transaction_hash, swap.processed, swap.created, swap.client_account_uuid, swap.direction from swaps swap where swap.token_uuid = \'Harmony_One\' order by swap.created DESC;')
       .then((swaps) => {
         if (!swaps) {
           res.status(404)
