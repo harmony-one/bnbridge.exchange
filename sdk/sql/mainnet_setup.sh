@@ -79,7 +79,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
 #     'erc_account_uuid',
 #     '$ETH_ACCOUNT_ADDRESS',
 #     'bnb_account_uuid_client',
-#     now()
+#    timezone('utc', now())
 #   );
 # "
 
@@ -91,7 +91,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
     '$bnbAddress',
     'bnbcli-keyname-optional',
     '$bnbEncrKey',
-    now()
+   timezone('utc', now())
   );
 "
 
@@ -118,7 +118,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
 #     '$clientBnbAddress',
 #     'client-bnbcli-keyname-optional',
 #     '$clientBnbEncrKey',
-#     now()
+#    timezone('utc', now())
 #   );
 # "
 
@@ -154,6 +154,6 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
     '$ERC20_ADDRESS',
     'erc_account_uuid', 'bnb_account_uuid',
     true, true, 'list_proposal_uuid',
-    true, now(), true, 0, 0, now(), true, false
+    true, timezone('utc', now()), true, 0, 0, timezone('utc', now()), true, false
   );
 "

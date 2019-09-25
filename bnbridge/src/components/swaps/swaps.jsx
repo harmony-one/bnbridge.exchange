@@ -178,12 +178,12 @@ class Swaps extends Component {
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
-            <TableCell>Time</TableCell>
-            <TableCell align="right">ETH Addr</TableCell>
-            <TableCell align="right">BNB Addr</TableCell>
-            <TableCell align="right">Amount</TableCell>
-            <TableCell align="right">Deposit</TableCell>
-            <TableCell align="right">Transfer</TableCell>
+            <TableCell>Time (UTC)</TableCell>
+            {/* <TableCell align="right">ETH Addr</TableCell>
+            <TableCell align="right">BNB Addr</TableCell> */}
+            <TableCell align="right">Amount (ONE)</TableCell>
+            <TableCell align="right">Deposit (BEP2)</TableCell>
+            <TableCell align="right">Receive (ERC20) </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -219,8 +219,8 @@ class Swaps extends Component {
           <TableCell component="th" scope="row">
             {swap.created}
           </TableCell>
-          <TableCell align="right">{swap.eth_address}</TableCell>
-          <TableCell align="right">{swap.bnb_address}</TableCell>
+          {/* <TableCell align="right">{swap.eth_address}</TableCell>
+          <TableCell align="right">{swap.bnb_address}</TableCell> */}
           <TableCell align="right">{swap.amount}</TableCell>
           <TableCell align="right">{swap.deposit_transaction_hash}</TableCell>
           <TableCell align="right">{swap.transfer_transaction_hash}</TableCell>
