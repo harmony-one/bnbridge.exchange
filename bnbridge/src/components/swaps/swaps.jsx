@@ -152,8 +152,8 @@ class Swaps extends Component {
 
     let swapsDisplay = swaps.map((swap) => {
       return {
-        eth_address: swap.eth_address,
-        bnb_address: swap.bnb_address,
+        // eth_address: swap.eth_address,
+        // bnb_address: swap.bnb_address,
         amount: swap.amount,
         deposit_transaction_hash: swap.deposit_transaction_hash,
         transfer_transaction_hash: swap.transfer_transaction_hash,
@@ -222,8 +222,8 @@ class Swaps extends Component {
           {/* <TableCell align="right">{swap.eth_address}</TableCell>
           <TableCell align="right">{swap.bnb_address}</TableCell> */}
           <TableCell align="right">{swap.amount}</TableCell>
-          <TableCell align="right">{swap.deposit_transaction_hash}</TableCell>
-          <TableCell align="right">{swap.transfer_transaction_hash}</TableCell>
+          <TableCell align="right"><a href={"https://explorer.binance.org/tx/" + swap.deposit_transaction_hash} target="_blank">{swap.deposit_transaction_hash}</a></TableCell>
+          <TableCell align="right"><a href={"https://etherscan.io/tx/" + swap.transfer_transaction_hash} target="_blank">{swap.transfer_transaction_hash}</a></TableCell>
         </TableRow>
       })
   }
