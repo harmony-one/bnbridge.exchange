@@ -1,9 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
-import {
-  Typography,
-  Grid
-} from '@material-ui/core';
 import { colors } from '../../theme/theme'
 
 import { withStyles } from '@material-ui/core/styles';
@@ -179,11 +175,11 @@ class Swaps extends Component {
         <TableHead>
           <TableRow>
             <TableCell>Time (UTC)</TableCell>
-            {/* <TableCell align="right">ETH Addr</TableCell>
-            <TableCell align="right">BNB Addr</TableCell> */}
-            <TableCell align="right">Amount (ONE)</TableCell>
-            <TableCell align="right">Deposit (BEP2)</TableCell>
-            <TableCell align="right">Receive (ERC20) </TableCell>
+            {/* <TableCell align="left">ETH Addr</TableCell>
+            <TableCell align="left">BNB Addr</TableCell> */}
+            <TableCell align="left">Amount (ONE)</TableCell>
+            <TableCell align="left">Deposit (BEP2)</TableCell>
+            <TableCell align="left">Receive (ERC20) </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -219,11 +215,19 @@ class Swaps extends Component {
           <TableCell component="th" scope="row">
             {swap.created}
           </TableCell>
-          {/* <TableCell align="right">{swap.eth_address}</TableCell>
-          <TableCell align="right">{swap.bnb_address}</TableCell> */}
-          <TableCell align="right">{swap.amount}</TableCell>
-          <TableCell align="right"><a href={"https://explorer.binance.org/tx/" + swap.deposit_transaction_hash} target="_blank">{swap.deposit_transaction_hash}</a></TableCell>
-          <TableCell align="right"><a href={"https://etherscan.io/tx/" + swap.transfer_transaction_hash} target="_blank">{swap.transfer_transaction_hash}</a></TableCell>
+          {/* <TableCell align="left">{swap.eth_address}</TableCell>
+          <TableCell align="left">{swap.bnb_address}</TableCell> */}
+          <TableCell align="left">{swap.amount}</TableCell>
+          <TableCell align="left">
+            <a href={"https://explorer.binance.org/tx/" + swap.deposit_transaction_hash} rel="noopener noreferrer" target="_blank">
+              {swap.deposit_transaction_hash.substring(0, 8)}
+            </a>
+          </TableCell>
+          <TableCell align="left">
+            <a href={"https://etherscan.io/tx/" + swap.transfer_transaction_hash} rel="noopener noreferrer" target="_blank">
+              {swap.transfer_transaction_hash.substring(0, 8)}
+            </a>
+          </TableCell>
         </TableRow>
       })
   }
