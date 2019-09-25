@@ -4,6 +4,9 @@ export const TOKENS_UPDATED = 'TOKENS_UPDATED'
 export const GET_FEES = 'GET_FEES'
 export const FEES_UPDATED = 'FEES_UPDATED'
 
+export const GET_SWAPS = 'GET_SWAPS'
+export const SWAPS_UPDATED = 'SWAPS_UPDATED'
+
 export const ISSUE_TOKEN = 'ISSUE_TOKEN'
 export const TOKEN_ISSUED = 'TOKEN_ISSUED'
 

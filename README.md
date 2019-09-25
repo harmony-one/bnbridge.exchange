@@ -17,6 +17,9 @@ Binance CLI utility.
 API used to interact with the CLI utility, Binance javascript SDK and Web3.js to enable BNB to ERC bridge utility.
 
 ### Installation
+    sudo apt-get install libudev-dev libusb-dev usbutils
+    (for unix/linux) npm install --save node-pty-linux
+
     first, install bnbcli binaries following https://docs.binance.org/api-reference/cli.html#cli-installation
     and place the binaries (bnbcli/tbnbcli) in cli/node-binary directory.
 
@@ -44,4 +47,4 @@ API used to interact with the CLI utility, Binance javascript SDK and Web3.js to
 
     npm install
     vi ./src/config.js
-    Modify config urls that the bnbridge.excahnge API is running at. (http://localhost:8000 by default)
+    Modify config urls that the bnbridge.excahnge API is running at. (http://localhost:5000 by default)

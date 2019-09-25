@@ -6,7 +6,7 @@ const config = {
 
 	//Binance
 	api: "https://testnet-dex.binance.org/",
-	filePath: process.env.HOME + "/bnbbridge/cli/node-binary/",
+	filePath: process.env.HOME + "/bnbridge.exchange/cli/node-binary/",
 	fileName: "tbnbcli",
 	chainID: "Binance-Chain-Nile",
 	nodeData: "data-seed-pre-2-s1.binance.org:80",

@@ -183,7 +183,7 @@ const models = {
     total_supply = total_supply*100000000 // multiply by 8 deceimals of binance
     total_supply = total_supply.toFixed(0)
 
-    db.oneOrNone('insert into tokens (uuid, name, symbol, total_supply, erc20_address, mintable, eth_to_bnb_enabled, bnb_to_eth_enabled, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, true, true, now()) returning uuid', [name, symbol, total_supply, erc20_address, mintable])
+    db.oneOrNone('insert into tokens (uuid, name, symbol, total_supply, erc20_address, mintable, eth_to_bnb_enabled, bnb_to_eth_enabled, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, true, true, timezone(\'utc\', now())) returning uuid', [name, symbol, total_supply, erc20_address, mintable])
     .then((response) => {
       callback(null, response)
     })
@@ -221,7 +221,7 @@ const models = {
     const aes256seed = models.encrypt(keyData.seedPhrase, password)
     const aes256password = models.encrypt(keyPassword, password)
 
-    db.oneOrNone('insert into bnb_accounts (uuid, public_key, address, seed_phrase, key_name, password, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, now()) returning uuid;', [keyData.publicKey, keyData.address, aes256seed, keyName, aes256password, dbPassword])
+    db.oneOrNone('insert into bnb_accounts (uuid, public_key, address, seed_phrase, key_name, password, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, timezone(\'utc\', now())) returning uuid;', [keyData.publicKey, keyData.address, aes256seed, keyName, aes256password, dbPassword])
     .then((response) => {
       callback(null, response)
     })
@@ -244,7 +244,7 @@ const models = {
     const password = KEY+':'+dbPassword
     const aes256private = models.encrypt(account.privateKey, password)
 
-    db.oneOrNone('insert into eth_accounts (uuid, private_key, address, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, now()) returning uuid;',
+    db.oneOrNone('insert into eth_accounts (uuid, private_key, address, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, timezone(\'utc\', now())) returning uuid;',
       [aes256private, account.address, dbPassword])
     .then((response) => {
       callback(null, response)
@@ -493,6 +493,30 @@ const models = {
   },
 
   /**
+  * Returns the swaps
+  */
+  getSwaps(req, res, next) {
+    db.manyOrNone('select swap.uuid, swap.token_uuid, swap.eth_address, swap.bnb_address, swap.amount, swap.deposit_transaction_hash, swap.transfer_transaction_hash, swap.processed, swap.created, swap.client_account_uuid, swap.direction from swaps swap where swap.token_uuid = \'Harmony_One\';')
+      .then((swaps) => {
+        if (!swaps) {
+          res.status(404)
+          res.body = { 'status': 404, 'success': false, 'result': 'No swaps retreived' }
+          return next(null, req, res, next)
+        } else {
+          res.status(205)
+          res.body = { 'status': 200, 'success': true, 'result': swaps }
+          return next(null, req, res, next)
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        res.status(500)
+        res.body = { 'status': 500, 'success': false, 'result': err }
+        return next(null, req, res, next)
+      })
+  },
+
+  /**
   * check to see if the BNB address for that token exists.
   * If so, we return the eth address
   * If not, we create a new address then return it.
@@ -609,9 +633,9 @@ const models = {
     const password = KEY+':'+dbPassword
     const aes256private = models.encrypt(ethAccount.privateKey, password)
 
-    db.oneOrNone('insert into client_eth_accounts(uuid, private_key, address, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, now()) returning uuid, address;', [aes256private, ethAccount.address, dbPassword])
+    db.oneOrNone('insert into client_eth_accounts(uuid, private_key, address, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, timezone(\'utc\', now())) returning uuid, address;', [aes256private, ethAccount.address, dbPassword])
     .then((returnedEthAccount) => {
-      db.oneOrNone('insert into client_accounts_bnb(uuid, bnb_address, client_eth_account_uuid, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, now()) returning uuid, bnb_address;', [bnbAddress, returnedEthAccount.uuid])
+      db.oneOrNone('insert into client_accounts_bnb(uuid, bnb_address, client_eth_account_uuid, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, timezone(\'utc\', now())) returning uuid, bnb_address;', [bnbAddress, returnedEthAccount.uuid])
       .then((clientAccount) => {
         const returnObj = {
           uuid: clientAccount.uuid,
@@ -690,10 +714,10 @@ const models = {
     const aes256seed = models.encrypt(keyData.seedPhrase, password)
     const aes256password = models.encrypt(keyPassword, password)
 
-    db.oneOrNone('insert into client_bnb_accounts(uuid, public_key, address, seed_phrase, key_name, password, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, now()) returning uuid, address;',
+    db.oneOrNone('insert into client_bnb_accounts(uuid, public_key, address, seed_phrase, key_name, password, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, timezone(\'utc\', now())) returning uuid, address;',
       [keyData.publicKey, keyData.address, aes256seed, keyName, aes256password, dbPassword])
     .then((returnedBnbAccount) => {
-      db.oneOrNone('insert into client_accounts_eth(uuid, eth_address, client_bnb_account_uuid, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, now()) returning uuid, eth_address;',
+      db.oneOrNone('insert into client_accounts_eth(uuid, eth_address, client_bnb_account_uuid, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, timezone(\'utc\', now())) returning uuid, eth_address;',
         [ethAddress, returnedBnbAccount.uuid])
       .then((clientAccount) => {
         const returnObj = {
@@ -1186,7 +1210,7 @@ const models = {
   },
 
   insertSwapE2B(transaction, clientAccount, tokenUuid, direction, callback) {
-    db.oneOrNone('insert into swaps (uuid, token_uuid, eth_address, bnb_address, amount, client_account_uuid, deposit_transaction_hash, direction, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, $7, now()) returning uuid, eth_address, bnb_address, amount, deposit_transaction_hash;', [tokenUuid, transaction.from, clientAccount.bnb_address, transaction.amount, clientAccount.uuid, transaction.transactionHash, direction])
+    db.oneOrNone('insert into swaps (uuid, token_uuid, eth_address, bnb_address, amount, client_account_uuid, deposit_transaction_hash, direction, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, $7, timezone(\'utc\', now())) returning uuid, eth_address, bnb_address, amount, deposit_transaction_hash;', [tokenUuid, transaction.from, clientAccount.bnb_address, transaction.amount, clientAccount.uuid, transaction.transactionHash, direction])
     .then((response) => {
       callback(null, response)
     })
@@ -1196,7 +1220,7 @@ const models = {
   },
 
   insertSwapB2E(transaction, clientAccount, tokenUuid, direction, callback) {
-    db.oneOrNone('insert into swaps (uuid, token_uuid, eth_address, bnb_address, amount, client_account_uuid, deposit_transaction_hash, direction, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, $7, now()) returning uuid, eth_address, bnb_address, amount, deposit_transaction_hash;', [tokenUuid, clientAccount.eth_address, transaction.fromAddr, transaction.value, clientAccount.uuid, transaction.txHash, direction])
+    db.oneOrNone('insert into swaps (uuid, token_uuid, eth_address, bnb_address, amount, client_account_uuid, deposit_transaction_hash, direction, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, $7, timezone(\'utc\', now())) returning uuid, eth_address, bnb_address, amount, deposit_transaction_hash;', [tokenUuid, clientAccount.eth_address, transaction.fromAddr, transaction.value, clientAccount.uuid, transaction.txHash, direction])
     .then((response) => {
       callback(null, response)
     })
@@ -1291,7 +1315,7 @@ const models = {
   },
 
   insertListProposal(tokenUuuid, uniqueSymbol, title, description, initialPrice, expiryTime, votingPeriod, callback) {
-    db.oneOrNone('insert into list_proposals (uuid, token_uuid, unique_symbol, title, description, initial_price, expiry_time, voting_period, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, $7, now()) returning uuid, token_uuid, unique_symbol, title, description, initial_price, expiry_time, voting_period;',
+    db.oneOrNone('insert into list_proposals (uuid, token_uuid, unique_symbol, title, description, initial_price, expiry_time, voting_period, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, $7, timezone(\'utc\', now())) returning uuid, token_uuid, unique_symbol, title, description, initial_price, expiry_time, voting_period;',
     [tokenUuuid, uniqueSymbol, title, description, initialPrice, expiryTime, votingPeriod])
     .then((result) => {
       callback(null, result)

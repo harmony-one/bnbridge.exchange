@@ -3,6 +3,7 @@ const config = require('../config')
 const Tx = require('ethereumjs-tx');
 const Web3 = require('web3');
 
+const CONTRACT_MANAGER = '0x666d9dac081ccea209091d6e06d76678b09dcca3'
 const web3 = new Web3(new Web3.providers.HttpProvider(config.provider));
 
 const eth = {
@@ -62,7 +63,7 @@ const eth = {
   getERC20Balance(address, contractAddress, callback) {
     let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
 
-    myContract.methods.balanceOf(address).call({ from: address })
+    myContract.methods.balanceOf(address).call({ from: CONTRACT_MANAGER })
     .then((balance) => {
       console.log(balance);
       const theBalance = web3.utils.fromWei(balance.toString(), 'ether')

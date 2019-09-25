@@ -9,6 +9,10 @@ import {
 } from '@material-ui/core'
 import config from '../../config'
 
+import {
+  GET_SWAPS,
+} from '../../constants/constants'
+
 import Input from '../common/input';
 import Button from '../common/button';
 import PageLoader from "../common/pageLoader";
@@ -337,6 +341,7 @@ class Swap extends Component {
       bnbBalances: null,
       ethBalances: null,
     })
+    dispatcher.dispatch({ type: GET_SWAPS, content: {} })
   };
 
   onBack = (event) => {
@@ -540,7 +545,7 @@ class Swap extends Component {
                 <Input
                   id='ethReceiveAddress'
                   fullWidth={ true }
-                  label="Eth Receive Address"
+                  label="Your ETH address (to receive ERC20 ONE tokens)"
                   placeholder="eg: 0x0dE0BCb0703ff8F1aEb8C892eDbE692683bD8030"
                   value={ ethReceiveAddress }
                   error={ ethReceiveAddressError }
@@ -645,7 +650,7 @@ class Swap extends Component {
     const totalAmount = transactions.reduce(reducer, 0)
 
     return (
-      <React.Fragment>
+      <React.Fragment key='totalAmount'>
         <Typography className={ classes.instructions }>
           You will receive another <b>{totalAmount} { swapDirection === 'EthereumToBinance' ? selectedToken.unique_symbol : (selectedToken.symbol+'-ERC20') }</b> in your address <b>{ swapDirection === 'EthereumToBinance' ? bnbReceiveAddress : ethReceiveAddress }</b>
         </Typography>
@@ -666,7 +671,7 @@ class Swap extends Component {
 
     return transactions.map((transaction) => {
       return (
-        <React.Fragment>
+        <React.Fragment key={transaction}>
           <Typography className={ classes.hash } onClick={ (event) => { this.onHashClick(transaction.deposit_transaction_hash); } }>
             <b>{transaction.amount} { swapDirection === 'EthereumToBinance' ? (selectedToken.symbol+'-ERC20') : selectedToken.unique_symbol }</b> from <b>{ swapDirection === 'EthereumToBinance' ? transaction.eth_address : transaction.bnb_address }</b>
           </Typography>
@@ -706,7 +711,7 @@ class Swap extends Component {
     return (
       <React.Fragment>
         <Label label={ 'Swap direction' } overrideStyle={ { marginTop: '12px' } } />
-        <Grid item xs={ 5 } onClick={ this.onSwapDirectionClick } className={ classes.gridClick } >
+        <Grid item xs={ 5 } /* onClick={ this.onSwapDirectionClick } */ className={ classes.gridClick } >
           <div className={ classes.icon }>
             <img
               alt=""
@@ -718,10 +723,10 @@ class Swap extends Component {
             <Typography  variant='h5'>{ first ==='Binance' ? 'BEP2' : 'ERC20' }</Typography>
           </div>
         </Grid>
-        <Grid item xs={ 2 } onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
+        <Grid item xs={2} /* onClick={ this.onSwapDirectionClick } */ className={ classes.gridClick }>
           <SwapIcon className={ classes.swapDirection } />
         </Grid>
-        <Grid item xs={ 5 } align='left' onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
+        <Grid item xs={5} align='left' /* onClick={ this.onSwapDirectionClick } */ className={ classes.gridClick }>
           <div className={ classes.icon }>
             <img
               alt=""
