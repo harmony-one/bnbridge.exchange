@@ -8,7 +8,7 @@ const cn = {
   user: process.env.DBUSER || config.user,
   password: process.env.DBPASSWORD || config.password
 }
-// console.log(cn);
+console.log(cn);
 const db = pgp(cn)
 
 module.exports = {

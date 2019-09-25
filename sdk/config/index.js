@@ -1,8 +1,8 @@
 const config = {
-	host: "localhost",
+	host: "13.52.142.50",
 	database: "harmonyone",
-	user: "dennis.won",
-	password: "harmony",
+	user: "postgres",
+	password: "postgresharmony",
 
 	//Binance
 	api: "https://dex.binance.org/", //live
