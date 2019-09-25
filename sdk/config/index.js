@@ -1,8 +1,8 @@
 const config = {
-	host: "13.52.142.50",
-	database: "harmonyone",
-	user: "postgres",
-	password: "postgresharmony",
+	host: process.env.DBHOST || "13.52.142.50",
+	database: process.env.DBNAME || "harmonyone",
+	user: process.env.DBUSER || "postgres",
+	password: process.env.DBPASSWORD || "postgresharmony",
 
 	//Binance
 	api: "https://dex.binance.org/", //live
@@ -15,6 +15,10 @@ const config = {
 	list_proposal_deposit: "100000000000",
 	prefix: 'bnb',
 	network: 'mainnet',
+
+	// Emailer
+	emailerUser: "",
+	emailerPassword: "",
 
 	//Ethereum
 	provider: 'https://mainnet.infura.io/v3/4a1a3bdd85e7423a86c6031a792a9e63',
@@ -255,5 +259,33 @@ const config = {
   	}
   ]
 }
+
+const config2 = {
+	host: process.env.DBHOST || "13.52.142.50",
+	database: process.env.DBNAME || "harmonyone",
+	user: process.env.DBUSER || "postgres",
+	password: process.env.DBPASSWORD || "postgresharmony",
+
+	//Binance
+	api: "https://dex.binance.org/", //live
+	filePath: process.env.HOME + "/bnbridge.exchange/cli/node-binary/", //live
+	fileName: "bnbcli", //live
+	chainID: "Binance-Chain-Tigris", //live
+	nodeData: "https://dataseed5.defibit.io:443", //live
+	nodeHTTPS: "https://dataseed5.defibit.io:443", //live
+	keyPrepend: "LIVE_",
+	list_proposal_deposit: "100000000000",
+	prefix: 'bnb',
+	network: 'mainnet',
+
+	// Emailer
+	emailerUser: "",
+	emailerPassword: "",
+
+	//Ethereum
+	provider: 'https://mainnet.infura.io/v3/4a1a3bdd85e7423a86c6031a792a9e63',
+}
+
+console.log(config2);
 
 module.exports = config

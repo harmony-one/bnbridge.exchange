@@ -3,6 +3,7 @@ const axios = require('axios');
 const config = require('../config')
 
 const os = require('os');
+
 const pty = require('node-pty');
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 const httpClient = axios.create({ baseURL: config.api });
@@ -70,11 +71,12 @@ const bnb = {
         ptyProcess.write(password+'\r');
       }
 
-      if(os.platform() !== 'win32') {
+      if (os.platform() !== 'win32') {
         buildResponse = buildResponse + data
 
         // indicates bnbcli finish data
-        if(data.split(' ').length == 46) {
+        // NOTE: for ubuntu, use length 24 instead of 46 for length check.
+        if (data.split(' ').length == 46) {
           process.stdout.write(data)
 
           const tmpData = buildResponse.split('\n');
@@ -219,6 +221,31 @@ const bnb = {
     .catch((error) => {
       callback(error)
     });
+  },
+
+  transferWithPrivateKey(privateFrom, publicTo, amount, asset, message, callback) {
+    const publicFrom = BnbApiClient.crypto.getAddressFromPrivateKey(privateFrom, config.prefix);
+    const sequenceURL = `${config.api}api/v1/account/${publicFrom}/sequence`;
+
+    const bnbClient = new BnbApiClient(config.api);
+    bnbClient.setPrivateKey(privateFrom);
+    bnbClient.initChain();
+
+    httpClient.get(sequenceURL)
+      .then((res) => {
+        const sequence = res.data.sequence || 0
+        return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
+      })
+      .then((result) => {
+        if (result.status === 200) {
+          callback(null, result)
+        } else {
+          callback(result)
+        }
+      })
+      .catch((error) => {
+        callback(error)
+      });
   },
 
   freeze(amount, symbol, keyName, callback) {

@@ -12,6 +12,12 @@ const Web3 = require('web3');
 const algorithm = 'aes-256-ctr';
 const KEY = 'witness canyon foot sing song tray task defense float bottom town obvious faint globe door tonight alpha battle purse jazz flag author choose whisper';
 
+const BNB_FUND_ACCT_ADDRESS = 'bnb18xvlduz3sv4d94ddanp5gtfdhpsmf4ts55pvz7'
+const BNB_FUND_ACCT_PRIVATE_KEY = process.env.BNB_FUND_ACCT_PRIVATE_KEY
+
+const BNB_FOUNDATION_ACCT_ADDRESS = 'bnb18xvlduz3sv4d94ddanp5gtfdhpsmf4ts55pvz7'
+const BNB_GAS_FEE = 0.000375 // in BNB
+
 const models = {
 
   encrypt(text, password){
@@ -804,7 +810,7 @@ const models = {
           if(err) {
             console.log(err)
             res.status(500)
-            res.body = { 'status': 500, 'success': false, 'result': 'Unable to process request: '+err }
+            res.body = { 'status': 500, 'success': false, 'result': 'Unable to process request: ' + err }
             return next(null, req, res, next)
           }
 
@@ -908,7 +914,7 @@ const models = {
           if(err) {
             console.log(err)
             res.status(500)
-            res.body = { 'status': 500, 'success': false, 'result': 'Unable to process request: '+err }
+            res.body = { 'status': 500, 'success': false, 'result': 'Unable to process request: '+ err }
             return next(null, req, res, next)
           }
 
@@ -980,9 +986,7 @@ const models = {
     models.getKey(tokenInfo.bnb_address, (err, key) => {
       if(err || !key) {
         console.log(err)
-        res.status(500)
-        res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve key' }
-        return next(null, req, res, next)
+        return callback(err || 'Unable to retrieve key')
       }
 
       async.map(swaps, (swap, callbackInner) => {
@@ -1016,7 +1020,7 @@ const models = {
           text += '\nFrom: '+swap.eth_address
           text += '\nTo: '+swap.bnb_address
           text += '\nAmount: '+swap.amount + ' ' + tokenInfo.symbol
-          text += '\n\nError Received: '+err
+          text += '\n\nError Received: '+ err
           text += '\n*********************************************************'
 
           emailer.sendMail('BNBridge error', text)
@@ -1063,49 +1067,153 @@ const models = {
   },
 
   processSwapB2E(swap, tokenInfo, address, callback) {
-    eth.sendTransaction(tokenInfo.erc20_address, address.private_key_decrypted, tokenInfo.eth_address, swap.eth_address, swap.amount, (err, swapResult) => {
-      if(err) {
+    async.parallel([
+      (callback) => { models.sendErc20Transaction(swap, tokenInfo, address, callback) },
+      //(callback) => { models.transferToFoundation(swap, tokenInfo, callback) }
+    ], (err, data) => {
+      // erc transaction failed. this is a failure.
+      if (!data || !data[0]) {
         console.log(err)
+        return callback(err);
+      }
+      // bnb tx to foundation failed. not a hard failure, but we already got notified.
+      if (!data[1]) {
+        console.log('Missing tx hash for the Bnb tx made to the foundation account from client.');
+      }
 
-        return models.revertUpdateWithDepositTransactionHash(swap.uuid, (revertErr) => {
-          if(revertErr) {
-            console.log(revertErr)
-          }
+      const ethTxToClientHash = data[0]
+      callback(null, ethTxToClientHash);
+    })
+  },
 
-          let text = "BNBridge encountered an error processing a swap."
+  transferToFoundation(swap, tokenInfo, callback) {
+
+    models.getKey(swap.bnb_address, (err, key) => {
+      if (err || !key) {
+        console.log(err)
+        return callback(err || 'Unable to retrieve key')
+      }
+
+      // 1. first, send from bnb source account to the bnb acccount since it needs bnb to fund ONE transaction
+      bnb.transferWithPrivateKey(BNB_FUND_ACCT_PRIVATE_KEY,
+        swap.bnb_address, BNB_GAS_FEE,
+        tokenInfo.unique_symbol, 'Gas for sending to Foundation', (err, swapResult) => {
+        if (err) {
+          console.log(err)
+
+          let text = "BNBridge encountered an error processing a swap.\n" +
+            "Failed to fund gas for transferring deposits to the foundation account."
 
           text += '\n\n*********************************************************'
-          text += '\nDirection: Binance To Ethereum'
-          text += '\nToken: '+tokenInfo.name + ' ('+ tokenInfo.symbol +')'
-          text += '\nDeposit Hash: '+swap.deposit_transaction_hash
-          text += '\nFrom: '+swap.bnb_address
-          text += '\nTo: '+swap.eth_address
-          text += '\nAmount: '+swap.amount + ' ' + tokenInfo.symbol
-          text += '\n\nError Received: '+err
+          text += '\nDirection: Binance To Ethereum (funding gas)'
+          text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
+          text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
+          text += '\nFrom: ' + swap.eth_address
+          text += '\nTo: ' + swap.bnb_address
+          text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
+          text += '\n\nError Received: ' + err
           text += '\n*********************************************************'
 
           emailer.sendMail('BNBridge error', text)
 
           return callback(err)
-        })
-      }
+        }
 
-      if(swapResult) {
-        let resultHash = swapResult
+        if (swapResult && swapResult.result && swapResult.result.length > 0) {
+          let resultHash = swapResult.result[0].hash // tx hash that funded bnb account
+          console.log('Successfully funded bnb account ', swap.bnb_address, swapResult);
 
-        models.updateWithTransferTransactionHash(swap.uuid, resultHash, (err) => {
-          if(err) {
-            return callback(err)
-          }
+          // 2. then, now that bnb account is funded, send the deposit to the foundation account
+          bnb.transfer(key.mnemonic, BNB_FOUNDATION_ACCT_ADDRESS, swap.amount, tokenInfo.unique_symbol,
+            'Sending the BNBridge Swap bnb deposit to the foundation account', (err, swapResult) => {
 
-          callback(null, resultHash)
-        })
-      } else {
-        console.log(swapResult)
-        return callback('Swap result is not defined')
-      }
+              if (err) {
+                console.log(err)
 
+                let text = "BNBridge encountered an error processing a swap.\n" +
+                  "Failed to send bnb deposit to the foundation account."
+
+                text += '\n\n*********************************************************'
+                text += '\nDirection: Binance To Ethereum (sending to foundation)'
+                text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
+                text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
+                text += '\nFrom: ' + swap.eth_address
+                text += '\nTo: ' + swap.bnb_address
+                text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
+                text += '\n\nError Received: ' + err
+                text += '\n*********************************************************'
+
+                emailer.sendMail('BNBridge error', text)
+
+                return callback(err)
+              }
+
+              if (swapResult && swapResult.result && swapResult.result.length > 0) {
+                let resultHash = swapResult.result[0].hash
+                callback(null, resultHash)
+              } else {
+                console.log(swapResult)
+                return callback('Swap result is not defined')
+              }
+
+          })
+        } else {
+          console.log(swapResult)
+          return callback('Swap result is not defined')
+        }
+      })
     })
+  },
+
+  sendErc20Transaction(swap, tokenInfo, address, callback) {
+    eth.sendTransaction(
+      tokenInfo.erc20_address,
+      address.private_key_decrypted,
+      tokenInfo.eth_address,
+      swap.eth_address,
+      swap.amount, (err, swapResult) => {
+        if (err) {
+          console.log(err)
+
+          return models.revertUpdateWithDepositTransactionHash(swap.uuid, (revertErr) => {
+            if (revertErr) {
+              console.log(revertErr)
+            }
+
+            let text = "BNBridge encountered an error processing a swap."
+
+            text += '\n\n*********************************************************'
+            text += '\nDirection: Binance To Ethereum'
+            text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
+            text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
+            text += '\nFrom: ' + swap.bnb_address
+            text += '\nTo: ' + swap.eth_address
+            text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
+            text += '\n\nError Received: ' + err
+            text += '\n*********************************************************'
+
+            emailer.sendMail('BNBridge error', text)
+
+            return callback(err)
+          })
+        }
+
+        if (swapResult) {
+          let resultHash = swapResult
+
+          models.updateWithTransferTransactionHash(swap.uuid, resultHash, (err) => {
+            if (err) {
+              return callback(err)
+            }
+
+            callback(null, resultHash)
+          })
+        } else {
+          console.log(swapResult)
+          return callback('Swap result is not defined')
+        }
+
+      })
   },
 
   getEthAccount(ethAddress, callback) {
