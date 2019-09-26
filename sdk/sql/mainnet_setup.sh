@@ -53,7 +53,7 @@ echo "bnbAddress = $bnbAddress"
 
 export ERC20_ADDRESS=0x799a4202c12ca952cb311598a024c80ed371a41e
 export ETH_ACCOUNT_ADDRESS=0x05C6651BF91B37184fE340F61dD76D41034e9922
-# export ETH_PRIVATE_KEY=
+export ETH_PRIVATE_KEY=CF537CCDAE79533663D062AF1C6FFA04B811EE0E9282F2413B1EBD07F733E80D
 
 echo "erc20_address = " ${ERC20_ADDRESS}
 echo "eth_account_address = ${ETH_ACCOUNT_ADDRESS}"
@@ -91,7 +91,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
     '$bnbAddress',
     'bnbcli-keyname-optional',
     '$bnbEncrKey',
-   timezone(\'utc\', now())
+   timezone('utc', now())
   );
 "
 
@@ -154,6 +154,6 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
     '$ERC20_ADDRESS',
     'erc_account_uuid', 'bnb_account_uuid',
     true, true, 'list_proposal_uuid',
-    true, timezone(\'utc\', now()), true, 0, 0, timezone(\'utc\', now()), true, false
+    true, timezone('utc', now()), true, 0, 0, timezone('utc', now()), true, false
   );
 "

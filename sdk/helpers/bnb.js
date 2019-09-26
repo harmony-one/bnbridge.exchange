@@ -3,9 +3,10 @@ const axios = require('axios');
 const config = require('../config')
 
 const os = require('os');
+
 const pty = require('node-pty');
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
-const httpClient = axios.create({ baseURL: config.api });
+const httpClient = axios.create({ baseURL: "https://dex.binance.org" /*config.api*/ });
 
 const bnb = {
   spawnProcess() {
@@ -70,11 +71,12 @@ const bnb = {
         ptyProcess.write(password+'\r');
       }
 
-      if(os.platform() !== 'win32') {
+      if (os.platform() !== 'win32') {
         buildResponse = buildResponse + data
 
         // indicates bnbcli finish data
-        if(data.split(' ').length == 46) {
+        // NOTE: for ubuntu, use length 24 instead of 46 for length check.
+        if (data.split(' ').length == 46) {
           process.stdout.write(data)
 
           const tmpData = buildResponse.split('\n');
@@ -200,13 +202,20 @@ const bnb = {
 
     const sequenceURL = `${config.api}api/v1/account/${publicFrom}/sequence`;
 
+    console.log('private key', privateFrom, 'publicFrom', publicFrom);
+    console.log('mnemonic, publicTo, amount, asset, message', mnemonic, publicTo, amount, asset, message);
+    console.log('sequenceURL', sequenceURL);
+
     const bnbClient = new BnbApiClient(config.api);
+    bnbClient.chooseNetwork(config.network);
     bnbClient.setPrivateKey(privateFrom);
     bnbClient.initChain();
 
     httpClient.get(sequenceURL)
     .then((res) => {
       const sequence = res.data.sequence || 0
+      // console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
+      //   publicFrom, publicTo, amount, asset, message, sequence);
       return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
     })
     .then((result) => {
@@ -219,6 +228,40 @@ const bnb = {
     .catch((error) => {
       callback(error)
     });
+  },
+
+  transferWithPrivateKey(privateFrom, publicTo, amount, asset, message, callback) {
+    const publicFrom = BnbApiClient.crypto.getAddressFromPrivateKey(privateFrom, config.prefix);
+    const sequenceURL = `https://dex.binance.org/api/v1/account/${publicFrom}/sequence`;
+
+    // console.log('##########################################');
+    // console.log(privateFrom, publicFrom, publicTo, amount, asset, message);
+    // console.log('##########################################');
+    // console.log('sequenceURL', sequenceURL);
+    // console.log('##########################################');
+
+    const bnbClient = new BnbApiClient(config.api);
+    bnbClient.chooseNetwork(config.network);
+    bnbClient.setPrivateKey(privateFrom);
+    bnbClient.initChain();
+
+    httpClient.get(sequenceURL)
+      .then((res) => {
+        const sequence = res.data.sequence || 0
+        // console.log('transferWithPrivateKey httpClientgetsequenceURL bnbClient.transfer',
+        //   publicFrom, publicTo, amount, asset, message, sequence);
+        return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
+      })
+      .then((result) => {
+        if (result.status === 200) {
+          callback(null, result)
+        } else {
+          callback(result)
+        }
+      })
+      .catch((error) => {
+        callback(error)
+      });
   },
 
   freeze(amount, symbol, keyName, callback) {
