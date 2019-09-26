@@ -6,7 +6,7 @@ const os = require('os');
 
 const pty = require('node-pty');
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
-const httpClient = axios.create({ baseURL: config.api });
+const httpClient = axios.create({ baseURL: "https://dex.binance.org" /*config.api*/ });
 
 const bnb = {
   spawnProcess() {
@@ -202,13 +202,20 @@ const bnb = {
 
     const sequenceURL = `${config.api}api/v1/account/${publicFrom}/sequence`;
 
+    console.log('private key', privateFrom, 'publicFrom', publicFrom);
+    console.log('mnemonic, publicTo, amount, asset, message', mnemonic, publicTo, amount, asset, message);
+    console.log('sequenceURL', sequenceURL);
+
     const bnbClient = new BnbApiClient(config.api);
+    bnbClient.chooseNetwork(config.network);
     bnbClient.setPrivateKey(privateFrom);
     bnbClient.initChain();
 
     httpClient.get(sequenceURL)
     .then((res) => {
       const sequence = res.data.sequence || 0
+      // console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
+      //   publicFrom, publicTo, amount, asset, message, sequence);
       return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
     })
     .then((result) => {
@@ -225,15 +232,24 @@ const bnb = {
 
   transferWithPrivateKey(privateFrom, publicTo, amount, asset, message, callback) {
     const publicFrom = BnbApiClient.crypto.getAddressFromPrivateKey(privateFrom, config.prefix);
-    const sequenceURL = `${config.api}api/v1/account/${publicFrom}/sequence`;
+    const sequenceURL = `https://dex.binance.org/api/v1/account/${publicFrom}/sequence`;
+
+    // console.log('##########################################');
+    // console.log(privateFrom, publicFrom, publicTo, amount, asset, message);
+    // console.log('##########################################');
+    // console.log('sequenceURL', sequenceURL);
+    // console.log('##########################################');
 
     const bnbClient = new BnbApiClient(config.api);
+    bnbClient.chooseNetwork(config.network);
     bnbClient.setPrivateKey(privateFrom);
     bnbClient.initChain();
 
     httpClient.get(sequenceURL)
       .then((res) => {
         const sequence = res.data.sequence || 0
+        // console.log('transferWithPrivateKey httpClientgetsequenceURL bnbClient.transfer',
+        //   publicFrom, publicTo, amount, asset, message, sequence);
         return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
       })
       .then((result) => {
