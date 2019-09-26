@@ -168,7 +168,8 @@ class Swaps extends Component {
   render() {
     const { classes } = this.props;
     const { swaps, rowsPerPage, page } = this.state;
-    const emptyRows = rowsPerPage - Math.min(rowsPerPage, swaps.length - page * rowsPerPage);
+    const rowsPerPageNum = Number(rowsPerPage);
+    const emptyRows = rowsPerPageNum - Math.min(rowsPerPageNum, swaps.length - page * rowsPerPageNum);
 
     return (
       <Table className={classes.table}>
@@ -183,7 +184,7 @@ class Swaps extends Component {
           </TableRow>
         </TableHead>
         <TableBody>
-          {this.renderSwaps(swaps, page, rowsPerPage) }
+          {this.renderSwaps(swaps, page, rowsPerPageNum) }
           {
             emptyRows > 0 && (
               <TableRow style={{ height: 48 * emptyRows }}>
@@ -194,7 +195,7 @@ class Swaps extends Component {
         </TableBody>
         <TableFooter>
           <TableRow>
-            <TablePagination rowsPerPageOptions={[5, 10, 25]} colSpan={3} count={swaps.length} rowsPerPage={rowsPerPage} page={page} SelectProps={{
+            <TablePagination rowsPerPageOptions={[5, 10, 25]} colSpan={3} count={swaps.length} rowsPerPage={rowsPerPageNum} page={page} SelectProps={{
               native: true
             }} onChangePage={this.handleChangePage} onChangeRowsPerPage={this.handleChangeRowsPerPage} ActionsComponent={TablePaginationActionsWrapped} />
           </TableRow>
@@ -220,12 +221,12 @@ class Swaps extends Component {
           <TableCell align="left">{swap.amount}</TableCell>
           <TableCell align="left">
             <a href={"https://explorer.binance.org/tx/" + swap.deposit_transaction_hash} rel="noopener noreferrer" target="_blank">
-              {swap.deposit_transaction_hash.substring(0, 8)}
+              {swap.deposit_transaction_hash ? swap.deposit_transaction_hash.substring(0, 8) : swap.deposit_transaction_hash }
             </a>
           </TableCell>
           <TableCell align="left">
             <a href={"https://etherscan.io/tx/" + swap.transfer_transaction_hash} rel="noopener noreferrer" target="_blank">
-              {swap.transfer_transaction_hash.substring(0, 8)}
+              {swap.deposit_transaction_hash ? swap.deposit_transaction_hash.substring(0, 8) : swap.deposit_transaction_hash }
             </a>
           </TableCell>
         </TableRow>

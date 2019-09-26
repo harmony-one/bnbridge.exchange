@@ -80,7 +80,7 @@ const eth = {
     const gasLimit = 3000000;
 
     const [chainId, nonce] = await Promise.all([web3.eth.net.getId(), web3.eth.getTransactionCount(from, 'pending')]);
-    console.log('chainId: ' + chainId + ', nonce: ' + nonce);
+    // console.log('chainId: ' + chainId + ', nonce: ' + nonce);
 
     const tx = {
       from,
@@ -110,7 +110,7 @@ const eth = {
         }
         callback(null, hash.toString())
       })
-    console.log(receipt)
+    console.log('Transaction receipt', receipt)
   },
 
   addAccount(account) {

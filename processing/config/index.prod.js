@@ -6,7 +6,7 @@ const config = {
 
 	//Binance
 	api: "https://dex.binance.org/", //live
-	filePath: "/Users/dennis.won/harmony-one/bnbridge.exchange/cli/node-binary/", //live
+	filePath: "/Users/dennis.won/bnbridge.exchange/cli/node-binary/", //live
 	fileName: "bnbcli", //live
 	chainID: "Binance-Chain-Tigris", //live
 	nodeData: "https://dataseed5.defibit.io:443", //live
@@ -14,6 +14,7 @@ const config = {
 	keyPrepend: "LIVE_",
 	list_proposal_deposit: "100000000000",
 	prefix: 'bnb',
+	network: 'mainnet',
 
 	//Ethereum
 	provider: 'https://mainnet.infura.io/v3/4a1a3bdd85e7423a86c6031a792a9e63', //live
