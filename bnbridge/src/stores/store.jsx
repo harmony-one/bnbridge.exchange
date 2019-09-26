@@ -46,8 +46,7 @@ const Emitter = require('events').EventEmitter;
 const dispatcher = new Dispatcher();
 const emitter = new Emitter();
 
-const apiUrl = process.env.BNBRIDGE_API_URL || config.apiUrl;
-console.log('apiUrl', apiUrl);
+const apiUrl = config.apiUrl;
 
 function encrypt(data, url) {
   const signJson = JSON.stringify(data);
