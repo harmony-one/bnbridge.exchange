@@ -226,7 +226,7 @@ class Swaps extends Component {
           </TableCell>
           <TableCell align="left">
             <a href={"https://etherscan.io/tx/" + swap.transfer_transaction_hash} rel="noopener noreferrer" target="_blank">
-              {swap.deposit_transaction_hash ? swap.deposit_transaction_hash.substring(0, 8) : swap.deposit_transaction_hash }
+              {swap.transfer_transaction_hash ? swap.transfer_transaction_hash.substring(0, 8) : swap.transfer_transaction_hash }
             </a>
           </TableCell>
         </TableRow>
