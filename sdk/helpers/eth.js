@@ -122,7 +122,7 @@ const eth = {
     const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
 
     const gasPriceGwei = 20;
-    const gasLimit = 51000;
+    const gasLimit = 510000;
 
     const nonce = await web3.eth.getTransactionCount(from, 'pending');
 
