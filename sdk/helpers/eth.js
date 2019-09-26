@@ -121,7 +121,7 @@ const eth = {
     const consumerContract = new web3.eth.Contract(config.erc20ABI, contractAddress);
     const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
 
-    const gasPriceGwei = 100;
+    const gasPriceGwei = 20;
     const gasLimit = 51000;
 
     const nonce = await web3.eth.getTransactionCount(from, 'pending');
