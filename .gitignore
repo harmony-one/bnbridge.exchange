@@ -16,11 +16,6 @@
 # Mac
 .DS_Store
 
-sdk/node_modules/
-sdk/.elasticbeanstalk/*
-sdk/!.elasticbeanstalk/*.cfg.yml
-sdk/!.elasticbeanstalk/*.global.yml
-
 cli/node-binary
 accounts/
 

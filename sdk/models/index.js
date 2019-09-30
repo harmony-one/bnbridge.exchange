@@ -10,12 +10,12 @@ const sha256 = require('sha256');
 const bip39 = require('bip39');
 const Web3 = require('web3');
 const algorithm = 'aes-256-ctr';
+
 const KEY = 'witness canyon foot sing song tray task defense float bottom town obvious faint globe door tonight alpha battle purse jazz flag author choose whisper';
 
-const BNB_FUND_ACCT_ADDRESS = 'bnb18xvlduz3sv4d94ddanp5gtfdhpsmf4ts55pvz7'
 const BNB_FUND_ACCT_PRIVATE_KEY = process.env.BNB_FUND_ACCT_PRIVATE_KEY
+const BNB_FOUNDATION_ACCT_ADDRESS = process.env.BNB_FOUNDATION_ACCT_ADDRESS
 
-const BNB_FOUNDATION_ACCT_ADDRESS = 'bnb1xwvm73088qrhq8aykcunsq25x2ymxc7pyg7tpj'
 const BNB_GAS_FEE = 0.000375 // in BNB
 
 const models = {

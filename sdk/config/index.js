@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const config = {
 	host: process.env.DBHOST || "13.52.142.50",
 	database: process.env.DBNAME || "harmonyone",

@@ -47,6 +47,7 @@ const dispatcher = new Dispatcher();
 const emitter = new Emitter();
 
 const apiUrl = config.apiUrl;
+console.log('Backend API url: ', apiUrl);
 
 function encrypt(data, url) {
   const signJson = JSON.stringify(data);

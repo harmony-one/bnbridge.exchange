@@ -2,13 +2,13 @@ const pgp = require('pg-promise')(/*options*/)
 const config = require('../config')
 
 const cn = {
-  host: process.env.BNBRIDGE_DB_HOST || config.host,
+  host: config.host,
   port: 5432,
-  database: process.env.DBNAME || config.database,
-  user: process.env.DBUSER || config.user,
-  password: process.env.DBPASSWORD || config.password
+  database: config.database,
+  user: config.user,
+  password: config.password
 }
-console.log(cn);
+console.log('postgres db', cn);
 const db = pgp(cn)
 
 module.exports = {

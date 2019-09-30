@@ -4,9 +4,9 @@ import example from "./example.config";
 const env = process.env.APP_ENV || 'development';
 
 const config = {
-  example,
-  development,
-  production
+  example: example,
+  development: development,
+  production: production
 };
 
 export default config[env];

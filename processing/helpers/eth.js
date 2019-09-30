@@ -4,6 +4,8 @@ const Tx = require('ethereumjs-tx');
 const Web3 = require('web3');
 
 var web3 = new Web3(new Web3.providers.HttpProvider(config.provider));
+const ETH_TX_GAS_PRICE_GWEI = process.env.ETH_TX_GAS_PRICE_GWEI
+const ETH_TX_GAS_LIMIT = process.env.ETH_TX_GAS_LIMIT
 
 const eth = {
   createAccount(callback) {
@@ -76,8 +78,8 @@ const eth = {
     const consumerContract = new web3.eth.Contract(config.erc20ABI, contractAddress);
     const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
 
-    const gasPriceGwei = 3;
-    const gasLimit = 3000000;
+    const gasPriceGwei = ETH_TX_GAS_PRICE_GWEI;
+    const gasLimit = ETH_TX_GAS_LIMIT;
 
     const [chainId, nonce] = await Promise.all([web3.eth.net.getId(), web3.eth.getTransactionCount(from, 'pending')]);
     // console.log('chainId: ' + chainId + ', nonce: ' + nonce);

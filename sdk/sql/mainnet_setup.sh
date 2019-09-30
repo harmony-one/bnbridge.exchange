@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if test -f "env_var_setup.sh"; then
+  echo "running env_var_setup.sh"
+  source env_var_setup.sh
+fi
+
 if [[ -z $DBUSER ]]; then
   echo "Export DBUSER to environment variable"
   exit
@@ -15,17 +20,17 @@ if [[ -z $DBNAME ]]; then
   exit
 fi
 
-if [[ -z $KEY ]]; then
-  echo "Export KEY to environment variable"
+if [[ -z $BNB_ENCRYPTION_KEY ]]; then
+  echo "Export BNB_ENCRYPTION_KEY to environment variable"
   exit
 fi
 
-if [[ -z $PRIVATE_KEY ]]; then
-  echo "Export PRIVATE_KEY to environment variable"
+if [[ -z $BNB_PRIVATE_KEY ]]; then
+  echo "Export BNB_PRIVATE_KEY to environment variable"
   exit
 fi
 
-# set +o history
+set +o history
 
 # linux only
 # sudo adduser $DBUSER
@@ -38,9 +43,8 @@ sudo -u $DBUSER createdb -O $DBUSER $DBNAME
 # Creating tables from setup.sql
 sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -f ${PWD}/setup.sql
 
-
 # Gen encryption keys and encrypted password
-var=$(ISTESTNET=0 PRIVATE_KEY=$PRIVATE_KEY KEY=$KEY CLIPASSWORD=$CLIPASSWORD node keygen.js)
+var=$(ISTESTNET=0 BNB_PRIVATE_KEY=$BNB_PRIVATE_KEY BNB_ENCRYPTION_KEY=$BNB_ENCRYPTION_KEY CLIPASSWORD=$CLIPASSWORD node keygen.js)
 bnbPubKey=$(echo $var | cut -d, -f1)
 bnbAddress=$(echo $var | cut -d, -f2)
 bnbEncrSeed=$(echo $var | cut -d, -f3)
@@ -51,20 +55,11 @@ echo "bnbEncrKey = $bnbEncrKey"
 echo "bnbPubKey = $bnbPubKey"
 echo "bnbAddress = $bnbAddress"
 
-export ERC20_ADDRESS=0x799a4202c12ca952cb311598a024c80ed371a41e
-export ETH_ACCOUNT_ADDRESS=0x05C6651BF91B37184fE340F61dD76D41034e9922
-export ETH_PRIVATE_KEY=CF537CCDAE79533663D062AF1C6FFA04B811EE0E9282F2413B1EBD07F733E80D
-
 echo "erc20_address = " ${ERC20_ADDRESS}
 echo "eth_account_address = ${ETH_ACCOUNT_ADDRESS}"
 echo "eth_private_key = ${ETH_PRIVATE_KEY}"
 
-# # set -o history
-
-# # You should keep your own copy of the following secrets. unset to ensure safety.
-# # You might also need to clear bash history to avoid leaking secrets.
-# # unset DBPASSWORD
-# # unset PRIVATE_KEY
+set -o history
 
 psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
   insert into eth_accounts (uuid, private_key, address) VALUES (
@@ -157,3 +152,24 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
     true, timezone('utc', now()), true, 0, 0, timezone('utc', now()), true, false
   );
 "
+
+# You should keep your own copy of the following secrets. unset to ensure safety.
+# You might also need to clear bash history to avoid leaking secrets.
+
+# Postgres
+unset DBHOST
+unset DBNAME
+unset DBUSER
+unset DBPASSWORD
+
+# Harmony.One token issue bnb account. Note that this data does not equal the actual encription or private key
+# of ONE foundation bnb account. dummy data.
+unset BNB_ENCRYPTION_KEY
+unset BNB_PRIVATE_KEY
+
+# Harmony.One ERC20 smart contract
+unset ERC20_ADDRESS
+
+# Ethereum account used to fund BEP2->ERC20 swap
+unset ETH_ACCOUNT_ADDRESS
+unset ETH_PRIVATE_KEY
