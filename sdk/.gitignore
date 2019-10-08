@@ -9,6 +9,8 @@ sql/env_var_setup.sh
 
 # misc
 .DS_Store
+*.swp
+
 .env.local
 .env.development.local
 .env.test.local

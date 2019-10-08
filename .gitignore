@@ -15,6 +15,7 @@
 
 # Mac
 .DS_Store
+*.swp
 
 cli/node-binary
 accounts/
