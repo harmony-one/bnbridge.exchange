@@ -30,8 +30,11 @@ API used to interact with the CLI utility, Binance javascript SDK and Web3.js to
     git clone the repo
 
     cd ./sdk
-
     npm install
+    
+    for AWS linux, if you see error `/usr/bin/ld: cannot find -lusb-1.0` during npm install in /sdk
+    run `sudo yum install libusb1-devel`
+    
     run ./sdk/(testnet/mainnet)_setup.sh
     this will internally ./sql/setup.sql to instantiate the DB.
     update ./config/index.js with
