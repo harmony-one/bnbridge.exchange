@@ -41,7 +41,12 @@ set +o history
 sudo -u $DBUSER dropdb $DBNAME
 sudo -u $DBUSER createdb -O $DBUSER $DBNAME
 # Creating tables from setup.sql
-sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -f ${PWD}/setup.sql
+
+# centos only:
+# sudo cp ${PWD}/setup.sql /tmp/setup.sql
+sql_file=${PWD}/setup.sql # if centos, /tmp/setup.sql
+echo 'sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -f $sql_file'
+sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -f $sql_file
 
 # Gen encryption keys and encrypted password
 var=$(ISTESTNET=0 BNB_PRIVATE_KEY=$BNB_PRIVATE_KEY BNB_ENCRYPTION_KEY=$BNB_ENCRYPTION_KEY CLIPASSWORD=$CLIPASSWORD node keygen.js)
@@ -61,7 +66,7 @@ echo "eth_private_key = ${ETH_PRIVATE_KEY}"
 
 set -o history
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
   insert into eth_accounts (uuid, private_key, address) VALUES (
     'erc_account_uuid',
     '$ETH_PRIVATE_KEY',
@@ -69,7 +74,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
   );
 "
 
-# psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+# psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
 #   insert into client_accounts_eth VALUES (
 #     'erc_account_uuid',
 #     '$ETH_ACCOUNT_ADDRESS',
@@ -78,7 +83,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
 #   );
 # "
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
   INSERT INTO bnb_accounts VALUES (
     'bnb_account_uuid',
     '$bnbPubKey',
@@ -105,7 +110,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
 # echo "clientBnbPubKey = $clientBnbPubKey"
 # echo "clientBnbAddress = $clientBnbAddress"
 
-# psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+# psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
 #   INSERT INTO client_bnb_accounts VALUES (
 #     'bnb_account_uuid_client',
 #     '$clientBnbPubKey',
@@ -123,7 +128,7 @@ token_uuid=Harmony_One
 # "owner":"bnb1a03uvqmnqzl85csnxnsx2xy28m76gkkht46f2l","symbol":"ONE-5F9",
 # "total_supply":"12600000000.00000000"}
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
   insert into tokens (
     uuid,
     name,

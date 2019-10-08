@@ -36,7 +36,7 @@ psql -c "ALTER USER $DBUSER WITH PASSWORD $DBPASSWORD;"
 sudo -u $DBUSER dropdb $DBNAME
 sudo -u $DBUSER createdb -O $DBUSER $DBNAME
 # Creating tables from setup.sql
-sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -f ${PWD}/setup.sql
+sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -f ${PWD}/setup.sql
 
 
 # Gen encryption keys and encrypted password
@@ -74,7 +74,7 @@ echo "eth_private_key = $ETH_PRIVATE_KEY"
 # unset DBPASSWORD
 # unset BNB_PRIVATE_KEY
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
   insert into eth_accounts VALUES (
     'erc_account_uuid',
     '$eth_private_key',
@@ -84,7 +84,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
   );
 "
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
   insert into client_accounts_eth VALUES (
     'erc_account_uuid',
     '$ETH_ACCOUNT_ADDRESS',
@@ -93,7 +93,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
   );
 "
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
   INSERT INTO bnb_accounts VALUES (
     'bnb_account_uuid',
     '$bnbPubKey',
@@ -105,7 +105,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
   );
 "
 
-# psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+# psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
 #   INSERT INTO client_bnb_accounts VALUES (
 #     'bnb_account_uuid_client',
 #     '$clientBnbPubKey',
@@ -119,7 +119,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
 
 token_uuid=ONE_uuid
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
+psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
   insert into tokens (
     uuid,
     name,
