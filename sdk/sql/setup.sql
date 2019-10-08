@@ -136,5 +136,6 @@ ALTER TABLE "public"."eth_accounts" ADD PRIMARY KEY ("uuid");
 ALTER TABLE "public"."list_proposals" ADD PRIMARY KEY ("uuid");
 
 ALTER TABLE "public"."swaps" ADD PRIMARY KEY ("uuid");
+CREATE INDEX "swap_created_index" ON "public"."swaps"("created" DESC NULLS LAST);
 
 ALTER TABLE "public"."tokens" ADD PRIMARY KEY ("uuid");

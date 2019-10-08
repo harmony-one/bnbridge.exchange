@@ -186,7 +186,10 @@ class Store {
   };
 
   getSwaps(payload) {
-    const url = "/api/v1/swaps"
+    const limit = payload.content.limit ? payload.content.limit : 100
+    const offset = payload.content.offset ? payload.content.offset : 0
+    const url = "/api/v1/swaps?limit=" + limit + '&offset=' + offset
+
     this.callApi(url, 'GET', null, payload, (err, data) => {
       if (err) {
         console.log(err)
