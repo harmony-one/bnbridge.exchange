@@ -12,6 +12,8 @@ import Instructions from './components/instructions';
 import Controller from './components/controller';
 import Swaps from './components/swaps';
 
+require('dotenv').config();
+
 function App() {
   return (
     <MuiThemeProvider theme={ createMuiTheme(bnbridgeTheme) }>
@@ -30,7 +32,7 @@ function App() {
         </Grid>
       </Grid>
       <Grid
-        style={{ padding: '0 50.0rem 20.0rem', display: 'inline-block'}}
+        style={{ padding: '5.0rem 20%', display: 'inline-block'}}
         container
         justify="center"
         alignItems="center"

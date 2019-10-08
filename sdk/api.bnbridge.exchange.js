@@ -7,6 +7,8 @@ const https = require('https')
 const fs = require('fs')
 const auth = require('http-auth')
 
+require('dotenv').config();
+
 /*  ZTgwMTY1NjkzZjAyOTk1N2VjNDQ4MjBhNGRiODJiMGI1NjI5YjM2YjJkNjc1YjVhYjE0YmEwNTBhMDFiNDk3ZDpmYmM3MWMyOTRmOWE4N2VlM2QzMmVkZDVkNjExNTE4MTFlNDRmNzc0NDgzNzY4OWVmYWRkYmJiOWY3NjgxYzA5 */
 var basic = auth.basic({ realm: 'bnbridge.exchange' }, function (username, password, callback) {
   callback(username === 'e80165693f029957ec44820a4db82b0b5629b36b2d675b5ab14ba050a01b497d' && password === 'fbc71c294f9a87ee3d32edd5d61151811e44f7744837689efaddbbb9f7681c09')
@@ -120,10 +122,10 @@ app.use(function(err, req, res, next) {
 
 var options = {}
 https.globalAgent.maxSockets = 50
-app.set('port', process.env.BNBRIDGE_API_PORT)
+app.set('port', process.env.API_PORT)
 var server = null
 server = require('http').Server(app)
 server.listen(app.get('port'), function () {
-  console.log('api.bnbridge.exchange',server.address().port)
+  console.log('api.bnbridge.exchange', server.address().port)
   module.exports = server
 })

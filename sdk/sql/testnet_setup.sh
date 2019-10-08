@@ -15,13 +15,13 @@ if [[ -z $DBNAME ]]; then
   exit
 fi
 
-if [[ -z $KEY ]]; then
-  echo "Export KEY to environment variable"
+if [[ -z $BNB_ENCRYPTION_KEY ]]; then
+  echo "Export BNB_ENCRYPTION_KEY to environment variable"
   exit
 fi
 
-if [[ -z $PRIVATE_KEY ]]; then
-  echo "Export PRIVATE_KEY to environment variable"
+if [[ -z $BNB_PRIVATE_KEY ]]; then
+  echo "Export BNB_PRIVATE_KEY to environment variable"
   exit
 fi
 
@@ -40,7 +40,7 @@ sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -f ${P
 
 
 # Gen encryption keys and encrypted password
-var=$(ISTESTNET=1 PRIVATE_KEY=$PRIVATE_KEY KEY=$KEY CLIPASSWORD=$CLIPASSWORD node keygen.js)
+var=$(ISTESTNET=1 BNB_PRIVATE_KEY=$BNB_PRIVATE_KEY BNB_ENCRYPTION_KEY=$BNB_ENCRYPTION_KEY CLIPASSWORD=$CLIPASSWORD node keygen.js)
 bnbPubKey=$(echo $var | cut -d, -f1)
 bnbAddress=$(echo $var | cut -d, -f2)
 bnbEncrSeed=$(echo $var | cut -d, -f3)
@@ -52,7 +52,7 @@ echo "bnbPubKey = $bnbPubKey"
 echo "bnbAddress = $bnbAddress"
 
 # Gen encryption keys and encrypted password
-# var=$(ISTESTNET=1 PRIVATE_KEY=$CLIENT_PRIVATE_KEY KEY=$CLIENT_KEY CLIPASSWORD=$CLIENT_CLIPASSWORD node keygen.js)
+# var=$(ISTESTNET=1 BNB_PRIVATE_KEY=$CLIENT_PRIVATE_KEY BNB_ENCRYPTION_KEY=$CLIENT_KEY CLIPASSWORD=$CLIENT_CLIPASSWORD node keygen.js)
 # clientBnbPubKey=$(echo $var | cut -d, -f1)
 # clientBnbAddress=$(echo $var | cut -d, -f2)
 # clientBnbEncrSeed=$(echo $var | cut -d, -f3)
@@ -63,25 +63,22 @@ echo "bnbAddress = $bnbAddress"
 # echo "clientBnbPubKey = $clientBnbPubKey"
 # echo "clientBnbAddress = $clientBnbAddress"
 
-erc20_address=0xD379255277e87E3636708A71F7A845A86f8c591d
-eth_account_address=0xBE2E9AAd36a3C3C0c189A9C1f2e4E73bCD472a57
-eth_private_key=
-echo "erc20_address = $erc20_address"
-echo "eth_account_address = $eth_account_address"
-echo "eth_private_key = $eth_private_key"
+echo "erc20_address = $ERC20_ADDRESS"
+echo "eth_account_address = $ETH_ACCOUNT_ADDRESS"
+echo "eth_private_key = $ETH_PRIVATE_KEY"
 
 # set -o history
 
 # You should keep your own copy of the following secrets. unset to ensure safety.
 # You might also need to clear bash history to avoid leaking secrets.
 # unset DBPASSWORD
-# unset PRIVATE_KEY
+# unset BNB_PRIVATE_KEY
 
 psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
   insert into eth_accounts VALUES (
     'erc_account_uuid',
     '$eth_private_key',
-    '$eth_account_address',
+    '$ETH_ACCOUNT_ADDRESS',
    timezone(\'utc\', now()),
     'erc_account_encr_key'
   );
@@ -90,7 +87,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
 psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
   insert into client_accounts_eth VALUES (
     'erc_account_uuid',
-    '$eth_account_address',
+    '$ETH_ACCOUNT_ADDRESS',
     'bnb_account_uuid_client',
    timezone(\'utc\', now())
   );
@@ -145,7 +142,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@localhost/$DBNAME" -c "
     eth_to_bnb_enabled
   ) values (
     '$token_uuid', 'Harmony ONE', 'ONE', 'ONE-C00', 10000000000,
-    '$erc20_address',
+    '$ERC20_ADDRESS',
     'erc_account_uuid', 'bnb_account_uuid',
     true, true, 'list_proposal_uuid',
     true, timezone(\'utc\', now()), true, 1000, 0, timezone(\'utc\', now()), true, false

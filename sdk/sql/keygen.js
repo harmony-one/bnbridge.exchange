@@ -20,16 +20,16 @@ function bech32EncodedPubKey(pubKeyHex) {
 }
 
 assert(process.env.ISTESTNET != null, "Environment variable ISTESTNET not set!");
-assert(process.env.PRIVATE_KEY != null, "Environment variable PRIVATE_KEY is not set!");
-assert(process.env.KEY != null, "Environment variable KEY is not set!");
+assert(process.env.BNB_PRIVATE_KEY != null, "Environment variable BNB_PRIVATE_KEY is not set!");
+assert(process.env.BNB_ENCRYPTION_KEY != null, "Environment variable BNB_ENCRYPTION_KEY is not set!");
 
-var publicKey = bnbsdk.crypto.getPublicKeyFromPrivateKey(process.env.PRIVATE_KEY);
+var publicKey = bnbsdk.crypto.getPublicKeyFromPrivateKey(process.env.BNB_PRIVATE_KEY);
 publicKey = bech32EncodedPubKey(publicKey);
-const address = bnbsdk.crypto.getAddressFromPrivateKey(process.env.PRIVATE_KEY, process.env.ISTESTNET == 1 ? "tbnb" : "bnb");
+const address = bnbsdk.crypto.getAddressFromPrivateKey(process.env.BNB_PRIVATE_KEY, process.env.ISTESTNET == 1 ? "tbnb" : "bnb");
 // aka `encr_key` in schema
 const dbPassword = bip39.generateMnemonic()
-const encryptionKey = process.env.KEY + ':' + dbPassword
+const encryptionKey = process.env.BNB_ENCRYPTION_KEY + ':' + dbPassword
 // aka `private_key` in schema
-const encPK = encrypt(process.env.PRIVATE_KEY, encryptionKey)
+const encPK = encrypt(process.env.BNB_PRIVATE_KEY, encryptionKey)
 
 console.log("%s,%s,%s,%s", publicKey, address, encPK, dbPassword);

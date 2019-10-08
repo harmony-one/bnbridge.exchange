@@ -6,7 +6,8 @@ const os = require('os');
 
 const pty = require('node-pty');
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
-const httpClient = axios.create({ baseURL: "https://dex.binance.org" /*config.api*/ });
+const httpClient = axios.create({ baseURL: config.api });
+console.log('binance sdk base url: ', config.api);
 
 const bnb = {
   spawnProcess() {

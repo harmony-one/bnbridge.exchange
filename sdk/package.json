@@ -4,6 +4,7 @@
   "description": "Token swap utility for Harmony to Binance Chain",
   "main": "index.js",
   "scripts": {
+    "start": "pm2 start api.bnbridge.exchange.js --watch --ignore-watch='node_modules'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "antonnell.crypto@gmail.com",
@@ -16,6 +17,7 @@
     "compression": "^1.7.4",
     "crypto": "^1.0.1",
     "crypto-browserify": "^3.12.0",
+    "dotenv": "^8.1.0",
     "ethereumjs-tx": "^2.1.1",
     "execa": "^1.0.0",
     "express": "^4.16.4",
@@ -30,5 +32,9 @@
     "pg-promise": "^8.6.5",
     "sha256": "^0.2.0",
     "web3": "^1.0.0-beta.53"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.3",
+    "pm2": "^3.5.1"
   }
 }

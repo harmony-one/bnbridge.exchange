@@ -10,12 +10,12 @@ const sha256 = require('sha256');
 const bip39 = require('bip39');
 const Web3 = require('web3');
 const algorithm = 'aes-256-ctr';
+
 const KEY = 'witness canyon foot sing song tray task defense float bottom town obvious faint globe door tonight alpha battle purse jazz flag author choose whisper';
 
-const BNB_FUND_ACCT_ADDRESS = 'bnb18xvlduz3sv4d94ddanp5gtfdhpsmf4ts55pvz7'
 const BNB_FUND_ACCT_PRIVATE_KEY = process.env.BNB_FUND_ACCT_PRIVATE_KEY
+const BNB_FOUNDATION_ACCT_ADDRESS = process.env.BNB_FOUNDATION_ACCT_ADDRESS
 
-const BNB_FOUNDATION_ACCT_ADDRESS = 'bnb1xwvm73088qrhq8aykcunsq25x2ymxc7pyg7tpj'
 const BNB_GAS_FEE = 0.000375 // in BNB
 
 const models = {
@@ -516,8 +516,12 @@ const models = {
   * Returns the swaps
   */
   getSwaps(req, res, next) {
-    db.manyOrNone('select swap.uuid, swap.token_uuid, swap.eth_address, swap.bnb_address, swap.amount, swap.deposit_transaction_hash, swap.transfer_transaction_hash, swap.processed, swap.created, swap.client_account_uuid, swap.direction from swaps swap where swap.token_uuid = \'Harmony_One\' order by swap.created DESC;')
-      .then((swaps) => {
+    // console.log(req.query)
+    db.manyOrNone(
+      'SELECT swap.uuid, swap.token_uuid, swap.eth_address, swap.bnb_address, swap.amount, swap.deposit_transaction_hash, swap.transfer_transaction_hash, swap.processed, swap.created, swap.client_account_uuid, swap.direction FROM swaps swap WHERE swap.token_uuid = \'Harmony_One\' ORDER BY swap.created DESC LIMIT $1 OFFSET $2;',
+      [req.query.limit ? req.query.limit : 100,
+        req.query.offset ? req.query.offset : 0]
+    ).then((swaps) => {
         if (!swaps) {
           res.status(404)
           res.body = { 'status': 404, 'success': false, 'result': 'No swaps retreived' }
@@ -543,8 +547,6 @@ const models = {
   */
   swapToken(req, res, next) {
     models.descryptPayload(req, res, next, (data) => {
-      console.log('swapToken', data);
-
       let result = models.validateSwap(data)
 
       if(result !== true) {
@@ -676,15 +678,14 @@ const models = {
 
     models.getClientAccountForEthAddress(eth_address, (err, clientAccount) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
       }
 
       if(clientAccount) {
-        console.log('clientAccount', clientAccount);
-
+        // console.log('clientAccount', clientAccount);
         res.status(205)
         res.body = { 'status': 200, 'success': true, 'result': clientAccount }
         return next(null, req, res, next)
@@ -1924,7 +1925,6 @@ const models = {
             return next(null, req, res, next)
           }
 
-
           let balance = 0;
 
           let filteredBalances = balances.filter((balance) => {
@@ -2011,8 +2011,6 @@ const models = {
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
         }
-
-        console.log('getERC20Balance', eth_address, tokenInfo.erc20_address);
 
         eth.getERC20Balance(eth_address, tokenInfo.erc20_address, (err, balance) => {
           if(err) {

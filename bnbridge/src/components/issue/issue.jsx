@@ -173,7 +173,7 @@ class Issue extends Component {
       mintable: mintable
     }
 
-    console.log("ISSUE_TOKEN");
+    // console.log("ISSUE_TOKEN");
     dispatcher.dispatch({type: ISSUE_TOKEN, content })
 
     this.setState({ loading: true })

@@ -1,8 +1,8 @@
 const config = {
-	host: "localhost",
-	database: "harmonyone",
-	user: "dennis.won",
-	password: "harmony",
+	host: process.env.DBHOST || "13.52.142.50",
+	database: process.env.DBNAME || "harmonyone",
+	user: process.env.DBUSER || "postgres",
+	password: process.env.DBPASSWORD || "postgresharmony",
 
 	//Binance
 	api: "https://dex.binance.org/", //live

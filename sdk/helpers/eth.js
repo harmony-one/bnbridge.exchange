@@ -3,7 +3,11 @@ const config = require('../config')
 const Tx = require('ethereumjs-tx');
 const Web3 = require('web3');
 
-const CONTRACT_MANAGER = '0x666d9dac081ccea209091d6e06d76678b09dcca3'
+const CONTRACT_MANAGER = process.env.ERC20_CONTRACT_MANAGER
+
+const ETH_TX_GAS_PRICE_GWEI = process.env.ETH_TX_GAS_PRICE_GWEI
+const ETH_TX_GAS_LIMIT = process.env.ETH_TX_GAS_LIMIT
+
 const web3 = new Web3(new Web3.providers.HttpProvider(config.provider));
 
 const eth = {
@@ -65,7 +69,7 @@ const eth = {
 
     myContract.methods.balanceOf(address).call({ from: CONTRACT_MANAGER })
     .then((balance) => {
-      console.log(balance);
+      // console.log(balance);
       const theBalance = web3.utils.fromWei(balance.toString(), 'ether')
 
       callback(null, theBalance)
@@ -78,8 +82,7 @@ const eth = {
 
     myContract.methods.symbol().call({ from: contractAddress })
     .then((symbol) => {
-      console.log(symbol);
-
+      // console.log(symbol);
       callback(null, symbol)
     })
     .catch(callback)
@@ -90,8 +93,7 @@ const eth = {
 
     myContract.methods.name().call({ from: contractAddress })
     .then((name) => {
-      console.log(name);
-
+      // console.log(name);
       callback(null, name)
     })
     .catch(callback)
@@ -106,9 +108,8 @@ const eth = {
         return callback(null, null)
       }
 
-      console.log(supply);
+      // console.log(supply);
       const theSupply = web3.utils.fromWei(supply.toString(), 'ether')
-
       callback(null, theSupply)
     })
     .catch(callback)
@@ -121,8 +122,8 @@ const eth = {
     const consumerContract = new web3.eth.Contract(config.erc20ABI, contractAddress);
     const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
 
-    const gasPriceGwei = 20;
-    const gasLimit = 510000;
+    const gasPriceGwei = ETH_TX_GAS_PRICE_GWEI;
+    const gasLimit = ETH_TX_GAS_LIMIT;
 
     const nonce = await web3.eth.getTransactionCount(from, 'pending');
 
@@ -139,7 +140,7 @@ const eth = {
       data: myData
     }
 
-    console.log(tx);
+    console.log('Sending ERC20 transaction', tx);
 
     const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
     const privKey = Buffer.from(privateKey, 'hex');

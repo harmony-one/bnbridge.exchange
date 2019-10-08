@@ -7,7 +7,6 @@ import {
 } from '@material-ui/core';
 
 import {
-  GET_FEES,
   FEES_UPDATED,
 } from '../../constants'
 
@@ -18,7 +17,6 @@ import ErrorSnackbar from '../errorSnackbar';
 import CreateAccount from '../createAccount';
 
 import Store from "../../stores";
-const dispatcher = Store.dispatcher
 const emitter = Store.emitter
 const store = Store.store
 
@@ -44,7 +42,7 @@ class Controller extends Component {
 
   componentWillMount() {
     emitter.on(FEES_UPDATED, this.feesUpdated);
-    dispatcher.dispatch({type: GET_FEES, content: {} })
+    // dispatcher.dispatch({type: GET_FEES, content: {} })
   };
 
   componentWillUnmount() {

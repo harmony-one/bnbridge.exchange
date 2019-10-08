@@ -57,16 +57,20 @@ class TablePaginationActions extends React.Component {
     const { classes, count, page, rowsPerPage, theme } = this.props;
 
     return <div className={classes.root}>
-      <IconButton onClick={this.handleFirstPageButtonClick} disabled={page === 0} aria-label="First Page">
+      <IconButton onClick={this.handleFirstPageButtonClick}
+        disabled={page === 0} aria-label="First Page">
         {theme.direction === 'rtl' ? <LastPage /> : <FirstPage />}
       </IconButton>
-      <IconButton onClick={this.handleBackButtonClick} disabled={page === 0} aria-label="Previous Page">
+      <IconButton onClick={this.handleBackButtonClick}
+        disabled={page === 0} aria-label="Previous Page">
         {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
       </IconButton>
-      <IconButton onClick={this.handleNextButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} aria-label="Next Page">
+      <IconButton onClick={this.handleNextButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1} aria-label="Next Page">
         {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
       </IconButton>
-      <IconButton onClick={this.handleLastPageButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} aria-label="Last Page">
+      <IconButton onClick={this.handleLastPageButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1} aria-label="Last Page">
         {theme.direction === 'rtl' ? <FirstPage /> : <LastPage />}
       </IconButton>
     </div>;
@@ -195,9 +199,9 @@ class Swaps extends Component {
         </TableBody>
         <TableFooter>
           <TableRow>
-            <TablePagination rowsPerPageOptions={[5, 10, 25]} colSpan={3} count={swaps.length} rowsPerPage={rowsPerPageNum} page={page} SelectProps={{
-              native: true
-            }} onChangePage={this.handleChangePage} onChangeRowsPerPage={this.handleChangeRowsPerPage} ActionsComponent={TablePaginationActionsWrapped} />
+            <TablePagination rowsPerPageOptions={[5, 10, 25]} colSpan={3} count={swaps.length} rowsPerPage={rowsPerPageNum} page={page}
+              SelectProps={{ native: true }} onChangePage={this.handleChangePage} onChangeRowsPerPage={this.handleChangeRowsPerPage}
+              ActionsComponent={TablePaginationActionsWrapped} />
           </TableRow>
         </TableFooter>
       </Table>
@@ -221,12 +225,12 @@ class Swaps extends Component {
           <TableCell align="left">{swap.amount}</TableCell>
           <TableCell align="left">
             <a href={"https://explorer.binance.org/tx/" + swap.deposit_transaction_hash} rel="noopener noreferrer" target="_blank">
-              {swap.deposit_transaction_hash ? swap.deposit_transaction_hash.substring(0, 8) : swap.deposit_transaction_hash }
+              {swap.deposit_transaction_hash ? swap.deposit_transaction_hash.substring(0, 12) : '' }
             </a>
           </TableCell>
           <TableCell align="left">
             <a href={"https://etherscan.io/tx/" + swap.transfer_transaction_hash} rel="noopener noreferrer" target="_blank">
-              {swap.transfer_transaction_hash ? swap.transfer_transaction_hash.substring(0, 8) : swap.transfer_transaction_hash }
+              {swap.transfer_transaction_hash ? swap.transfer_transaction_hash.substring(0, 12) : '' }
             </a>
           </TableCell>
         </TableRow>
