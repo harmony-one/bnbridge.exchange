@@ -678,15 +678,14 @@ const models = {
 
     models.getClientAccountForEthAddress(eth_address, (err, clientAccount) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
       }
 
       if(clientAccount) {
-        console.log('clientAccount', clientAccount);
-
+        // console.log('clientAccount', clientAccount);
         res.status(205)
         res.body = { 'status': 200, 'success': true, 'result': clientAccount }
         return next(null, req, res, next)
@@ -1926,7 +1925,6 @@ const models = {
             return next(null, req, res, next)
           }
 
-
           let balance = 0;
 
           let filteredBalances = balances.filter((balance) => {
@@ -2013,8 +2011,6 @@ const models = {
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
         }
-
-        console.log('getERC20Balance', eth_address, tokenInfo.erc20_address);
 
         eth.getERC20Balance(eth_address, tokenInfo.erc20_address, (err, balance) => {
           if(err) {

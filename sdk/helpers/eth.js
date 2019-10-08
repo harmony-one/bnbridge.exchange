@@ -69,7 +69,7 @@ const eth = {
 
     myContract.methods.balanceOf(address).call({ from: CONTRACT_MANAGER })
     .then((balance) => {
-      console.log(balance);
+      // console.log(balance);
       const theBalance = web3.utils.fromWei(balance.toString(), 'ether')
 
       callback(null, theBalance)
@@ -82,8 +82,7 @@ const eth = {
 
     myContract.methods.symbol().call({ from: contractAddress })
     .then((symbol) => {
-      console.log(symbol);
-
+      // console.log(symbol);
       callback(null, symbol)
     })
     .catch(callback)
@@ -94,8 +93,7 @@ const eth = {
 
     myContract.methods.name().call({ from: contractAddress })
     .then((name) => {
-      console.log(name);
-
+      // console.log(name);
       callback(null, name)
     })
     .catch(callback)
@@ -110,9 +108,8 @@ const eth = {
         return callback(null, null)
       }
 
-      console.log(supply);
+      // console.log(supply);
       const theSupply = web3.utils.fromWei(supply.toString(), 'ether')
-
       callback(null, theSupply)
     })
     .catch(callback)
