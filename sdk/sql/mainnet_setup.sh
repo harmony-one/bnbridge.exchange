@@ -45,7 +45,6 @@ sudo -u $DBUSER createdb -O $DBUSER $DBNAME
 # centos only:
 # sudo cp ${PWD}/setup.sql /tmp/setup.sql
 sql_file=${PWD}/setup.sql # if centos, /tmp/setup.sql
-echo 'sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -f $sql_file'
 sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -f $sql_file
 
 # Gen encryption keys and encrypted password

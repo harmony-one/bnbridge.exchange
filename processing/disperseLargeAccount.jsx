@@ -91,6 +91,6 @@ function formatAccounts(accounts) {
 }
 
 function error(err) {
-  console.log(err)
+  console.error(err)
   return
 }

@@ -204,8 +204,8 @@ const bnb = {
     const sequenceURL = `${config.api}api/v1/account/${publicFrom}/sequence`;
 
     console.log('private key', privateFrom, 'publicFrom', publicFrom);
-    console.log('mnemonic, publicTo, amount, asset, message', mnemonic, publicTo, amount, asset, message);
-    console.log('sequenceURL', sequenceURL);
+    // console.log('mnemonic, publicTo, amount, asset, message', mnemonic, publicTo, amount, asset, message);
+    // console.log('sequenceURL', sequenceURL);
 
     const bnbClient = new BnbApiClient(config.api);
     bnbClient.chooseNetwork(config.network);

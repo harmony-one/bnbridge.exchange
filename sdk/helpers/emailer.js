@@ -26,7 +26,7 @@ var emailer = {
 
     transporter.sendMail(mailOptions, function(error, info) {
       if (error) {
-        console.log(error)
+        console.error(error)
       }
 
       if (callback != null) {

@@ -118,7 +118,7 @@ function getBalancesForAddresses(addresses, callback) {
     eth.getERC20Balance(address, HMY_ERC, callbackInner)
   }, (err, balances) => {
     if(err) {
-      console.log(err)
+      console.error(err)
     }
 
     callback(err, balances)
@@ -130,7 +130,7 @@ function getBalancesBNB(addresses, callback) {
     bnb.getBalance(address, callbackInner)
   }, (err, balances) => {
     if(err) {
-      console.log(err)
+      console.error(err)
     }
     callback(err, balances)
   })
@@ -139,6 +139,6 @@ function getBalancesBNB(addresses, callback) {
 
 
 function error(err) {
-  console.log(err)
+  console.error(err)
   return
 }

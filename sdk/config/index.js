@@ -23,7 +23,7 @@ const config = {
 	emailerPassword: "",
 
 	//Ethereum
-	provider: 'https://mainnet.infura.io/v3/4a1a3bdd85e7423a86c6031a792a9e63',
+	provider: 'https://mainnet.infura.io/v3/981292667b474eb593bfce7d7cffe047',
 
   erc20ABI: [
   	{

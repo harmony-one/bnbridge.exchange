@@ -33,7 +33,7 @@ const eth = {
       return callback(null, returnEvents)
     })
     .catch((err) => {
-      console.log(err)
+      console.error(err)
       // callback(err)
     });
   },

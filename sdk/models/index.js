@@ -111,7 +111,7 @@ const models = {
 
       models.insertToken(data, (err, response) => {
         if(err || !response) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -123,7 +123,7 @@ const models = {
             (callback) => { models.processEthAccount(data, callback) }
           ], (err, data) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': 'Unable to process request' }
               return next(null, req, res, next)
@@ -134,7 +134,7 @@ const models = {
             models.updateTokenAddresses(uuid, bnbUUID, ethUUID, (err, updateResponse) => {
               models.getTokenInfo(uuid, (err, getResponse) => {
                 if(err) {
-                  console.log(err)
+                  console.error(err)
                   res.status(500)
                   res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve token information' }
                   return next(null, req, res, next)
@@ -213,7 +213,7 @@ const models = {
 
     bnb.createKey(keyName, password, (err, keyData) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         callback(err)
       }
 
@@ -237,7 +237,7 @@ const models = {
   processEthAccount(body, callback) {
     eth.createAccount((err, account) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         return callback(err)
       }
 
@@ -294,7 +294,7 @@ const models = {
 
       models.getTokenInfo(uuid, (err, tokenInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve token information' }
           return next(null, req, res, next)
@@ -302,7 +302,7 @@ const models = {
 
         models.validateBalances(tokenInfo, (err, code, balanceValidation) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(code)
             res.body = { 'status': code, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -310,7 +310,7 @@ const models = {
 
           models.getKey(tokenInfo.bnb_address, (err, key) => {
             if(err || !key) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve key' }
               return next(null, req, res, next)
@@ -318,7 +318,7 @@ const models = {
 
             bnb.issue(tokenInfo.name, tokenInfo.total_supply, tokenInfo.symbol, tokenInfo.mintable, key.key_name, key.password_decrypted, (err, issueResult) => {
               if(err) {
-                console.log(err)
+                console.error(err)
                 res.status(500)
                 res.body = { 'status': 500, 'success': false, 'result': err }
                 return next(null, req, res, next)
@@ -326,7 +326,7 @@ const models = {
 
               models.updateUniqueSymbol(uuid, issueResult.uniqueSymbol, (err, result) => {
                 if(err) {
-                  console.log(err)
+                  console.error(err)
                   res.status(500)
                   res.body = { 'status': 500, 'success': false, 'result': err }
                   return next(null, req, res, next)
@@ -357,7 +357,7 @@ const models = {
 
     bnb.getFees((err, feesData) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         return callback(err, 500)
       }
 
@@ -370,7 +370,7 @@ const models = {
 
       bnb.getBalance(getResponse.bnb_address, (err, balances) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           return callback(err, 500)
         }
 
@@ -456,7 +456,7 @@ const models = {
       }
     })
     .catch((err) => {
-      console.log(err)
+      console.error(err)
       res.status(500)
       res.body = { 'status': 500, 'success': false, 'result': err }
       return next(null, req, res, next)
@@ -480,7 +480,7 @@ const models = {
       }
     })
     .catch((err) => {
-      console.log(err)
+      console.error(err)
       res.status(500)
       res.body = { 'status': 500, 'success': false, 'result': err }
       return next(null, req, res, next)
@@ -493,7 +493,7 @@ const models = {
   getFees(req, res, next) {
     bnb.getFees((err, feesData) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
@@ -533,7 +533,7 @@ const models = {
         }
       })
       .catch((err) => {
-        console.log(err)
+        console.error(err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
@@ -606,7 +606,7 @@ const models = {
 
     models.getClientAccountForBnbAddress(bnb_address, (err, clientAccount) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
@@ -619,7 +619,7 @@ const models = {
       } else {
         eth.createAccount((err, account) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -627,7 +627,7 @@ const models = {
 
           models.insertClientEthAccount(bnb_address, account, (err, clientAccount) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)
@@ -703,7 +703,7 @@ const models = {
 
           models.insertClientBnbAccount(eth_address, keyName, password, keyData, (err, clientAccount) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)
@@ -792,7 +792,7 @@ const models = {
 
     models.getClientAccountForUuidE2B(uuid, (err, clientAccount) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
@@ -806,7 +806,7 @@ const models = {
 
       models.getTokenInfoForSwap(token_uuid, (err, tokenInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -823,7 +823,7 @@ const models = {
           (callback) => { models.getTransactionHashs(token_uuid, uuid, callback) }
         ], (err, data) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': 'Unable to process request: ' + err }
             return next(null, req, res, next)
@@ -862,7 +862,7 @@ const models = {
 
           models.insertSwaps(newTransactions, clientAccount, token_uuid, direction, (err, newSwaps) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)
@@ -870,7 +870,7 @@ const models = {
 
             models.proccessSwapsE2B(newSwaps, tokenInfo, (err, result) => {
               if(err) {
-                console.log(err)
+                console.error(err)
                 res.status(500)
                 res.body = { 'status': 500, 'success': false, 'result': err }
                 return next(null, req, res, next)
@@ -896,7 +896,7 @@ const models = {
 
     models.getClientAccountForUuidB2E(uuid, (err, clientAccount) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
@@ -910,7 +910,7 @@ const models = {
 
       models.getTokenInfoForSwap(token_uuid, (err, tokenInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -927,7 +927,7 @@ const models = {
           (callback) => { models.getTransactionHashs(token_uuid, uuid, callback) }
         ], (err, info) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': 'Unable to process request: '+ err }
             return next(null, req, res, next)
@@ -972,7 +972,7 @@ const models = {
 
           models.insertSwaps(newTransactions, clientAccount, token_uuid, direction, (err, newSwaps) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)
@@ -980,7 +980,7 @@ const models = {
 
             models.proccessSwapsB2E(newSwaps, tokenInfo, (err, result) => {
               if(err) {
-                console.log(err)
+                console.error(err)
                 res.status(500)
                 res.body = { 'status': 500, 'success': false, 'result': err }
                 return next(null, req, res, next)
@@ -1000,7 +1000,7 @@ const models = {
 
     models.getKey(tokenInfo.bnb_address, (err, key) => {
       if(err || !key) {
-        console.log(err)
+        console.error(err)
         return callback(err || 'Unable to retrieve key')
       }
 
@@ -1019,7 +1019,7 @@ const models = {
   processSwapE2B(swap, tokenInfo, key, callback) {
     bnb.transfer(key.mnemonic, swap.bnb_address, swap.amount, tokenInfo.unique_symbol, 'BNBridge Swap', (err, swapResult) => {
       if(err) {
-        console.log(err)
+        console.error(err)
 
         return models.revertUpdateWithDepositTransactionHash(swap.uuid, (revertErr) => {
           if(revertErr) {
@@ -1064,7 +1064,7 @@ const models = {
 
     models.getEthAccount(tokenInfo.eth_address, (err, address) => {
       if(err || !address) {
-        console.log(err)
+        console.error(err)
         return callback(err)
       }
 
@@ -1087,7 +1087,7 @@ const models = {
     ], (err, data) => {
       // erc transaction failed. this is a failure.
       if (!data || !data[0]) {
-        console.log('[Error] sendErc20Transaction', err)
+        console.error('[Error] sendErc20Transaction', err)
         return callback(err);
       }
 
@@ -1105,20 +1105,20 @@ const models = {
     })
   },
 
-  transferToFoundation(swap, tokenInfo, callback) {
+   transferToFoundation(swap, tokenInfo, callback) {
     console.log('transferToFoundation for swap', swap);
     // console.log('TokenInfo', tokenInfo);
     console.log('1. look for the client bnb account from db matching eth account that made the swap.');
     models.getClientAccountForEthAddress(swap.eth_address, (err, clientAccount) => {
       if (err || !clientAccount) {
-        console.log(err);
+        console.error(err);
         return callback(err);
       }
 
       console.log('2. get encrypted key for client bnb account ' + clientAccount.bnb_address);
       models.getClientKey(clientAccount.bnb_address, (err, key) => {
         if (err || !key) {
-          console.log(err)
+          console.error(err)
           return callback(err || 'Unable to retrieve key')
         }
 
@@ -1128,7 +1128,7 @@ const models = {
           clientAccount.bnb_address, BNB_GAS_FEE,
           'BNB', 'Bnb gas for sending to Foundation', (err, txResult1) => {
             if (err) {
-              console.log('[Error] bnb transferWithPrivateKey', err)
+              console.error('[Error] bnb transferWithPrivateKey', err)
 
               let text = "BNBridge encountered an error processing a swap.\n" +
                 "Failed to fund gas for transferring deposits to the foundation account."
@@ -1158,7 +1158,7 @@ const models = {
                 'Sending the BNBridge Swap bnb deposit to the foundation account', (err, txResult2) => {
 
                   if (err) {
-                    console.log('[Error] bnb transfer', err)
+                    console.error('[Error] bnb transfer', err)
 
                     let text = "BNBridge encountered an error processing a swap.\n" +
                       "Failed to send bnb deposit to the foundation account."
@@ -1203,7 +1203,7 @@ const models = {
       swap.eth_address,
       swap.amount, (err, swapResult) => {
         if (err) {
-          console.log(err)
+          console.error(err)
 
           return models.revertUpdateWithDepositTransactionHash(swap.uuid, (revertErr) => {
             if (revertErr) {
@@ -1337,7 +1337,7 @@ const models = {
       },
       function(err, result) {
         if (err) {
-          console.log(err)
+          console.error(err)
           return callback(err)
         }
 
@@ -1393,7 +1393,7 @@ const models = {
 
       models.getTokenInfo(token_uuid, (err, tokenInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -1408,7 +1408,7 @@ const models = {
 
         models.insertListProposal(token_uuid, tokenInfo.unique_symbol, title, description, initial_price, expiryTime, votingTime, (err, insertResult) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -1482,7 +1482,7 @@ const models = {
 
       models.getListProposalInfo(uuid, (err, proposalInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -1490,7 +1490,7 @@ const models = {
 
         models.validateProposalBalances(proposalInfo, (err, code, balanceValidation) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(code)
             res.body = { 'status': code, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -1498,7 +1498,7 @@ const models = {
 
           models.getTokenInfo(proposalInfo.token_uuid, (err, tokenInfo) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve token information' }
               return next(null, req, res, next)
@@ -1506,7 +1506,7 @@ const models = {
 
             models.getKey(tokenInfo.bnb_address, (err, key) => {
               if(err || !key) {
-                console.log(err)
+                console.error(err)
                 res.status(500)
                 res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve key' }
                 return next(null, req, res, next)
@@ -1514,7 +1514,7 @@ const models = {
 
               bnb.submitListProposal(tokenInfo.unique_symbol, key.key_name, key.password_decrypted, proposalInfo.initial_price, proposalInfo.title, proposalInfo.description, proposalInfo.expiry_time, proposalInfo.voting_period, balanceValidation.depositRequired, (err, transactionHash) => {
                 if(err) {
-                  console.log(err)
+                  console.error(err)
                   res.status(500)
                   res.body = { 'status': 500, 'success': false, 'result': err }
                   return next(null, req, res, next)
@@ -1522,7 +1522,7 @@ const models = {
 
                 models.updateListProposal(proposalInfo.uuid, transactionHash, (err, updateResponse) => {
                   if(err) {
-                    console.log(err)
+                    console.error(err)
                     res.status(500)
                     res.body = { 'status': 500, 'success': false, 'result': err }
                     return next(null, req, res, next)
@@ -1530,7 +1530,7 @@ const models = {
 
                   models.updateTokenListProposed(tokenInfo.uuid, proposalInfo.uuid, (err, updateTokenResponse) => {
                     if(err) {
-                      console.log(err)
+                      console.error(err)
                       res.status(500)
                       res.body = { 'status': 500, 'success': false, 'result': err }
                       return next(null, req, res, next)
@@ -1571,7 +1571,7 @@ const models = {
   validateProposalBalances(proposalInfo, callback) {
     bnb.getFees((err, feesData) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         return callback(err, 500)
       }
 
@@ -1587,7 +1587,7 @@ const models = {
 
       bnb.getBalance(proposalInfo.bnb_address, (err, balances) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           return callback(err, 500)
         }
 
@@ -1662,7 +1662,7 @@ const models = {
 
       models.getListProposalInfo(uuid, (err, proposalInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -1670,7 +1670,7 @@ const models = {
 
         bnb.getListProposal(proposalInfo.proposal_id, (err, bnbProposalInfo) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -1680,7 +1680,7 @@ const models = {
 
             models.validateListBalances(proposalInfo, (err, balanceValidation) => {
               if(err) {
-                console.log(err)
+                console.error(err)
                 res.status(code)
                 res.body = { 'status': code, 'success': false, 'result': err }
                 return next(null, req, res, next)
@@ -1688,7 +1688,7 @@ const models = {
 
               models.getKey(proposalInfo.bnb_address, (err, key) => {
                 if(err || !key) {
-                  console.log(err)
+                  console.error(err)
                   res.status(500)
                   res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve key' }
                   return next(null, req, res, next)
@@ -1696,7 +1696,7 @@ const models = {
 
                 bnb.list(proposalInfo.unique_symbol, key.key_name, key.password_decrypted, proposalInfo.initial_price, proposalInfo.proposal_id, (err, listResult) => {
                   if(err) {
-                    console.log(err)
+                    console.error(err)
                     res.status(code)
                     res.body = { 'status': code, 'success': false, 'result': err }
                     return next(null, req, res, next)
@@ -1704,7 +1704,7 @@ const models = {
 
                   models.updateListProposalListed(proposalInfo.uuid, (err, updateData) => {
                     if(err) {
-                      console.log(err)
+                      console.error(err)
                       res.status(code)
                       res.body = { 'status': code, 'success': false, 'result': err }
                       return next(null, req, res, next)
@@ -1712,7 +1712,7 @@ const models = {
 
                     models.updateTokenListed(proposalInfo.token_uuid, (err, updateData) => {
                       if(err) {
-                        console.log(err)
+                        console.error(err)
                         res.status(code)
                         res.body = { 'status': code, 'success': false, 'result': err }
                         return next(null, req, res, next)
@@ -1751,7 +1751,7 @@ const models = {
   validateListBalances(proposalInfo, callback) {
     bnb.getFees((err, feesData) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         return callback(err, 500)
       }
 
@@ -1764,7 +1764,7 @@ const models = {
 
       bnb.getBalance(proposalInfo.bnb_address, (err, balances) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           return callback(err, 500)
         }
 
@@ -1838,7 +1838,7 @@ const models = {
 
             bnb.getListProposal(proposalId, (err, proposalInfo) => {
               if(err) {
-                console.log(err)
+                console.error(err)
                 res.status(500)
                 res.body = { 'status': 500, 'success': false, 'result': err }
                 return next(null, req, res, next)
@@ -1855,7 +1855,7 @@ const models = {
           //get proposal
           bnb.getListProposal(listing_proposal.proposal_id, (err, proposalInfo) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)
@@ -1871,7 +1871,7 @@ const models = {
       }
     })
     .catch((err) => {
-      console.log(err)
+      console.error(err)
       res.status(500)
       res.body = { 'status': 500, 'success': false, 'result': err }
       return next(null, req, res, next)
@@ -1884,7 +1884,7 @@ const models = {
 
     })
     .catch((err) => {
-      console.log(err)
+      console.error(err)
     })
   },
 
@@ -1911,7 +1911,7 @@ const models = {
 
       models.getTokenInfo(token_uuid, (err, tokenInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -1919,7 +1919,7 @@ const models = {
 
         bnb.getBalance(bnb_address, (err, balances) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -1937,7 +1937,7 @@ const models = {
 
           models.getPendingBnbBalance(token_uuid, bnb_address, (err, pendingBalance) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)
@@ -2006,7 +2006,7 @@ const models = {
 
       models.getTokenInfo(token_uuid, (err, tokenInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -2014,7 +2014,7 @@ const models = {
 
         eth.getERC20Balance(eth_address, tokenInfo.erc20_address, (err, balance) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -2116,21 +2116,21 @@ const models = {
 
       eth.getERC20Name(contract_address, (err, name) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
         }
         eth.getERC20Symbol(contract_address, (err, symbol) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
           }
           eth.getERC20TotalSupply(contract_address, (err, totalSupply) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)

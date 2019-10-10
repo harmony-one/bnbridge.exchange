@@ -23,5 +23,5 @@ const keyStore = result.keyStore
 //   console.log(result)
 // })
 // .catch((err) => {
-//   console.log(err)
+//   console.error(err)
 // })

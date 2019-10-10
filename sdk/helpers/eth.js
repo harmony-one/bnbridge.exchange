@@ -156,7 +156,7 @@ const eth = {
       }
       callback(null, hash)
     }).catch(err => {
-      console.log(err)
+      console.error(err)
       callback(err)
     })
     console.log(receipt)
