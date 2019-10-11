@@ -1,9 +1,9 @@
 #!/bin/bash
 
-if test -f "env_var_setup.sh"; then
-  echo "running env_var_setup.sh"
-  source env_var_setup.sh
-fi
+# if test -f "env_var_setup.sh"; then
+#  echo "running env_var_setup.sh"
+#  source env_var_setup.sh
+# fi
 
 if [[ -z $DBUSER ]]; then
   echo "Export DBUSER to environment variable"
@@ -38,15 +38,15 @@ set +o history
 # sudo -u postgres psql -c "ALTER USER $DBUSER WITH PASSWORD '$DBPASSWORD';"
 # psql -c "ALTER USER $DBUSER WITH PASSWORD $DBPASSWORD;"
 
-sudo -u $DBUSER dropdb $DBNAME
-sudo -u $DBUSER createdb -O $DBUSER $DBNAME
+# sudo -u $DBUSER dropdb $DBNAME
+# sudo -u $DBUSER createdb -O $DBUSER $DBNAME
 # Creating tables from setup.sql
 
 # centos only:
 # sudo cp ${PWD}/setup.sql /tmp/setup.sql
-sql_file=${PWD}/setup.sql # if centos, /tmp/setup.sql
-echo 'sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -f $sql_file'
-sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -f $sql_file
+# sql_file=${PWD}/setup.sql # if centos, /tmp/setup.sql
+# echo 'sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -f $sql_file'
+# sudo -u $DBUSER psql "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -f $sql_file
 
 # Gen encryption keys and encrypted password
 var=$(ISTESTNET=0 BNB_PRIVATE_KEY=$BNB_PRIVATE_KEY BNB_ENCRYPTION_KEY=$BNB_ENCRYPTION_KEY CLIPASSWORD=$CLIPASSWORD node keygen.js)
