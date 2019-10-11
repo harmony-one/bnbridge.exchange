@@ -1,5 +1,5 @@
 const config = {
-	host: process.env.DBHOST || "13.52.142.50",
+	host: process.env.DBHOST || "127.0.0.1",
 	database: process.env.DBNAME || "harmonyone",
 	user: process.env.DBUSER || "postgres",
 	password: process.env.DBPASSWORD || "postgresharmony",
