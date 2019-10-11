@@ -244,25 +244,25 @@ const bnb = {
     const bnbClient = new BnbApiClient(config.api);
     bnbClient.chooseNetwork(config.network);
     bnbClient.setPrivateKey(privateFrom);
-    bnbClient.initChain();
-
-    httpClient.get(sequenceURL)
-      .then((res) => {
-        const sequence = res.data.sequence || 0
-        // console.log('transferWithPrivateKey httpClientgetsequenceURL bnbClient.transfer',
-        //   publicFrom, publicTo, amount, asset, message, sequence);
-        return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
-      })
-      .then((result) => {
-        if (result.status === 200) {
-          callback(null, result)
-        } else {
-          callback(result)
-        }
-      })
-      .catch((error) => {
-        callback(error)
-      });
+    bnbClient.initChain().then(() => {
+      httpClient.get(sequenceURL)
+        .then((res) => {
+          const sequence = res.data.sequence || 0
+          // console.log('transferWithPrivateKey httpClientgetsequenceURL bnbClient.transfer',
+          //   publicFrom, publicTo, amount, asset, message, sequence);
+          return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
+        })
+        .then((result) => {
+          if (result.status === 200) {
+            callback(null, result)
+          } else {
+            callback(result)
+          }
+        })
+        .catch((error) => {
+          callback(error)
+        });
+    });
   },
 
   freeze(amount, symbol, keyName, callback) {
