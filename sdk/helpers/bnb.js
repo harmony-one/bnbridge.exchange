@@ -209,30 +209,31 @@ const bnb = {
 
     const bnbClient = new BnbApiClient(config.api);
     bnbClient.chooseNetwork(config.network);
-    bnbClient.setPrivateKey(privateFrom);
-    bnbClient.initChain();
 
-    httpClient.get(sequenceURL)
-    .then((res) => {
-      const sequence = res.data.sequence || 0
-      // console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
-      //   publicFrom, publicTo, amount, asset, message, sequence);
-      return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
-    })
-    .then((result) => {
-      if (result.status === 200) {
-        callback(null, result)
-      } else {
-        callback(result)
-      }
-    })
-    .catch((error) => {
-      callback(error)
+    return Promise.all([
+      bnbClient.setPrivateKey(privateFrom),
+      bnbClient.initChain(),
+    ]).then(() => {
+      return httpClient.get(sequenceURL).then((res) => {
+        const sequence = res.data.sequence || 0
+        // console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
+        //   publicFrom, publicTo, amount, asset, message, sequence);
+        return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
+      }).then((result) => {
+        if (result.status === 200) {
+          callback(null, result)
+        } else {
+          callback(result)
+        }
+      }).catch((error) => {
+        callback(error)
+      });
     });
   },
 
   transferWithPrivateKey(privateFrom, publicTo, amount, asset, message, callback) {
     const publicFrom = BnbApiClient.crypto.getAddressFromPrivateKey(privateFrom, config.prefix);
+
     const sequenceURL = `https://dex.binance.org/api/v1/account/${publicFrom}/sequence`;
 
     // console.log('##########################################');
@@ -243,25 +244,25 @@ const bnb = {
 
     const bnbClient = new BnbApiClient(config.api);
     bnbClient.chooseNetwork(config.network);
-    bnbClient.setPrivateKey(privateFrom);
-    bnbClient.initChain().then(() => {
-      httpClient.get(sequenceURL)
-        .then((res) => {
-          const sequence = res.data.sequence || 0
-          // console.log('transferWithPrivateKey httpClientgetsequenceURL bnbClient.transfer',
-          //   publicFrom, publicTo, amount, asset, message, sequence);
-          return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
-        })
-        .then((result) => {
-          if (result.status === 200) {
-            callback(null, result)
-          } else {
-            callback(result)
-          }
-        })
-        .catch((error) => {
-          callback(error)
-        });
+
+    return Promise.all([
+      bnbClient.setPrivateKey(privateFrom),
+      bnbClient.initChain(),
+    ]).then(() => {
+      return httpClient.get(sequenceURL).then((res) => {
+        const sequence = res.data.sequence || 0
+        // console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
+        //   publicFrom, publicTo, amount, asset, message, sequence);
+        return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
+      }).then((result) => {
+        if (result.status === 200) {
+          callback(null, result)
+        } else {
+          callback(result)
+        }
+      }).catch((error) => {
+        callback(error)
+      });
     });
   },
 

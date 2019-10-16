@@ -186,7 +186,7 @@ class Store {
   };
 
   getSwaps(payload) {
-    const limit = payload.content.limit ? payload.content.limit : 100
+    const limit = payload.content.limit ? payload.content.limit : 1000
     const offset = payload.content.offset ? payload.content.offset : 0
     const url = "/api/v1/swaps?limit=" + limit + '&offset=' + offset
 
