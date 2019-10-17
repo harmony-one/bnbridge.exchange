@@ -16,6 +16,38 @@ const eth = {
     callback(null, account)
   },
 
+  getSentTransactionsForAddress(contractAddress, sourceAddress, callback) {
+    let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
+    console.log('hello');
+
+    return myContract.getPastEvents('Transfer', {
+      fromBlock: 8755198,
+      toBlock: 'latest',
+      filter: { _from: sourceAddress }
+    }).then((events) => {
+      console.log('then');
+
+      const returnEvents = events.map((event) => {
+        return {
+          from: event.returnValues._from,
+          to: event.returnValues._to,
+          amount: parseFloat(web3.utils.fromWei(event.returnValues._value._hex, 'ether')),
+          transactionHash: event.transactionHash
+        }
+      })
+
+      console.log(returnEvents);
+      if (!callback) return
+      return callback(null, returnEvents)
+    }).catch((err) => {
+      console.log('err');
+
+      console.error(err)
+      if (!callback) return
+      return callback(err)
+    });
+  },
+
   getTransactionsForAddress(contractAddress, depositAddress, callback) {
     let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
 

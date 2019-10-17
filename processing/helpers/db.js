@@ -8,6 +8,7 @@ const cn = {
   user: config.user,
   password: config.password
 }
+console.log('postgres db', cn);
 const db = pgp(cn)
 
 module.exports = {
