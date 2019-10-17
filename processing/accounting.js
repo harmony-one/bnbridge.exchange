@@ -5,6 +5,12 @@
   Get all the transactions from Eth
 
   Get all the transactions from Binance
+
+  node processing/accounting.js processing/export.csv
+
+  where export.csv is generated from etherscan here:
+  https://etherscan.io/address/0x799a4202c12ca952cb311598a024c80ed371a41e
+
 */
 
 if (!process.argv || process.argv.length < 3) {
