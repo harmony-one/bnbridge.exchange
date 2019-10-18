@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "@binance-chain/javascript-sdk": "^2.13.5",
+    "abi-decoder": "^2.2.2",
     "async": "^3.0.1",
     "axios": "^0.18.1",
     "csv-parser": "^2.3.1",

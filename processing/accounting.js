@@ -19,6 +19,9 @@ if (!process.argv || process.argv.length < 3) {
 }
 const exportFile = process.argv[2]
 
+const HMY_UUID = "Harmony_One"
+const HMY_ERC = "0x799a4202c12ca952cb311598a024c80ed371a41e"
+
 const db = require('./helpers/db.js').db
 const config = require('./config')
 const bnb = require('./helpers/bnb.js')
@@ -27,6 +30,9 @@ const async = require('async')
 
 const csv = require('csv-parser');
 const fs = require('fs');
+
+const Web3 = require('web3');
+const web3 = new Web3(new Web3.providers.HttpProvider(config.provider));
 
 function readExport(callback) {
   const ret = {}
@@ -66,12 +72,10 @@ function readDb(callback) {
   });
 }
 
-const HMY_UUID = "Harmony_One"
-const HMY_ERC = "0x799a4202c12ca952cb311598a024c80ed371a41e"
-
 findMissingERC20Txns()
 
 function findMissingERC20Txns() {
+  console.log('======== START ==========');
   return readDb((swapTxns, err) => {
     if (err) {
       console.error(`findMissingERC20Txns: readDb failed`, err);
@@ -80,23 +84,44 @@ function findMissingERC20Txns() {
 
     // console.log(swapTxns);
     return readExport((exportTxns, err) => {
-      console.log(exportTxns);
-
       if (err) {
         console.error(`findMissingERC20Txns: readExport failed`, err);
         return;
       }
 
-      const missing = [];
+      const missing = {};
       for (let exportTxnHash in exportTxns) {
         if (exportTxnHash in swapTxns) continue;
-        missing.push(exportTxnHash)
+        missing[exportTxnHash] = exportTxns[exportTxnHash]
       }
 
-      console.log(`missing ${missing.length} erc20 transactions`);
-      console.log(missing);
+      console.log(`missing ${Object.keys(missing).length} erc20 transactions`);
 
-      return;
+      let amount = 0
+      const promises = []
+      for (let txHash in missing) {
+        promises.push(eth.getTransactionEvent(txHash))
+      }
+
+      return Promise.all(promises).then((txnDetails) => {
+        let i = 0;
+        txnDetails.forEach(function (txnDetail) {
+          // { name: 'Transfer', events: [
+          //   { name: '_from', type: 'address', value: ... },
+          //   { name: '_to', type: 'address', value: ... },
+          //   { name: '_value', type: 'uint256', value: ... }
+          // ]}
+          const txValue = parseFloat(web3.utils.fromWei(txnDetail.events[2].value, 'ether'))
+          console.log(`- txn ${Object.keys(missing)[i]}: ${txValue}`);
+          amount += txValue
+          i++;
+        });
+
+        console.log(`Total missing amount: ${amount} ONE`);
+        console.log('======== END ==========');
+
+        return amount;
+      });
     });
   });
 }
