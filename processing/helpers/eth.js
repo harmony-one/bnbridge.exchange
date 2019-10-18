@@ -9,6 +9,8 @@ const ETH_TX_GAS_PRICE_GWEI = process.env.ETH_TX_GAS_PRICE_GWEI
 const ETH_TX_GAS_LIMIT = process.env.ETH_TX_GAS_LIMIT
 
 const web3 = new Web3(new Web3.providers.HttpProvider(config.provider));
+const abiDecoder = require('abi-decoder');
+abiDecoder.addABI(config.erc20ABI);
 
 const eth = {
   createAccount(callback) {
@@ -18,7 +20,6 @@ const eth = {
 
   getSentTransactionsForAddress(contractAddress, sourceAddress, callback) {
     let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
-    console.log('hello');
 
     return myContract.getPastEvents('Transfer', {
       fromBlock: 8755198,
@@ -46,6 +47,30 @@ const eth = {
       if (!callback) return
       return callback(err)
     });
+  },
+
+  getTransaction(txHash, callback) {
+    web3.eth.getTransaction(txHash)
+      .then((txn) => {
+        return callback(null, txn)
+      })
+      .catch((err) => {
+        console.error(err)
+        callback(err, null)
+      });
+  },
+
+  getTransactionEvent(txHash) {
+    return new Promise((resolve, reject) => {
+      web3.eth.getTransactionReceipt(txHash)
+        .then((receipt) => {
+          resolve(abiDecoder.decodeLogs(receipt.logs)[0])
+        })
+        .catch((err) => {
+          console.error(err)
+          reject(err)
+        });
+    })
   },
 
   getTransactionsForAddress(contractAddress, depositAddress, callback) {

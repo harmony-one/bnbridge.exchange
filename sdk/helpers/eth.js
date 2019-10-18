@@ -18,7 +18,6 @@ const eth = {
 
   getSentTransactionsForAddress(contractAddress, sourceAddress, callback) {
     let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
-    console.log('hello');
 
     return myContract.getPastEvents('Transfer', {
       fromBlock: 8755198,
@@ -48,6 +47,19 @@ const eth = {
     });
   },
 
+  getTransaction(contractAddress, txHash, callback) {
+    let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
+
+    myContract.getTransaction(txHash)
+      .then((txn) => {
+        return callback(null, txn)
+      })
+      .catch((err) => {
+        console.error(err)
+        callback(err, null)
+      });
+  },
+
   getTransactionsForAddress(contractAddress, depositAddress, callback) {
     let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
 
@@ -56,21 +68,21 @@ const eth = {
       toBlock: 'latest',
       filter: { _to: depositAddress }
     })
-    .then((events) => {
-      const returnEvents = events.map((event) => {
-        return {
-          from: event.returnValues._from,
-          to: event.returnValues._to,
-          amount: parseFloat(web3.utils.fromWei(event.returnValues._value._hex, 'ether')),
-          transactionHash: event.transactionHash
-        }
+      .then((events) => {
+        const returnEvents = events.map((event) => {
+          return {
+            from: event.returnValues._from,
+            to: event.returnValues._to,
+            amount: parseFloat(web3.utils.fromWei(event.returnValues._value._hex, 'ether')),
+            transactionHash: event.transactionHash
+          }
+        })
+        return callback(null, returnEvents)
       })
-      return callback(null, returnEvents)
-    })
-    .catch((err) => {
-      console.error(err)
-      callback(err, null)
-    });
+      .catch((err) => {
+        console.error(err)
+        callback(err, null)
+      });
   },
 
   getTransactions(contractAddress, accountAddress, depositAddress, depositAmount, callback) {
@@ -81,18 +93,18 @@ const eth = {
       toBlock: 'latest',
       filter: { _to: depositAddress, _from: accountAddress }
     })
-    .then((events) => {
-      let returnEvents = events.filter((event) => {
-        if(event.returnValues._from.toUpperCase() == accountAddress.toUpperCase() && event.returnValues._to.toUpperCase() == depositAddress.toUpperCase()) {
-          let amount = parseFloat(web3.utils.fromWei(event.returnValues._value._hex, 'ether'))
-          return depositAmount == amount
-        }
+      .then((events) => {
+        let returnEvents = events.filter((event) => {
+          if (event.returnValues._from.toUpperCase() == accountAddress.toUpperCase() && event.returnValues._to.toUpperCase() == depositAddress.toUpperCase()) {
+            let amount = parseFloat(web3.utils.fromWei(event.returnValues._value._hex, 'ether'))
+            return depositAmount == amount
+          }
+        })
+        callback(null, returnEvents)
       })
-      callback(null, returnEvents)
-    })
-    .catch((err) => {
-      callback(err)
-    });
+      .catch((err) => {
+        callback(err)
+      });
 
   },
 
@@ -100,51 +112,51 @@ const eth = {
     let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
 
     myContract.methods.balanceOf(address).call({ from: CONTRACT_MANAGER })
-    .then((balance) => {
-      // console.log(balance);
-      const theBalance = web3.utils.fromWei(balance.toString(), 'ether')
+      .then((balance) => {
+        // console.log(balance);
+        const theBalance = web3.utils.fromWei(balance.toString(), 'ether')
 
-      callback(null, theBalance)
-    })
-    .catch(callback)
+        callback(null, theBalance)
+      })
+      .catch(callback)
   },
 
   getERC20Symbol(contractAddress, callback) {
     let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
 
     myContract.methods.symbol().call({ from: contractAddress })
-    .then((symbol) => {
-      // console.log(symbol);
-      callback(null, symbol)
-    })
-    .catch(callback)
+      .then((symbol) => {
+        // console.log(symbol);
+        callback(null, symbol)
+      })
+      .catch(callback)
   },
 
   getERC20Name(contractAddress, callback) {
     let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
 
     myContract.methods.name().call({ from: contractAddress })
-    .then((name) => {
-      // console.log(name);
-      callback(null, name)
-    })
-    .catch(callback)
+      .then((name) => {
+        // console.log(name);
+        callback(null, name)
+      })
+      .catch(callback)
   },
 
   getERC20TotalSupply(contractAddress, callback) {
     let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
 
     myContract.methods.totalSupply().call({ from: contractAddress })
-    .then((supply) => {
-      if(!supply) {
-        return callback(null, null)
-      }
+      .then((supply) => {
+        if (!supply) {
+          return callback(null, null)
+        }
 
-      // console.log(supply);
-      const theSupply = web3.utils.fromWei(supply.toString(), 'ether')
-      callback(null, theSupply)
-    })
-    .catch(callback)
+        // console.log(supply);
+        const theSupply = web3.utils.fromWei(supply.toString(), 'ether')
+        callback(null, theSupply)
+      })
+      .catch(callback)
   },
 
   async sendTransaction(contractAddress, privateKey, from, to, amount, callback) {
