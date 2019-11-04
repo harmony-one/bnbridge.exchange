@@ -518,7 +518,7 @@ class Swap extends Component {
                 <Input
                   id='bnbReceiveAddress'
                   fullWidth={ true }
-                  label="BNB Receive Address"
+                  label="Your BNB address (to receive BEP2 ONE tokens)"
                   placeholder="eg: bnb1mmxvnhkyqrvd2dpskvsgl8lmft4tnrcs97apr3"
                   value={ bnbReceiveAddress }
                   error={ bnbReceiveAddressError }
@@ -711,7 +711,7 @@ class Swap extends Component {
     return (
       <React.Fragment>
         <Label label={ 'Swap direction' } overrideStyle={ { marginTop: '12px' } } />
-        <Grid item xs={ 5 } /* onClick={ this.onSwapDirectionClick } */ className={ classes.gridClick } >
+        <Grid item xs={ 5 } onClick={ this.onSwapDirectionClick } className={ classes.gridClick } >
           <div className={ classes.icon }>
             <img
               alt=""
@@ -723,10 +723,10 @@ class Swap extends Component {
             <Typography  variant='h5'>{ first ==='Binance' ? 'BEP2' : 'ERC20' }</Typography>
           </div>
         </Grid>
-        <Grid item xs={2} /* onClick={ this.onSwapDirectionClick } */ className={ classes.gridClick }>
+        <Grid item xs={2} onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
           <SwapIcon className={ classes.swapDirection } />
         </Grid>
-        <Grid item xs={5} align='left' /* onClick={ this.onSwapDirectionClick } */ className={ classes.gridClick }>
+        <Grid item xs={5} align='left' onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
           <div className={ classes.icon }>
             <img
               alt=""

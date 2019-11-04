@@ -1,5 +1,8 @@
 const config = require('../config')
 
+const bip39 = require("bip39");
+const hdkey = require("ethereumjs-wallet/hdkey");
+
 const Tx = require('ethereumjs-tx');
 const Web3 = require('web3');
 
@@ -24,8 +27,6 @@ const eth = {
       toBlock: 'latest',
       filter: { _from: sourceAddress }
     }).then((events) => {
-      console.log('then');
-
       const returnEvents = events.map((event) => {
         return {
           from: event.returnValues._from,
@@ -35,12 +36,10 @@ const eth = {
         }
       })
 
-      console.log(returnEvents);
+      // console.log(returnEvents);
       if (!callback) return
       return callback(null, returnEvents)
     }).catch((err) => {
-      console.log('err');
-
       console.error(err)
       if (!callback) return
       return callback(err)
@@ -64,7 +63,7 @@ const eth = {
     let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
 
     myContract.getPastEvents('Transfer', {
-      fromBlock: 0,
+      fromBlock: 8866650,
       toBlock: 'latest',
       filter: { _to: depositAddress }
     })
@@ -200,11 +199,32 @@ const eth = {
       }
       callback(null, hash)
     }).catch(err => {
-      console.log(err)
+      console.error(err)
       callback(err)
     })
-    console.log(receipt)
+    console.log('transaction receipt', receipt)
   },
+
+  generateAddressesFromSeed(mnemonic, count) {
+    const seed = bip39.mnemonicToSeedSync(mnemonic);
+    const hdwallet = hdkey.fromMasterSeed(seed);
+
+    const wallet_hdpath = "m/44'/60'/0'/0/";
+
+    const accounts = [];
+    for (let i = 0; i < count; i++) {
+      const wallet = hdwallet.derivePath(wallet_hdpath + i).getWallet();
+      const address = '0x' + wallet.getAddress().toString("hex");
+      const privateKey = wallet.getPrivateKey().toString("hex");
+      accounts.push({ address: address, privateKey: privateKey });
+    }
+
+    return accounts;
+  }
 }
+
+// eth.getTransactionsForAddress('0x799a4202c12ca952cb311598a024c80ed371a41e', '0xABe6B2b84A55d56Fd13EF2062e47F5e40a18392C', (err, events) => {
+//   console.log('returned events', JSON.stringify(events));
+// })
 
 module.exports = eth

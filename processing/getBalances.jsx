@@ -45,7 +45,7 @@ function processFile(content) {
     })
   }, (err, result) => {
     if(err) {
-      console.log(err)
+      console.error(err)
       return
     }
 
@@ -61,6 +61,6 @@ function processFile(content) {
 }
 
 function error(err) {
-  console.log(err)
+  console.error(err)
   return
 }

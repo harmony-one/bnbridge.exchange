@@ -32,7 +32,7 @@ function getAllTransactions(token) {
 }
 
 function error(err) {
-  console.log(err)
+  console.error(err)
   return
 }
 

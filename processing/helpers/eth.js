@@ -26,8 +26,6 @@ const eth = {
       toBlock: 'latest',
       filter: { _from: sourceAddress }
     }).then((events) => {
-      console.log('then');
-
       const returnEvents = events.map((event) => {
         return {
           from: event.returnValues._from,
@@ -37,12 +35,10 @@ const eth = {
         }
       })
 
-      console.log(returnEvents);
+      // console.log(returnEvents);
       if (!callback) return
       return callback(null, returnEvents)
     }).catch((err) => {
-      console.log('err');
-
       console.error(err)
       if (!callback) return
       return callback(err)
@@ -213,10 +209,10 @@ const eth = {
       }
       callback(null, hash)
     }).catch(err => {
-      console.log(err)
+      console.error(err)
       callback(err)
     })
-    console.log(receipt)
+    console.log('transaction receipt', receipt)
   },
 }
 

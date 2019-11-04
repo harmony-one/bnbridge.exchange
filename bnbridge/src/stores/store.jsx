@@ -160,7 +160,7 @@ class Store {
     const url = "/api/v1/tokens"
     this.callApi(url, 'GET', null, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -175,7 +175,7 @@ class Store {
     const url = "/api/v1/fees"
     this.callApi(url, 'GET', null, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -192,7 +192,7 @@ class Store {
 
     this.callApi(url, 'GET', null, payload, (err, data) => {
       if (err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -206,13 +206,13 @@ class Store {
     const url = "/api/v1/tokens"
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
 
       if(data.success) {
-        console.log("TOKEN_ISSUED");
+        console.log("TOKEN_ISSUED", data.result);
         emitter.emit(TOKEN_ISSUED, data.result);
       } else if (data.errorMsg) {
         emitter.emit(ERROR, data.errorMsg);
@@ -225,7 +225,7 @@ class Store {
     const url = "/api/v1/finalizeToken"
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -243,7 +243,7 @@ class Store {
     const url = "/api/v1/swaps"
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -261,7 +261,7 @@ class Store {
     const url = "/api/v1/finalizeSwap"
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -279,7 +279,7 @@ class Store {
     const url = "/api/v1/lists"
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -297,7 +297,7 @@ class Store {
     const url = "/api/v1/listProposals"
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -315,7 +315,7 @@ class Store {
     const url = "/api/v1/finalizeListProposal"
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -334,7 +334,7 @@ class Store {
     const url = "/api/v1/listProposals/"+payload.content.uuid
     this.callApi(url, 'GET', null, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -347,7 +347,7 @@ class Store {
     const url = "/api/v1/getBnbBalances"
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -366,7 +366,7 @@ class Store {
     const url = "/api/v1/getEthBalances"
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -379,7 +379,7 @@ class Store {
     const url = "/api/v1/createAccountBNB"
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -392,7 +392,7 @@ class Store {
     const url = "/api/v1/downloadKeystoreBNB"
     this.downloadFile(url, payload.content, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -405,7 +405,7 @@ class Store {
     const url = "/api/v1/getERC20Info"
     this.callApi(url, 'POST', payload.content, payload, (err, data) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         emitter.emit(ERROR, err);
         return
       }
@@ -420,7 +420,7 @@ class Store {
     if (method === 'GET') {
       postData = null;
     } else {
-      console.log(postData)
+      // console.log(postData)
       postData = encrypt(postData, url);
     }
 
@@ -451,7 +451,7 @@ class Store {
         callback(null, res)
       })
       .catch(error => {
-        console.log(error)
+        console.error(error)
         callback(error, null)
       });
   };

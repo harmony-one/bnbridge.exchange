@@ -301,7 +301,7 @@ class Swap extends Component {
         <Grid item xs={ 12 } align='right' className={ classes.button }>
           <Button
             fullWidth={true}
-            label={ "Download Mnemonic" }
+            label={ "Download Keystore" }
             disabled={ !accept }
             onClick={ this.onNext }
           />

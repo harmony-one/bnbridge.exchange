@@ -35,7 +35,7 @@ function getTransactions(contractAddress, accountAddress, depositAddress, callba
 getTransactions(contractAddress, accountAddress, depositAddress, (err, result) => {
   if(err) {
     console.log("ERR")
-    console.log(err)
+    console.error(err)
     return
   }
 
