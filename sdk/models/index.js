@@ -807,14 +807,14 @@ const models = {
 
     models.getClientAccountForUuidE2B(uuid, (err, clientAccount) => {
       if(err) {
-        console.log(`getClientAccountForUuidE2B error`, err)
+        console.error(`[Error] getClientAccountForUuidE2B error`, err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
       }
 
       if(!clientAccount) {
-        console.log(`getClientAccountForUuidE2B clientAccount nil`)
+        console.error(`[Error] getClientAccountForUuidE2B clientAccount nil`)
 
         res.status(400)
         res.body = { 'status': 400, 'success': false, 'result': 'Unable to find swap details' }
@@ -906,14 +906,15 @@ const models = {
 
     models.getKey(tokenInfo.bnb_address, (err, key) => {
       if(err || !key) {
-        console.error(err)
-        return callback(err || 'Unable to retrieve key')
+        const cbError = err || 'Unable to retrieve key'
+        console.error([Error]  + cbError)
+        return callback(cbError)
       }
 
       async.map(swaps, (swap, callbackInner) => {
         models.processSwapE2B(swap, tokenInfo, key, callbackInner)
       }, (err, swapResults) => {
-        if(err) {
+        if (err) {
           return callback(err)
         }
 
@@ -925,12 +926,12 @@ const models = {
   processSwapE2B(swap, tokenInfo, key, callback) {
 
     async.parallel([
-      (callback) => { models.sendBep2Transaction(swap, tokenInfo, address, callback) },
+      (callback) => { models.sendBep2Transaction(swap, tokenInfo, callback) },
       (callback) => { models.transferToERC20Foundation(swap, tokenInfo, callback) }
     ], (err, data) => {
       // erc transaction failed. this is a failure.
       if (!data || !data[0] || !data[0][1]) {
-        console.log('[Error] sendBep2Transaction', err)
+        console.error('[Error] sendBep2Transaction', err)
         return callback(err);
       }
 
@@ -939,7 +940,7 @@ const models = {
 
       // eth tx to foundation failed. not a hard failure, but we already got notified.
       if (!ethDepositToFoundationTxHash) {
-        console.log('Missing tx hash for the Eth tx made to the foundation account from client.');
+        console.error('[Error] Missing tx hash for the Eth tx made to the foundation account from client.');
       } else {
         console.log('Successfully transferred client eth deposit to foundation account. TxHash:', ethDepositToFoundationTxHash);
       }
@@ -954,7 +955,7 @@ const models = {
       swap.bnb_address, swap.amount,
       tokenInfo.unique_symbol, 'Bnbridge ERC20 One - BEP2 One swap', (err, swapResult) => {
         if (err) {
-          console.log('[Error] bnb transferWithPrivateKey', err)
+          console.error('[Error] bnb transferWithPrivateKey', err)
 
           return models.revertUpdateWithDepositTransactionHash(swap.uuid, (revertErr) => {
             if (revertErr) {
@@ -1001,17 +1002,19 @@ const models = {
     console.log('transferToERC20Foundation for swap', swap);
 
     console.log('1. look for the client bnb account from db matching eth account that made the swap.');
-    models.getClientAccountForEthAddress(swap.eth_address, (err, clientAccount) => {
+    models.getClientAccountForBnbAddress(swap.bnb_address, (err, clientAccount) => {
       if (err || !clientAccount) {
-        console.error(err);
-        return callback(err);
+        const cbError = err || `Unable to retrieve client account for swap bnb address ${swap.bnb_address}`
+        console.error('[Error] ' + cbError);
+        return callback(cbError);
       }
 
       console.log('2. get encrypted key for client eth account ' + clientAccount.eth_address);
       models.getClientEthKey(clientAccount.eth_address, (err, key) => {
         if (err || !key) {
-          console.error(err)
-          return callback(err || 'Unable to retrieve key')
+          const cbError = err || 'Unable to retrieve key'
+          console.error('[Error] ' + cbError)
+          return callback(cbError)
         }
 
         console.log('3. transfer gas from eth funding account to the client eth acccount', clientAccount.eth_address);
@@ -1080,13 +1083,13 @@ const models = {
                     callback(null, resultHash)
                   } else {
                     return callback('Failed sending eth deposit to foundation account from account ' +
-                      clientAccount.eth_address + ': [Error] Tx result is null or empty')
+                      clientAccount.eth_address + '. Tx result is null or empty')
                   }
                 })
 
             } else {
-              return callback('Error funding Eth gas for account ' + clientAccount.eth_address +
-                ': [Error] Tx result is null or empty')
+              return callback('Failed funding Eth gas for account ' + clientAccount.eth_address +
+                '. Tx result is null or empty')
             }
 
           })
@@ -1231,7 +1234,7 @@ const models = {
     ], (err, data) => {
       // erc transaction failed. this is a failure.
       if (!data || !data[0]) {
-        console.log('[Error] sendErc20Transaction', err)
+        console.error('[Error] processSwapB2E: sendErc20Transaction', err)
         return callback(err);
       }
 
@@ -1240,7 +1243,7 @@ const models = {
 
       // bnb tx to foundation failed. not a hard failure, but we already got notified.
       if (!bnbDepositToFoundationTxHash) {
-        console.log('Missing tx hash for the Bnb tx made to the foundation account from client.');
+        console.error('[Error] processSwapB2E: Missing tx hash for the Bnb tx made to the foundation account from client.');
       } else {
         console.log('Successfully transferred client bnb deposit to foundation account. TxHash:', bnbDepositToFoundationTxHash);
       }
@@ -1304,15 +1307,17 @@ const models = {
     console.log('1. look for the client eth account from db matching bnb account that made the swap.');
     models.getClientAccountForBnbAddress(swap.bnb_address, (err, clientAccount) => {
       if (err || !clientAccount) {
-        console.error(err);
-        return callback(err);
+        const cbError = err || `Unable to retrieve client account for swap bnb address ${swap.bnb_address}`
+        console.error('[Error] '+ cbError);
+        return callback(cbError);
       }
 
-      console.log('2. get encrypted key for client eth account ' + clientAccount.bnb_address);
+      console.log('2. get encrypted key for client bnb account ' + clientAccount.bnb_address);
       models.getClientBnbKey(clientAccount.bnb_address, (err, key) => {
         if (err || !key) {
-          console.error(err)
-          return callback(err || 'Unable to retrieve key')
+          const cbError = err || 'Unable to retrieve key'
+          console.error('[Error] ' + cbError)
+          return callback(cbError)
         }
 
         console.log('3. transfer gas from bnb funding account to the client bnb acccount', clientAccount.bnb_address);
@@ -1374,12 +1379,12 @@ const models = {
                     callback(null, resultHash)
                   } else {
                     return callback('Failed sending bnb deposit to foundation account from account ' +
-                      clientAccount.bnb_address + ': [Error] Tx result is null or empty')
+                      clientAccount.bnb_address + '. Tx result is null or empty')
                   }
                 })
             } else {
-              return callback('Error funding Bnb gas for account ' + clientAccount.bnb_address +
-                ': [Error] Tx result is null or empty')
+              return callback('Failed funding Bnb gas for account ' + clientAccount.bnb_address +
+                '. Tx result is null or empty')
             }
           })
       })
