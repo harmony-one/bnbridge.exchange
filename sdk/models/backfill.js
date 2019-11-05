@@ -16,9 +16,9 @@ const amount = parseFloat(process.argv[3])
 const fundBnb = process.argv[4] === 'true' ? true : (process.argv[4] === 'false' ? false : Boolean(process.argv[4]))
 console.log(bnbaddress, amount, fundBnb);
 
-models.getClientKey(bnbaddress, (err, key) => {
+models.getClientBnbKey(bnbaddress, (err, key) => {
   if (err || !key) {
-    console.error('[ERROR] getClientKey', err)
+    console.error('[ERROR] getClientBnbKey', err)
     return bnbaddress, null
   }
 
