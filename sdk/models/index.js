@@ -19,7 +19,7 @@ const BNB_GAS_FEE = 0.000375 // in BNB
 const ETH_FUND_ACCT_ADDRESS = process.env.ETH_FUND_ACCT_ADDRESS
 const ETH_FUND_ACCT_PRIVATE_KEY = process.env.ETH_FUND_ACCT_PRIVATE_KEY
 const ETH_FOUNDATION_ACCT_ADDRESS = process.env.ETH_FOUNDATION_ACCT_ADDRESS
-const ETH_GAS_FEE = 0.0001 // in ETH
+const ETH_GAS_FEE = 0.0005 // in ETH
 
 const models = {
 
@@ -223,11 +223,6 @@ const models = {
   },
 
   insertBNBAccount(keyName, keyPassword, keyData, callback) {
-    const dbPassword = bip39.generateMnemonic()
-    const password = KEY+':'+dbPassword
-    const aes256seed = models.encrypt(keyData.seedPhrase, password)
-    const aes256password = models.encrypt(keyPassword, password)
-
     db.oneOrNone('insert into bnb_accounts (uuid, public_key, address, seed_phrase, key_name, password, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, timezone(\'utc\', now())) returning uuid;', [keyData.publicKey, keyData.address, aes256seed, keyName, aes256password, dbPassword])
     .then((response) => {
       callback(null, response)
@@ -926,31 +921,24 @@ const models = {
   processSwapE2B(swap, tokenInfo, key, callback) {
 
     async.parallel([
-      (callback) => { models.sendBep2Transaction(swap, tokenInfo, callback) },
+      (callback) => { models.sendBep2Txn(swap, tokenInfo, callback) },
       (callback) => { models.transferToERC20Foundation(swap, tokenInfo, callback) }
-    ], (err, data) => {
-      // erc transaction failed. this is a failure.
-      if (!data || !data[0] || !data[0][1]) {
-        console.error('[Error] sendBep2Transaction', err)
-        return callback(err);
-      }
+    ], (err, [sendBep2TxnHash, transferToERC20FoundationHash]) => {
+        console.log(`processSwapE2B: [${sendBep2TxnHash}, ${transferToERC20FoundationHash}]`);
 
-      const ethTxToClientHash = data[0][1]
-      const ethDepositToFoundationTxHash = data[1]
+        // erc transaction failed. this is a failure.
+        if (err || !sendBep2TxnHash) {
+          const cbError = err || 'sendBep2TxnHash is nil'
+          console.error(cbError)
+          return callback(cbError);
+        }
 
-      // eth tx to foundation failed. not a hard failure, but we already got notified.
-      if (!ethDepositToFoundationTxHash) {
-        console.error('[Error] Missing tx hash for the Eth tx made to the foundation account from client.');
-      } else {
-        console.log('Successfully transferred client eth deposit to foundation account. TxHash:', ethDepositToFoundationTxHash);
-      }
-
-      callback(null, ethTxToClientHash);
-    })
+        callback(null, sendBep2TxnHash);
+      })
 
   },
 
-  sendBep2Transaction(swap, tokenInfo, callback) {
+  sendBep2Txn(swap, tokenInfo, callback) {
     bnb.transferWithPrivateKey(BNB_FUND_ACCT_PRIVATE_KEY,
       swap.bnb_address, swap.amount,
       tokenInfo.unique_symbol, 'Bnbridge ERC20 One - BEP2 One swap', (err, swapResult) => {
@@ -1001,7 +989,7 @@ const models = {
   transferToERC20Foundation(swap, tokenInfo, callback) {
     console.log('transferToERC20Foundation for swap', swap);
 
-    console.log('1. look for the client bnb account from db matching eth account that made the swap.');
+    console.log('1. look for the client account from db matching the bnb account that made the swap.');
     models.getClientAccountForBnbAddress(swap.bnb_address, (err, clientAccount) => {
       if (err || !clientAccount) {
         const cbError = err || `Unable to retrieve client account for swap bnb address ${swap.bnb_address}`
@@ -1009,21 +997,20 @@ const models = {
         return callback(cbError);
       }
 
-      console.log('2. get encrypted key for client eth account ' + clientAccount.eth_address);
+      console.log('2. get encrypted key for the retrieved client eth account ' + clientAccount.eth_address);
       models.getClientEthKey(clientAccount.eth_address, (err, key) => {
         if (err || !key) {
-          const cbError = err || 'Unable to retrieve key'
+          const cbError = err || 'getClientEthKey: Unable to retrieve key'
           console.error('[Error] ' + cbError)
           return callback(cbError)
         }
 
         console.log('3. transfer gas from eth funding account to the client eth acccount', clientAccount.eth_address);
         // 1. first, send from eth source account to the eth client acccount since it needs eth to fund ONE transaction
-        eth.sendTransaction(
-          tokenInfo.erc20_address,
-          key.private_key_decrypted,
-          ETH_FUND_ACCT_ADDRESS,
+        eth.fundEthForGasFee(
           ETH_FUND_ACCT_PRIVATE_KEY,
+          ETH_FUND_ACCT_ADDRESS,
+          clientAccount.eth_address,
           ETH_GAS_FEE, (err, txResult1) => {
             if (err) {
               let text = "BNBridge encountered an error processing a swap.\n" +
@@ -1041,7 +1028,6 @@ const models = {
 
               // emailer.sendMail('BNBridge error', text)
               console.error(text, err);
-
               return callback(err)
             }
 
@@ -1052,9 +1038,9 @@ const models = {
 
               console.log('4. Transfer the BNBridge Swap eth deposit to the foundation account');
               // 2. then, now that eth account is funded, send the deposit to the foundation account
-              eth.sendTransaction(
+              eth.sendErc20Transaction(
                 tokenInfo.erc20_address,
-                key.private_key_decrypted,
+                key.private_key_decrypted.substring(2), // need to strip out '0x' in front
                 clientAccount.eth_address,
                 ETH_FOUNDATION_ACCT_ADDRESS,
                 swap.amount, (err, txResult2) => {
@@ -1078,18 +1064,30 @@ const models = {
                     return callback(err)
                   }
 
-                  if (txResult2 && txResult2.result && txResult2.result.length > 0) {
-                    let resultHash = txResult2.result[0].hash
-                    callback(null, resultHash)
+                  if (txResult2) {
+                    const resultHash = txResult2
+
+                    // eth tx to foundation failed. not a hard failure, but we already got notified.
+                    if (!resultHash) {
+                      console.error('[Error] Missing tx hash for the Eth tx made to the foundation account from client.');
+                    } else {
+                      console.log('Successfully transferred client eth deposit to foundation account. TxHash:', resultHash);
+                    }
+
+                    return callback(null, resultHash)
                   } else {
-                    return callback('Failed sending eth deposit to foundation account from account ' +
-                      clientAccount.eth_address + '. Tx result is null or empty')
+                    const errMsg = 'Failed sending eth deposit to foundation account from account ' +
+                      clientAccount.eth_address + '. Tx result is null or empty';
+                    console.error(errMsg);
+                    return callback(errMsg)
                   }
                 })
 
             } else {
-              return callback('Failed funding Eth gas for account ' + clientAccount.eth_address +
-                '. Tx result is null or empty')
+              const errMsg = 'Failed funding Eth gas for account ' + clientAccount.eth_address +
+                '. Tx result is null or empty';
+              console.error(errMsg);
+              return callback(errMsg)
             }
 
           })
@@ -1218,7 +1216,7 @@ const models = {
       async.map(swaps, (swap, callbackInner) => {
         models.processSwapB2E(swap, tokenInfo, address, callbackInner)
       }, (err, swapResults) => {
-        if(err) {
+        if (err) {
           return callback(err)
         }
 
@@ -1229,33 +1227,25 @@ const models = {
 
   processSwapB2E(swap, tokenInfo, address, callback) {
     async.parallel([
-      (callback) => { models.sendErc20Transaction(swap, tokenInfo, address, callback) },
+      (callback) => { models.sendErc20Txn(swap, tokenInfo, address, callback) },
       (callback) => { models.transferToBEP2Foundation(swap, tokenInfo, callback) }
-    ], (err, data) => {
-      // erc transaction failed. this is a failure.
-      if (!data || !data[0]) {
-        console.error('[Error] processSwapB2E: sendErc20Transaction', err)
-        return callback(err);
-      }
+    ], (err, [sendErc20TxnHash, transferToBEP2FoundationHash]) => {
+        console.log(`processSwapB2E: [${sendErc20TxnHash}, ${transferToBEP2FoundationHash}]`);
+        // erc transaction failed. this is a failure.
+        if (err || !sendErc20TxnHash) {
+          const cbError = err || 'sendErc20TxnHash is nil'
+          console.error(cbError)
+          return callback(cbError);
+        }
 
-      const ethTxToClientHash = data[0]
-      const bnbDepositToFoundationTxHash = data[1]
-
-      // bnb tx to foundation failed. not a hard failure, but we already got notified.
-      if (!bnbDepositToFoundationTxHash) {
-        console.error('[Error] processSwapB2E: Missing tx hash for the Bnb tx made to the foundation account from client.');
-      } else {
-        console.log('Successfully transferred client bnb deposit to foundation account. TxHash:', bnbDepositToFoundationTxHash);
-      }
-
-        callback(null, ethTxToClientHash);
-    })
+        callback(null, sendErc20TxnHash);
+      })
   },
 
-  sendErc20Transaction(swap, tokenInfo, address, callback) {
-    eth.sendTransaction(
+  sendErc20Txn(swap, tokenInfo, address, callback) {
+    eth.sendErc20Transaction(
       tokenInfo.erc20_address,
-      address.private_key_decrypted,
+      address.private_key_decrypted, // '0x' already stripped out in front
       tokenInfo.eth_address,
       swap.eth_address,
       swap.amount, (err, swapResult) => {
@@ -1295,7 +1285,7 @@ const models = {
             callback(null, resultHash)
           })
         } else {
-          return callback('sendErc20Transaction: Swap result is not defined')
+          return callback('Swap result is not defined')
         }
 
       })
@@ -1304,18 +1294,18 @@ const models = {
   transferToBEP2Foundation(swap, tokenInfo, callback) {
     console.log('transferToBEP2Foundation for swap', swap);
 
-    console.log('1. look for the client eth account from db matching bnb account that made the swap.');
-    models.getClientAccountForBnbAddress(swap.bnb_address, (err, clientAccount) => {
+    console.log('1. look for the client account from db matching the eth account that made the swap.');
+    models.getClientAccountForEthAddress(swap.eth_address, (err, clientAccount) => {
       if (err || !clientAccount) {
-        const cbError = err || `Unable to retrieve client account for swap bnb address ${swap.bnb_address}`
+        const cbError = err || `Unable to retrieve client account for swap eth address ${swap.eth_address}`
         console.error('[Error] '+ cbError);
         return callback(cbError);
       }
 
-      console.log('2. get encrypted key for client bnb account ' + clientAccount.bnb_address);
+      console.log('2. get encrypted key for the retrieved client bnb account ' + clientAccount.bnb_address);
       models.getClientBnbKey(clientAccount.bnb_address, (err, key) => {
         if (err || !key) {
-          const cbError = err || 'Unable to retrieve key'
+          const cbError = err || 'getClientBnbKey: Unable to retrieve key'
           console.error('[Error] ' + cbError)
           return callback(cbError)
         }
@@ -1376,15 +1366,26 @@ const models = {
 
                   if (txResult2 && txResult2.result && txResult2.result.length > 0) {
                     let resultHash = txResult2.result[0].hash
-                    callback(null, resultHash)
+
+                    if (!resultHash) {
+                      console.error('[Error] processSwapB2E: Missing tx hash for the Bnb tx made to the foundation account from client.');
+                    } else {
+                      console.log('Successfully transferred client bnb deposit to foundation account. TxHash:', resultHash);
+                    }
+
+                    return callback(null, resultHash)
                   } else {
-                    return callback('Failed sending bnb deposit to foundation account from account ' +
-                      clientAccount.bnb_address + '. Tx result is null or empty')
+                    const errMsg = 'Failed sending bnb deposit to foundation account from account ' +
+                      clientAccount.bnb_address + '. Tx result is null or empty'
+                    console.error('[Error] ' + errMsg);
+                    return callback(errMsg)
                   }
                 })
             } else {
-              return callback('Failed funding Bnb gas for account ' + clientAccount.bnb_address +
-                '. Tx result is null or empty')
+              const errMsg = 'Failed funding Bnb gas for account ' + clientAccount.bnb_address +
+                '. Tx result is null or empty'
+              console.error('[Error] ' + errMsg);
+              return callback(errMsg)
             }
           })
       })

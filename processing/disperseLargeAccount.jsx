@@ -48,7 +48,7 @@ async function process() {
         // console.log(amount+'000000000000000000')
 
         var amount = Math.floor(Math.random() * (maximum - minimum + 1)) + minimum
-        const hash = await eth.sendTransaction(ERC20_CONTRACT, PRIVATE_KEY, ADDRESS, accounts[i].address, amount+'000000000000000000')
+        const hash = await eth.sendErc20Transaction(ERC20_CONTRACT, PRIVATE_KEY, ADDRESS, accounts[i].address, amount+'000000000000000000')
         transactionHashs.push(hash)
       // }
 

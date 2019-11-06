@@ -19,7 +19,7 @@
 
 cli/node-binary
 accounts/
-db_dump
+sdk/sql/db_dump.sql
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

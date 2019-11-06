@@ -168,7 +168,7 @@ const eth = {
       .catch(callback)
   },
 
-  async sendTransaction(contractAddress, privateKey, from, to, amount, callback) {
+  async sendErc20Transaction(contractAddress, privateKey, from, to, amount, callback) {
 
     const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
 

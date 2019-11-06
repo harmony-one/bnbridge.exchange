@@ -18,6 +18,8 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPage from "@material-ui/icons/LastPage";
 
+import Tooltip from "react-simple-tooltip"
+
 import {
   SWAPS_UPDATED,
   GET_SWAPS,
@@ -150,10 +152,10 @@ class Swaps extends Component {
   swapsUpdated = () => {
     const swaps = store.getStore('swaps')
 
-    let swapsDisplay = swaps.map((swap) => {
+    const swapsDisplay = swaps.map((swap) => {
       return {
-        // eth_address: swap.eth_address,
-        // bnb_address: swap.bnb_address,
+        eth_address: swap.eth_address,
+        bnb_address: swap.bnb_address,
         amount: swap.amount,
         deposit_transaction_hash: swap.deposit_transaction_hash,
         transfer_transaction_hash: swap.transfer_transaction_hash,
@@ -179,12 +181,27 @@ class Swaps extends Component {
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
-            <TableCell>Time (UTC)</TableCell>
-            {/* <TableCell align="left">ETH Addr</TableCell>
-            <TableCell align="left">BNB Addr</TableCell> */}
-            <TableCell align="left">Amount (ONE)</TableCell>
-            <TableCell align="left">Deposit (BEP2)</TableCell>
-            <TableCell align="left">Receive (ERC20) </TableCell>
+            <TableCell align="left">
+              <Tooltip content="Time zone in UTC">Time</Tooltip>
+            </TableCell>
+            <TableCell align="left">
+              <Tooltip content="Source account that made the deposit for swap.">From</Tooltip>
+            </TableCell>
+            <TableCell align="left">
+              <Tooltip content="Destination account that received the swapped token.">To</Tooltip>
+            </TableCell>
+            <TableCell align="left">
+              <Tooltip content="Unit is in One">Amount</Tooltip>
+            </TableCell>
+            <TableCell align="left">
+              <Tooltip content="Deposit transaction hash">Deposit</Tooltip>
+            </TableCell>
+            <TableCell align="left">
+              <Tooltip content="Receive transaction hash">Receive</Tooltip>
+            </TableCell>
+            <TableCell align="left">
+              <Tooltip content="Swap direction">Direction</Tooltip>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -216,23 +233,63 @@ class Swaps extends Component {
     return this.state.swapsDisplay
       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
       .map((swap) => {
+        let from, fromLink, to, toLink, amount, depositHash, depositLink, receiveHash, receiveLink, direction;
+
+        if (swap.direction === 'BinanceToEthereum') {
+          from = swap.bnb_address;
+          fromLink = `https://explorer.binance.org/address/${swap.bnb_address}`
+          to = swap.eth_address;
+          toLink = `https://etherscan.io/address/${swap.eth_address}#tokentxns`
+          amount = swap.amount;
+          depositHash = swap.deposit_transaction_hash;
+          depositLink = "https://explorer.binance.org/tx/" + swap.deposit_transaction_hash;
+          receiveHash = swap.transfer_transaction_hash;
+          receiveLink = "https://etherscan.io/tx/" + swap.transfer_transaction_hash;
+          direction = 'B2E';
+        } else {
+          from = swap.eth_address;
+          fromLink = `https://etherscan.io/address/${swap.eth_address}#tokentxns`
+          to = swap.bnb_address;
+          toLink = `https://explorer.binance.org/address/${swap.bnb_address}`
+          amount = swap.amount;
+          depositHash = swap.deposit_transaction_hash;
+          depositLink = "https://etherscan.io/tx/" + swap.deposit_transaction_hash;
+          receiveHash = swap.transfer_transaction_hash;
+          receiveLink = "https://explorer.binance.org/tx/" + swap.transfer_transaction_hash;
+          direction = 'E2B';
+        }
+
+        const fromShort = from ? from.substring(0, 12) : ''
+        const toShort = to ? to.substring(0, 12) : ''
+        const depositHashShort = depositHash ? depositHash.substring(0, 12) : ''
+        const receiveHashShort = receiveHash ? receiveHash.substring(0, 12) : ''
+
         return <TableRow key={swap.transfer_transaction_hash}>
           <TableCell component="th" scope="row">
             {swap.created}
           </TableCell>
-          {/* <TableCell align="left">{swap.eth_address}</TableCell>
-          <TableCell align="left">{swap.bnb_address}</TableCell> */}
-          <TableCell align="left">{swap.amount}</TableCell>
           <TableCell align="left">
-            <a href={"https://explorer.binance.org/tx/" + swap.deposit_transaction_hash} rel="noopener noreferrer" target="_blank">
-              {swap.deposit_transaction_hash ? swap.deposit_transaction_hash.substring(0, 12) : '' }
+            <a href={fromLink} rel="noopener noreferrer" target="_blank">
+              <Tooltip content={from}>{fromShort}</Tooltip>
             </a>
           </TableCell>
           <TableCell align="left">
-            <a href={"https://etherscan.io/tx/" + swap.transfer_transaction_hash} rel="noopener noreferrer" target="_blank">
-              {swap.transfer_transaction_hash ? swap.transfer_transaction_hash.substring(0, 12) : '' }
+            <a href={toLink} rel="noopener noreferrer" target="_blank">
+              <Tooltip content={to}>{toShort}</Tooltip>
             </a>
           </TableCell>
+          <TableCell align="left">{amount}</TableCell>
+          <TableCell align="left">
+            <a href={depositLink} rel="noopener noreferrer" target="_blank">
+              <Tooltip content={depositHash}>{depositHashShort}</Tooltip>
+            </a>
+          </TableCell>
+          <TableCell align="left">
+            <a href={receiveLink} rel="noopener noreferrer" target="_blank">
+              <Tooltip content={receiveHash}>{receiveHashShort}</Tooltip>
+            </a>
+          </TableCell>
+          <TableCell align="left"><Tooltip content={swap.direction}>{direction}</Tooltip></TableCell>
         </TableRow>
       })
   }

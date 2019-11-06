@@ -32,7 +32,7 @@ function App() {
         </Grid>
       </Grid>
       <Grid
-        style={{ padding: '5.0rem 20%', display: 'inline-block'}}
+        style={{ padding: '5.0rem 15%', display: 'inline-block'}}
         container
         justify="center"
         alignItems="center"
