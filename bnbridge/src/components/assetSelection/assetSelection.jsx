@@ -97,7 +97,7 @@ class AssetSelection extends Component {
     } = this.state
 
     return (
-      <Grid container className={ classes.root }>
+      <Grid container className={ classes.root } style={{marginTop: '1rem'}}>
         <Grid item xs={ 12 }>
           <Select
             id="token"

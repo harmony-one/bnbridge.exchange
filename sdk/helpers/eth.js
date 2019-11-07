@@ -202,9 +202,6 @@ const eth = {
   },
 
   async fundEthForGasFee(privateKey, from, to, amount, callback) {
-
-    console.log(`privateKey ${privateKey} from ${from} to ${to} amount ${amount}`);
-
     const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
 
     const gasPriceGwei = ETH_TX_GAS_PRICE_GWEI;

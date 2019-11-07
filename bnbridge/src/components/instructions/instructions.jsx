@@ -33,6 +33,12 @@ const styles = theme => ({
     display: 'inline-block',
     marginTop: "0.5rem"
   },
+  action2: {
+    fontSize: '0.85rem',
+    color: colors.lightBlack,
+    display: 'inline-block',
+    marginTop: "0.5rem"
+  },
   actionRed: {
     fontSize: '1rem',
     color: colors.lightBlack,
@@ -112,8 +118,15 @@ class Instructions extends Component {
         alignItems="flex-end">
         <Grid item xs={12} align='left'>
           <div style={{ "marginRight": "50px" }} className={classes.root} >
-            <Typography className={classes.header}>With bnbridge you can:</Typography>
-            <Typography className={classes.action}>Swap your BEP2 ONE tokens to ERC20 ONE tokens</Typography>
+            <Typography className={classes.header} style={{ marginTop: '8rem' }}>With bnbridge you can:</Typography>
+            <li><Typography className={classes.action}>Swap between ERC20 and BEP2 tokens</Typography></li>
+              <div style={{ margin: '30px', marginTop: '50px' }} />
+              <Typography className={classes.action2}>
+                Please contact <a href="mailto:hello@harmony.one" target="_blank" rel="noopener noreferrer">Harmony team</a> for any additional support
+              </Typography>
+            <Typography className={classes.action2}>
+              Note: UI of this page is not optimized for mobile experience.
+            </Typography>
           </div>
           {/* <div className={ classes.root } >
             <Typography className={ classes.header }>Bnbridge fees:</Typography>

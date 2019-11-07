@@ -178,28 +178,28 @@ class Swaps extends Component {
     const emptyRows = rowsPerPageNum - Math.min(rowsPerPageNum, swaps.length - page * rowsPerPageNum);
 
     return (
-      <Table className={classes.table}>
+      <Table className={classes.table} style={{ tableLayout: 'fixed', marginBottom: '10rem', marginTop: '5rem' }} fixedHeader={false}>
         <TableHead>
           <TableRow>
-            <TableCell align="left">
+            <TableCell align="center">
               <Tooltip content="Time zone in UTC">Time</Tooltip>
             </TableCell>
-            <TableCell align="left">
+            <TableCell align="center">
               <Tooltip content="Source account that made the deposit for swap.">From</Tooltip>
             </TableCell>
-            <TableCell align="left">
+            <TableCell align="center">
               <Tooltip content="Destination account that received the swapped token.">To</Tooltip>
             </TableCell>
-            <TableCell align="left">
+            <TableCell align="center">
               <Tooltip content="Unit is in One">Amount</Tooltip>
             </TableCell>
-            <TableCell align="left">
+            <TableCell align="center">
               <Tooltip content="Deposit transaction hash">Deposit</Tooltip>
             </TableCell>
-            <TableCell align="left">
+            <TableCell align="center">
               <Tooltip content="Receive transaction hash">Receive</Tooltip>
             </TableCell>
-            <TableCell align="left">
+            <TableCell align="center">
               <Tooltip content="Swap direction">Direction</Tooltip>
             </TableCell>
           </TableRow>
@@ -216,6 +216,7 @@ class Swaps extends Component {
         </TableBody>
         <TableFooter>
           <TableRow>
+            <div style={{ marginTop: '5rem' }}></div>
             <TablePagination rowsPerPageOptions={[5, 10, 25]} colSpan={3} count={swaps.length} rowsPerPage={rowsPerPageNum} page={page}
               SelectProps={{ native: true }} onChangePage={this.handleChangePage} onChangeRowsPerPage={this.handleChangeRowsPerPage}
               ActionsComponent={TablePaginationActionsWrapped} />
@@ -259,37 +260,41 @@ class Swaps extends Component {
           direction = 'E2B';
         }
 
+        const timetokens = swap.created.split('T');
+        const date = timetokens[0];
+        const time = timetokens[1].replace('Z', '')
         const fromShort = from ? from.substring(0, 12) : ''
         const toShort = to ? to.substring(0, 12) : ''
         const depositHashShort = depositHash ? depositHash.substring(0, 12) : ''
         const receiveHashShort = receiveHash ? receiveHash.substring(0, 12) : ''
 
         return <TableRow key={swap.transfer_transaction_hash}>
-          <TableCell component="th" scope="row">
-            {swap.created}
+          <TableCell component="th" scope="row" style={{ padding: '8px' }}>
+            <div style={{ marginTop: '4px', marginLeft: '20%' }}>{date}</div>
+            <div style={{ marginBottom: '4px', marginLeft: '20%' }}>{time}</div>
           </TableCell>
-          <TableCell align="left">
+          <TableCell align="center">
             <a href={fromLink} rel="noopener noreferrer" target="_blank">
               <Tooltip content={from}>{fromShort}</Tooltip>
             </a>
           </TableCell>
-          <TableCell align="left">
+          <TableCell align="center">
             <a href={toLink} rel="noopener noreferrer" target="_blank">
               <Tooltip content={to}>{toShort}</Tooltip>
             </a>
           </TableCell>
-          <TableCell align="left">{amount}</TableCell>
-          <TableCell align="left">
+          <TableCell align="center">{amount}</TableCell>
+          <TableCell align="center">
             <a href={depositLink} rel="noopener noreferrer" target="_blank">
               <Tooltip content={depositHash}>{depositHashShort}</Tooltip>
             </a>
           </TableCell>
-          <TableCell align="left">
+          <TableCell align="center">
             <a href={receiveLink} rel="noopener noreferrer" target="_blank">
               <Tooltip content={receiveHash}>{receiveHashShort}</Tooltip>
             </a>
           </TableCell>
-          <TableCell align="left"><Tooltip content={swap.direction}>{direction}</Tooltip></TableCell>
+          <TableCell align="center"><Tooltip content={swap.direction}>{direction}</Tooltip></TableCell>
         </TableRow>
       })
   }
