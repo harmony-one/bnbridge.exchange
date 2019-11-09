@@ -19,13 +19,17 @@ if (!process.argv || process.argv.length < 3) {
 }
 const exportFile = process.argv[2]
 
+const KEY = 'witness canyon foot sing song tray task defense float bottom town obvious faint globe door tonight alpha battle purse jazz flag author choose whisper';
+
 const HMY_UUID = "Harmony_One"
 const HMY_ERC = "0x799a4202c12ca952cb311598a024c80ed371a41e"
 
 const db = require('./helpers/db.js').db
-const config = require('./config')
 const bnb = require('./helpers/bnb.js')
 const eth = require('./helpers/eth.js')
+const models = require('../sdk/models')
+const config = require('./config')
+
 const async = require('async')
 
 const csv = require('csv-parser');
@@ -34,29 +38,85 @@ const fs = require('fs');
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(config.provider));
 
-function readExport(callback) {
+const ETH_FUND_ACCT_ADDRESS = process.env.ETH_FUND_ACCT_ADDRESS.toLowerCase()
+const ETH_FOUNDATION_ACCT_ADDRESS = process.env.ETH_FOUNDATION_ACCT_ADDRESS.toLowerCase()
+
+const BNB_FUND_ACCT_ADDRESS = process.env.BNB_FUND_ACCT_ADDRESS.toLowerCase()
+const BNB_FOUNDATION_ACCT_ADDRESS = process.env.BNB_FOUNDATION_ACCT_ADDRESS.toLowerCase()
+
+function readERC20TxnsForB2E(callback) {
   const ret = {}
   return fs.createReadStream(exportFile)
     .pipe(csv())
     .on('data', (row) => {
-      if (row.From !== '0x6750db41334e612a6e8eb60323cb6579f0a66542')
-        return
+      if (row.From !== ETH_FOUNDATION_ACCT_ADDRESS) {
+        return;
+      }
+
+      // if row.From == ETH_FOUNDATION_ACCT_ADDRESS, direction = b2e.
+      // for filtering e2b, we need to use web3 js to get the txn input data to decode 'To' info
       ret[row.Txhash] = row;
     })
     .on('end', () => {
-      console.log(`${Object.keys(ret).length} txns read from ${exportFile}`);
-      callback(ret, null);
+      console.log(`${Object.keys(ret).length} b2e swap txns read from ${exportFile}`);
+      callback(null, ret);
       return
     })
     .on('error', (error) => {
       console.error('Error reading CSV file', error);
-      callback(null, error);
+      callback(error);
     });
 }
 
-function readDb(callback) {
+function getERC20TxnsOfAccount(address, isDst, callback) {
+  const getTxnEventPromises = []
+  fs.createReadStream(exportFile)
+    .pipe(csv())
+    .on('data', (row) => {
+      getTxnEventPromises.push(
+        eth.getTransactionEvent(row.Txhash)
+      );
+    })
+    .on('end', () => {
+      console.log(`Total ${getTxnEventPromises.length} txns read from ${exportFile}`);
+
+      const ret = {}
+      return Promise.all(getTxnEventPromises).then(txnEvents => {
+        txnEvents.forEach(([txHash, txnDetail]) => {
+          if (!txnDetail) {
+            // this means the txn failed and got reverted
+            // console.log(`Reverted Txn: ${txHash}`);
+            return;
+          }
+
+          // { name: 'Transfer', events: [
+          //   { name: '_from', type: 'address', value: ... },
+          //   { name: '_to', type: 'address', value: ... },
+          //   { name: '_value', type: 'uint256', value: ... }
+          // ]}
+          const from = txnDetail.events[0].value
+          const to = txnDetail.events[1].value
+          const txValue = parseFloat(web3.utils.fromWei(txnDetail.events[2].value, 'ether'))
+
+          if ((isDst ? to : from) === address) {
+            ret[txHash] = txnDetail;
+          }
+        });
+
+        callback(null, ret);
+        return;
+      });
+    })
+    .on('error', (error) => {
+      console.error('Error reading CSV file', error);
+      callback(error);
+      return;
+    });
+}
+
+function readSwapTransactionsFromDb(direction, deposit, callback) {
   const ret = {}
-  return getB2ESwapsInDb((swaps, err) => {
+  return getSwapsDataFromDb(direction, (swaps, err) => {
     if (err) {
       console.error(`getSwapsInDb error`, error);
       callback(null, error);
@@ -64,7 +124,13 @@ function readDb(callback) {
     }
 
     for (let i in swaps) {
-      ret[swaps[i].transfer_transaction_hash] = swaps[i]
+      const swap = swaps[i]
+      if (swap.direction === direction) {
+        const txHash = deposit
+          ? swaps[i].deposit_transaction_hash
+          : swaps[i].transfer_transaction_hash;
+        ret[txHash] = swaps[i];
+      }
     }
     console.log(`${Object.keys(ret).length} swap txns read from db`);
     callback(ret);
@@ -72,20 +138,61 @@ function readDb(callback) {
   });
 }
 
-findMissingERC20Txns()
+function getAllClientBnbAccounts(callback) {
+  db.many('select address, key_name, seed_phrase as mnemonic, password, encr_key from client_bnb_accounts;')
+    .then((keys) => {
+      const decryptedKeys = {};
+      keys.forEach((key) => {
+        if (key.encr_key) {
+          const dbPassword = key.encr_key
+          const password = KEY + ':' + dbPassword
+          key.password_decrypted = models.decrypt(key.password, password)
+          key.mnemonic = models.decrypt(key.mnemonic, password)
+        } else {
+          console.log(`missing encrypted key ${key}`);
+        }
+        decryptedKeys[key.address] = key
+      });
+      callback(null, decryptedKeys)
+    })
+    .catch(callback)
+}
+
+// findERC20TxnsForFoundationForE2B();
+
+function findERC20TxnsForFoundationForE2B() {
+  console.log('======== START ==========');
+  console.log(`Finding ERC20 Transactions`);
+  const account = ETH_FOUNDATION_ACCT_ADDRESS
+  const isDst = true
+  return getERC20TxnsOfAccount(account, isDst, (err, toFoundationAccountTxns) => {
+    if (err) {
+      console.error(`findERC20TxnsForFoundationForE2B: getERC20TxnsOfAccount(${account}, ${isDst ? 'true' : 'false'}) failed`, err);
+      return;
+    }
+
+    console.log(`${JSON.stringify(toFoundationAccountTxns, null, 2)}\n`);
+
+    console.log(`Found ${Object.keys(toFoundationAccountTxns).length} ERC20 txns ${isDst ? 'to' : 'from'} the ETH foundation account for E2B`);
+    console.log('======== END ==========');
+    return toFoundationAccountTxns;
+  });
+}
+
+// findMissingERC20Txns()
 
 function findMissingERC20Txns() {
   console.log('======== START ==========');
-  return readDb((swapTxns, err) => {
+  return readSwapTransactionsFromDb('BinanceToEthereum', false /* deposit */, (swapTxns, err) => {
     if (err) {
-      console.error(`findMissingERC20Txns: readDb failed`, err);
+      console.error(`findMissingERC20Txns: readSwapTransactionsFromDb failed`, err);
       return;
     }
 
     // console.log(swapTxns);
-    return readExport((exportTxns, err) => {
+    return readERC20TxnsForB2E((err, exportTxns) => {
       if (err) {
-        console.error(`findMissingERC20Txns: readExport failed`, err);
+        console.error(`findMissingERC20Txns: readERC20TxnsForB2E failed`, err);
         return;
       }
 
@@ -103,9 +210,14 @@ function findMissingERC20Txns() {
         promises.push(eth.getTransactionEvent(txHash))
       }
 
-      return Promise.all(promises).then((txnDetails) => {
-        let i = 0;
-        txnDetails.forEach(function (txnDetail) {
+      return Promise.all(promises).then(txnEvents => {
+        txnEvents.forEach(([txHash, txnDetail], i) => {
+          if (!txnDetail) {
+            // this means the txn failed and got reverted
+            // console.log(`Reverted Txn: ${txHash}`);
+            return;
+          }
+
           // { name: 'Transfer', events: [
           //   { name: '_from', type: 'address', value: ... },
           //   { name: '_to', type: 'address', value: ... },
@@ -114,7 +226,6 @@ function findMissingERC20Txns() {
           const txValue = parseFloat(web3.utils.fromWei(txnDetail.events[2].value, 'ether'))
           console.log(`- txn ${Object.keys(missing)[i]}: ${txValue}`);
           amount += txValue
-          i++;
         });
 
         console.log(`Total missing amount: ${amount} ONE`);
@@ -124,6 +235,127 @@ function findMissingERC20Txns() {
       });
     });
   });
+}
+
+// processUnemptiedClientBnbAccounts();
+
+function processUnemptiedClientBnbAccounts() {
+  return getAllClientBnbAccounts((err, decryptedKeys) => {
+    if (err) {
+      console.error(`processUnemptiedClientBnbAccounts: getAllClientBnbAccounts failed`, err);
+      return;
+    }
+
+    // console.log(decryptedKeys);
+
+    getBalancesBNB(Object.keys(decryptedKeys), (err, accountsBalances) => {
+      accountsBalances.forEach(([address, balances]) => {
+        console.log(address, balances);
+      })
+    })
+
+    // Object.keys(decryptedKeys).forEach((clientBNBAccountAddress, i) => {
+    //   const key = decryptedKeys[clientBNBAccountAddress]
+    //   // key { address, key_name, mnemonic, password, encr_key, password_decrypted, mnemonic }
+    //   getBalancesBNB(Object.keys(decryptedKeys))
+    // })
+  })
+}
+
+findMissingBEP2Txns()
+
+function findMissingBEP2Txns() {
+  console.log('======== START ==========');
+  return readSwapTransactionsFromDb('EthereumToBinance', false /* deposit */, (swapTxns, err) => {
+    if (err) {
+      console.error(`findMissingBEP2Txns: readSwapTransactionsFromDb failed`, err);
+      return;
+    }
+
+    const account = BNB_FOUNDATION_ACCT_ADDRESS
+    const isDst = true
+
+    return getBEP2TxnsOfAccount(account, isDst, (err, fetchedTxns) => {
+      if (err) {
+        console.error(`findBEP2TxnsForFoundationForB2E: getBEP2TxnsOfAccount(${account}, ${isDst ? 'true' : 'false'}) failed`, err);
+        return;
+      }
+
+      const missing = {};
+      for (let txHash in fetchedTxns) {
+        if (txHash in swapTxns) continue;
+        missing[txHash] = fetchedTxns[txHash]
+      }
+
+      console.log(`missing ${Object.keys(missing).length} bep2 transactions`);
+
+      let amount = 0;
+      missing.keys.forEach((txn, i) => {
+        amount += parseFloat(txn.value);
+        console.log(`- txn ${Object.keys(missing)[i]}: ${txValue}`);
+      });
+
+      console.log(`Total missing amount: ${amount} ONE`);
+      console.log('======== END ==========');
+      return amount;
+    });
+  });
+}
+
+// findBEP2TxnsForFoundationForB2E();
+
+function findBEP2TxnsForFoundationForB2E() {
+  console.log('======== START ==========');
+  console.log(`Finding BEP2 Transactions `);
+  const account = BNB_FOUNDATION_ACCT_ADDRESS
+  const isDst = true
+  return getBEP2TxnsOfAccount(account, isDst, (err, res) => {
+    if (err) {
+      console.error(`findBEP2TxnsForFoundationForB2E: getBEP2TxnsOfAccount(${account}, ${isDst ? 'true' : 'false'}) failed`, err);
+      return;
+    }
+
+    // console.log(`${JSON.stringify(res.tx, null, 2)}\n`);
+    console.log(`Found ${Object.keys(res).length} BEP2 txns ${isDst ? 'to' : 'from'} the ETH foundation account for B2E`);
+    console.log('======== END ==========');
+    return res.tx;
+  });
+}
+
+function getBEP2TxnsOfAccount(address, isDst, callback) {
+  const symbol = 'ONE-5F9';
+  const startTime = (new Date('10-01-2019')).getTime(); // time in milliseconds time for 10-01-2019
+  const endTime = (new Date()).getTime();               // current time in milliseconds
+  const side = isDst ? 'RECEIVE' : 'SEND';
+  const limit = 1000;
+  return bnb.getTransactionsForAddress(address, symbol, side, startTime, endTime, limit, (err, res) => {
+    if (err) {
+      callback(err)
+      return;
+    }
+
+    // console.log(res.data);
+    if (!res.data || !res.data.tx) {
+      callback('Failed http request to get transactions for ' +
+        `address ${address}, symbol ${symbol}, side ${side}, startTime ${startTime}, endTime ${endTime}`)
+      return;
+    }
+
+    const ret = {}
+    let totalAmount = 0.0;
+    res.data.tx.forEach((tx, i) => {
+      // console.log(i, tx.Hash);
+      totalAmount += parseFloat(tx.value)
+      ret[tx.txHash] = tx;
+    })
+
+    // console.log('txns:\n', JSON.stringify(res.data.tx, null, 2));
+    console.log('total:', JSON.stringify(res.data.total, null, 2));
+    console.log('total amount:', totalAmount);
+
+    callback(null, ret);
+    return;
+  })
 }
 
 // run()
@@ -216,8 +448,8 @@ function getSwapsInDb(callback) {
     .catch(error)
 }
 
-function getB2ESwapsInDb(callback) {
-  db.manyOrNone('select * from swaps where token_uuid = $1 and direction = \'BinanceToEthereum\';', [HMY_UUID])
+function getSwapsDataFromDb(direction, callback) {
+  db.manyOrNone('select * from swaps where token_uuid = $1 and direction = $2;', [HMY_UUID, direction])
     .then(swaps => {
       callback(swaps);
       return;
@@ -247,11 +479,11 @@ function getBalancesForAddresses(addresses, callback) {
 function getBalancesBNB(addresses, callback) {
   async.map(addresses, (address, callbackInner) => {
     bnb.getBalance(address, callbackInner)
-  }, (err, balances) => {
+  }, (err, accountsBalances) => {
     if(err) {
-      console.error(err)
+      console.error(err);
     }
-    callback(err, balances)
+    callback(err, accountsBalances);
   })
 }
 

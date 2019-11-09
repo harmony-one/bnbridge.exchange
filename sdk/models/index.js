@@ -364,7 +364,7 @@ const models = {
       })
       .reduce(reducer, 0)
 
-      bnb.getBalance(getResponse.bnb_address, (err, balances) => {
+      bnb.getBalance(getResponse.bnb_address, (err, [address, balances]) => {
         if(err) {
           console.error(err)
           return callback(err, 500)
@@ -1131,8 +1131,13 @@ const models = {
           return next(null, req, res, next)
         }
 
+        const startTime = (new Date('10-01-2019')).getTime(); // time in milliseconds time for 10-01-2019
+        const endTime = (new Date()).getTime();               // current time in milliseconds
+        const side = 'RECEIVE'  // or 'SEND'
+
         async.parallel([
-          (callback) => { bnb.getTransactionsForAddress(clientAccount.bnb_address, tokenInfo.unique_symbol, callback) },
+          (callback) => { bnb.getTransactionsForAddress(clientAccount.bnb_address,
+            tokenInfo.unique_symbol, side, startTime, endTime, null /* limit. defaults to 25 recent txns */, callback) },
           (callback) => { models.getTransactionHashs(token_uuid, uuid, callback) }
         ], (err, info) => {
           if (err) {
@@ -1732,7 +1737,7 @@ const models = {
       let depositRequired = parseFloat(config.list_proposal_deposit) // 1000 on mainnet. Move to config
       totalRequired = totalRequired + depositRequired
 
-      bnb.getBalance(proposalInfo.bnb_address, (err, balances) => {
+      bnb.getBalance(proposalInfo.bnb_address, (err, [address, balances]) => {
         if(err) {
           console.error(err)
           return callback(err, 500)
@@ -1909,7 +1914,7 @@ const models = {
       })
       .reduce(reducer, 0)
 
-      bnb.getBalance(proposalInfo.bnb_address, (err, balances) => {
+      bnb.getBalance(proposalInfo.bnb_address, (err, [address, balances]) => {
         if(err) {
           console.error(err)
           return callback(err, 500)
@@ -2064,7 +2069,7 @@ const models = {
           return next(null, req, res, next)
         }
 
-        bnb.getBalance(bnb_address, (err, balances) => {
+        bnb.getBalance(bnb_address, (err, [address, balances]) => {
           if(err) {
             console.error(err)
             res.status(500)

@@ -294,7 +294,10 @@ const bnb = {
 
   getBalance(address, callback) {
     const bnbClient = new BnbApiClient(config.api);
-    bnbClient.getBalance(address).then((balances) => { callback(null, balances) });
+    bnbClient.getBalance(address).then((balances) => {
+      // console.log(address, balances);
+      callback(null, [address, balances])
+    });
   },
 
   submitListProposal(symbol, keyName, password, initPrice, title, description, expireTime, votingPeriod, deposit, callback) {
@@ -499,8 +502,26 @@ const bnb = {
     return result
   },
 
-  getTransactionsForAddress(address, symbol, callback) {
-    const url = `${config.api}api/v1/transactions?address=${address}&txType=TRANSFER&txAsset=${symbol}&side=RECEIVE`;
+  getTx(txHash, callback) {
+    const url = `${config.api}api/v1/tx/${txHash}?format=json`;
+
+    httpClient
+      .get(url)
+      .then((res) => {
+        callback(null, res)
+      })
+      .catch((error) => {
+        callback(error)
+      });
+  },
+
+  getTransactionsForAddress(address, symbol, side, startTime, endTime, limit, callback) {
+    // https://docs.binance.org/api-reference/dex-api/paths.html#apiv1transactions
+    let url = `${config.api}api/v1/transactions?address=${address}&txType=TRANSFER&txAsset=${symbol}` +
+      `&side=${side}&startTime=${startTime}&endTime=${endTime}`;
+    if (limit && limit > 0) {
+      url += `&limit=${limit}`
+    }
 
     httpClient
       .get(url)

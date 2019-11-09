@@ -128,7 +128,7 @@ function getBalancesForAddresses(addresses, callback) {
 function getBalancesBNB(addresses, callback) {
   async.map(addresses, (address, callbackInner) => {
     bnb.getBalance(address, callbackInner)
-  }, (err, balances) => {
+  }, (err, [address, balances]) => {
     if(err) {
       console.error(err)
     }

@@ -6,6 +6,9 @@ const hdkey = require("ethereumjs-wallet/hdkey");
 const Tx = require('ethereumjs-tx');
 const Web3 = require('web3');
 
+const abiDecoder = require('abi-decoder');
+abiDecoder.addABI(config.erc20ABI);
+
 const CONTRACT_MANAGER = process.env.ERC20_CONTRACT_MANAGER
 
 const ETH_TX_GAS_PRICE_GWEI = process.env.ETH_TX_GAS_PRICE_GWEI
@@ -60,11 +63,24 @@ const eth = {
       });
   },
 
+  getTransactionEvent(txHash) {
+    return new Promise((resolve, reject) => {
+      web3.eth.getTransactionReceipt(txHash)
+        .then((receipt) => {
+          resolve(abiDecoder.decodeLogs(receipt.logs)[0])
+        })
+        .catch((err) => {
+          console.error(err)
+          reject(err)
+        });
+    })
+  },
+
   getTransactionsForAddress(contractAddress, depositAddress, callback) {
     let myContract = new web3.eth.Contract(config.erc20ABI, contractAddress)
 
     myContract.getPastEvents('Transfer', {
-      fromBlock: 8866650,
+      fromBlock: 8698700, // first block number to search from, since around 10/09/2019 timepoint
       toBlock: 'latest',
       filter: { _to: depositAddress }
     })
