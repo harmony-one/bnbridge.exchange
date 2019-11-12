@@ -33,6 +33,7 @@
     "nodemailer": "^6.3.1",
     "path": "^0.12.7",
     "pg-promise": "^8.7.5",
+    "promise.series": "^0.2.0",
     "sha256": "^0.2.0",
     "web3": "^1.2.2",
     "web3-eth": "^1.2.2",

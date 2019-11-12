@@ -1,13 +1,13 @@
-var nodemailer = require('nodemailer')
-var config = require('../config')
+const nodemailer = require('nodemailer')
+const config = require('../config')
 
-var emailer = {
+const emailer = {
 
   sendMail: function(subject, text, callback) {
-    var mailOptions = {
-      from: '"BNBridge" <dennis@harmony.one>',
-      to: 'sahil@harmony.one',
-      cc: 'li@harmony.one',
+    const mailOptions = {
+      from: '"Harmony Team" <hello@harmony.one>',
+      to: 'li@harmony.one',
+      cc: ['sahil@harmony.one', 'dennis@harmony.one'],
       subject: subject,
       text: text
     }
@@ -16,7 +16,7 @@ var emailer = {
   },
 
   _sendMail: function(mailOptions, callback) {
-    var transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: config.emailerUser,

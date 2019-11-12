@@ -44,12 +44,37 @@ const ETH_FOUNDATION_ACCT_ADDRESS = process.env.ETH_FOUNDATION_ACCT_ADDRESS.toLo
 const BNB_FUND_ACCT_ADDRESS = process.env.BNB_FUND_ACCT_ADDRESS.toLowerCase()
 const BNB_FOUNDATION_ACCT_ADDRESS = process.env.BNB_FOUNDATION_ACCT_ADDRESS.toLowerCase()
 
-function readERC20TxnsForB2E(callback) {
+function readERC20TxnsPromise(srcOnly) {
+  return new Promise((resolve, reject) => {
+    const ret = {}
+    fs.createReadStream(exportFile)
+      .pipe(csv())
+      .on('data', (row) => {
+        if (srcOnly && row.From !== ETH_FOUNDATION_ACCT_ADDRESS) {
+          return;
+        }
+
+        // if row.From == ETH_FOUNDATION_ACCT_ADDRESS, direction = b2e.
+        // for filtering e2b, we need to use web3 js to get the txn input data to decode 'To' info
+        ret[row.Txhash] = row;
+      })
+      .on('end', () => {
+        console.log(`${Object.keys(ret).length} b2e swap txns read from ${exportFile}`);
+        resolve(ret);
+      })
+      .on('error', (error) => {
+        console.error('Error reading CSV file', error);
+        reject(error);
+      });
+  });
+}
+
+function readERC20Txns(srcOnly, callback) {
   const ret = {}
   return fs.createReadStream(exportFile)
     .pipe(csv())
     .on('data', (row) => {
-      if (row.From !== ETH_FOUNDATION_ACCT_ADDRESS) {
+      if (srcOnly && row.From !== ETH_FOUNDATION_ACCT_ADDRESS) {
         return;
       }
 
@@ -66,6 +91,119 @@ function readERC20TxnsForB2E(callback) {
       console.error('Error reading CSV file', error);
       callback(error);
     });
+}
+
+matchBinanceEthereumTxns();
+
+function matchBinanceEthereumTxns() {
+  console.log('======== START ==========');
+  const readERCSortedByTxValue = readERC20TxnsPromise(true)
+    .catch((err) => {
+      console.error(`matchBinanceEthereumTxns: readERC20Txns failed`, err);
+      return;
+    })
+    .then((exportTxns) => {
+      console.log(`${Object.keys(exportTxns).length} erc20 txns from ${ETH_FOUNDATION_ACCT_ADDRESS} read.`);
+
+      let amount = 0
+      const promises = []
+      for (let i = 0; i < Object.keys(exportTxns).length; i++) {
+        const txHash = Object.keys(exportTxns)[i]
+        promises.push(eth.getTransactionEvent(txHash))
+      }
+
+      return Promise.all(promises).then(txnEvents => {
+        txnEvents.forEach(([txHash, txnDetail], i) => {
+          if (!txnDetail) {
+            // this means the txn failed and got reverted
+            // console.log(`Reverted Txn: ${txHash}`);
+            return;
+          }
+
+          // { name: 'Transfer', events: [
+          //   { name: '_from', type: 'address', value: ... },
+          //   { name: '_to', type: 'address', value: ... },
+          //   { name: '_value', type: 'uint256', value: ... }
+          // ]}
+          const txValue = parseFloat(web3.utils.fromWei(txnDetail.events[2].value, 'ether'))
+          // console.log(`${Object.keys(exportTxns)[i]}\t${txValue}`);
+          amount += txValue
+          exportTxns[txHash].value = txValue
+        });
+
+        // sort exportTxns
+        const sortedKeys = Object.keys(exportTxns).sort((hash1, hash2) => {
+          const value1 = exportTxns[hash1].value
+          const value2 = exportTxns[hash2].value
+          return value1 < value2 ? -1 : (value1 > value2 ? 1 : 0)
+        });
+
+        const ret = {};
+        sortedKeys.forEach((txHash, i) => {
+          ret[txHash] = exportTxns[txHash]
+        });
+
+        console.log(`Total erc20 from ${ETH_FOUNDATION_ACCT_ADDRESS}: ${amount} ONE`);
+        return ret;
+      });
+    });
+
+  const readBEP2SortedByValue = getBEP2TxnsOfAccountPromise(BNB_FOUNDATION_ACCT_ADDRESS, true)
+    .then((bep2TxnsFromFounation) => {
+      console.log(`${Object.keys(bep2TxnsFromFounation).length} bep2 txns to ${BNB_FOUNDATION_ACCT_ADDRESS} read.`);
+
+      // sort exportTxns
+      const sortedKeys = Object.keys(bep2TxnsFromFounation).sort((hash1, hash2) => {
+        const value1 = parseFloat(bep2TxnsFromFounation[hash1].value)
+        const value2 = parseFloat(bep2TxnsFromFounation[hash2].value)
+        return value1 < value2 ? -1 : (value1 > value2 ? 1 : 0)
+      });
+
+      const ret = {}
+      let amount = 0.0;
+      sortedKeys.forEach((txHash, i) => {
+        const tx = bep2TxnsFromFounation[txHash]
+        tx.value = parseFloat(tx.value)
+        // console.log(`${txHash}\t${tx.value}`);
+        amount += tx.value
+        ret[txHash] = tx
+      })
+
+      console.log(`Total bep2 to ${ETH_FOUNDATION_ACCT_ADDRESS}: ${amount} ONE`);
+      return ret;
+    })
+    .catch((err) => {
+      console.error(`matchBinanceEthereumTxns: getBEP2TxnsOfAccount failed`, err);
+      return;
+    })
+
+  return Promise.all([readERCSortedByTxValue, readBEP2SortedByValue]).then(res => {
+    console.log('======== FINISHED FETCH ==========');
+    const [ercTxnsSorted, bep2TxnsSorted] = res;
+
+    let i = 0, j = 0
+    while (i < Object.keys(ercTxnsSorted).length && j < Object.keys(bep2TxnsSorted).length) {
+      const ercHash = Object.keys(ercTxnsSorted)[i]
+      const ercValue = ercTxnsSorted[ercHash].value
+
+      const bepHash = Object.keys(bep2TxnsSorted)[j]
+      const bepValue = bep2TxnsSorted[bepHash].value
+
+      if (ercValue === bepValue) {
+        i++;
+        j++;
+      } else if (ercValue > bepValue) {
+        console.log(`BEP txn ${bepHash} value ${bepValue}`);
+        j++
+      } else {
+        console.log(`ERC txn ${ercHash} value ${ercValue}`);
+        i++
+      }
+    }
+
+    console.log('======== END ==========');
+    return;
+  });
 }
 
 function getERC20TxnsOfAccount(address, isDst, callback) {
@@ -188,11 +326,10 @@ function findMissingERC20Txns() {
       console.error(`findMissingERC20Txns: readSwapTransactionsFromDb failed`, err);
       return;
     }
-
     // console.log(swapTxns);
-    return readERC20TxnsForB2E((err, exportTxns) => {
+    return readERC20Txns(true, (err, exportTxns) => {
       if (err) {
-        console.error(`findMissingERC20Txns: readERC20TxnsForB2E failed`, err);
+        console.error(`findMissingERC20Txns: readERC20Txns failed`, err);
         return;
       }
 
@@ -262,7 +399,7 @@ function processUnemptiedClientBnbAccounts() {
   })
 }
 
-findMissingBEP2Txns()
+// findMissingBEP2Txns()
 
 function findMissingBEP2Txns() {
   console.log('======== START ==========');
@@ -349,13 +486,43 @@ function getBEP2TxnsOfAccount(address, isDst, callback) {
       ret[tx.txHash] = tx;
     })
 
-    // console.log('txns:\n', JSON.stringify(res.data.tx, null, 2));
-    console.log('total:', JSON.stringify(res.data.total, null, 2));
-    console.log('total amount:', totalAmount);
+    // // console.log('txns:\n', JSON.stringify(res.data.tx, null, 2));
+    // console.log('total:', JSON.stringify(res.data.total, null, 2));
+    // console.log('total amount:', totalAmount);
 
     callback(null, ret);
     return;
   })
+}
+
+function getBEP2TxnsOfAccountPromise(address, isDst) {
+  const symbol = 'ONE-5F9';
+  const startTime = (new Date('10-01-2019')).getTime(); // time in milliseconds time for 10-01-2019
+  const endTime = (new Date()).getTime();               // current time in milliseconds
+  const side = isDst ? 'RECEIVE' : 'SEND';
+  const limit = 1000;
+  return bnb.getTransactionsForAddressPromise(address, symbol, side, startTime, endTime, limit)
+    .then((res) => {
+      // console.log(res.data);
+      if (!res.data || !res.data.tx) {
+        throw Error('Failed http request to get transactions for ' +
+          `address ${address}, symbol ${symbol}, side ${side}, startTime ${startTime}, endTime ${endTime}`)
+      }
+
+      const ret = {}
+      let totalAmount = 0.0;
+      res.data.tx.forEach((tx, i) => {
+        // console.log(i, tx.Hash);
+        totalAmount += parseFloat(tx.value)
+        ret[tx.txHash] = tx;
+      })
+
+      // console.log('txns:\n', JSON.stringify(res.data.tx, null, 2));
+      // console.log('total:', JSON.stringify(res.data.total, null, 2));
+      // console.log('total amount:', totalAmount);
+
+      return ret;
+    })
 }
 
 // run()

@@ -594,9 +594,10 @@ const models = {
         return 'bnb_address is required'
       }
 
-      if(!bnb.validateAddress(bnb_address)) {
-        return 'bnb_address is invalid'
-      }
+      // binance sdk having issue with validateAddreses api
+      // if(!bnb.validateAddress(bnb_address)) {
+      //   return 'bnb_address is invalid'
+      // }
     } else {
       if(!eth_address) {
         return 'eth_address is required'
@@ -960,9 +961,9 @@ const models = {
             text += '\nTo: ' + swap.bnb_address
             text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
             text += '\n\nError Received: ' + err
-            text += '\n*********************************************************'
+            text += '\n*********************************************************\n'
 
-            // emailer.sendMail('BNBridge error', text)
+            emailer.sendMail('BNBridge error', text)
             console.error(text, err);
 
             return callback(err)
@@ -1011,7 +1012,7 @@ const models = {
           ETH_FUND_ACCT_PRIVATE_KEY,
           ETH_FUND_ACCT_ADDRESS,
           clientAccount.eth_address,
-          ETH_GAS_FEE, (err, txResult1) => {
+          ETH_GAS_FEE, true /* earlyRet */, (err, txResult1) => {
             if (err) {
               let text = "BNBridge encountered an error processing a swap.\n" +
                 "Failed to fund gas for transferring deposits to the foundation account."
@@ -1024,9 +1025,9 @@ const models = {
               text += '\nTo: ' + swap.bnb_address
               text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
               text += '\n\nError Received: ' + err
-              text += '\n*********************************************************'
+              text += '\n*********************************************************\n'
 
-              // emailer.sendMail('BNBridge error', text)
+              emailer.sendMail('BNBridge error', text)
               console.error(text, err);
               return callback(err)
             }
@@ -1043,7 +1044,7 @@ const models = {
                 key.private_key_decrypted.substring(2), // need to strip out '0x' in front
                 clientAccount.eth_address,
                 ETH_FOUNDATION_ACCT_ADDRESS,
-                swap.amount, (err, txResult2) => {
+                swap.amount, true /* earlyRet */, (err, txResult2) => {
                   if (err) {
                     let text = "BNBridge encountered an error processing a swap.\n" +
                       "Failed to send eth deposit to the foundation account."
@@ -1056,9 +1057,9 @@ const models = {
                     text += '\nTo: ' + swap.bnb_address
                     text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
                     text += '\n\nError Received: ' + err
-                    text += '\n*********************************************************'
+                    text += '\n*********************************************************\n'
 
-                    // emailer.sendMail('BNBridge error', text)
+                    emailer.sendMail('BNBridge error', text)
                     console.error(text, err);
 
                     return callback(err)
@@ -1253,7 +1254,7 @@ const models = {
       address.private_key_decrypted, // '0x' already stripped out in front
       tokenInfo.eth_address,
       swap.eth_address,
-      swap.amount, (err, swapResult) => {
+      swap.amount, false /* earlyRet */, (err, swapResult) => {
         if (err) {
           return models.revertUpdateWithDepositTransactionHash(swap.uuid, (revertErr) => {
             if (revertErr) {
@@ -1270,9 +1271,9 @@ const models = {
             text += '\nTo: ' + swap.eth_address
             text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
             text += '\n\nError Received: ' + err
-            text += '\n*********************************************************'
+            text += '\n*********************************************************\n'
 
-            // emailer.sendMail('BNBridge error', text)
+            emailer.sendMail('BNBridge error', text)
             console.error(text, err);
 
             return callback(err)
@@ -1332,9 +1333,9 @@ const models = {
               text += '\nTo: ' + swap.eth_address
               text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
               text += '\n\nError Received: ' + err
-              text += '\n*********************************************************'
+              text += '\n*********************************************************\n'
 
-              // emailer.sendMail('BNBridge error', text)
+              emailer.sendMail('BNBridge error', text)
               console.error(text, err);
 
               return callback(err)
@@ -1361,9 +1362,9 @@ const models = {
                     text += '\nTo: ' + swap.eth_address
                     text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
                     text += '\n\nError Received: ' + err
-                    text += '\n*********************************************************'
+                    text += '\n*********************************************************\n'
 
-                    // emailer.sendMail('BNBridge error', text)
+                    emailer.sendMail('BNBridge error', text)
                     console.error(text, err);
 
                     return callback(err)

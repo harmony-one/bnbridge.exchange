@@ -35,7 +35,7 @@ const eth = {
         return {
           from: event.returnValues._from,
           to: event.returnValues._to,
-          amount: parseFloat(web3.utils.fromWei(event.returnValues._value._hex, 'ether')),
+          amount: parseFloat(web3.utils.fromWei(event.returnValues._value, 'ether')),
           transactionHash: event.transactionHash
         }
       })
@@ -89,7 +89,7 @@ const eth = {
           return {
             from: event.returnValues._from,
             to: event.returnValues._to,
-            amount: parseFloat(web3.utils.fromWei(event.returnValues._value._hex, 'ether')),
+            amount: parseFloat(web3.utils.fromWei(event.returnValues._value, 'ether')),
             transactionHash: event.transactionHash
           }
         })
@@ -112,7 +112,7 @@ const eth = {
       .then((events) => {
         let returnEvents = events.filter((event) => {
           if (event.returnValues._from.toUpperCase() == accountAddress.toUpperCase() && event.returnValues._to.toUpperCase() == depositAddress.toUpperCase()) {
-            let amount = parseFloat(web3.utils.fromWei(event.returnValues._value._hex, 'ether'))
+            let amount = parseFloat(web3.utils.fromWei(event.returnValues._value, 'ether'))
             return depositAmount == amount
           }
         })
@@ -175,21 +175,22 @@ const eth = {
       .catch(callback)
   },
 
-  async sendErc20Transaction(contractAddress, privateKey, from, to, amount, callback) {
+  async sendErc20Transaction(contractAddress, privateKey, from, to, amount, earlyRet, callback) {
     const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
     const consumerContract = new web3.eth.Contract(config.erc20ABI, contractAddress);
     const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
 
-    const gasPriceGwei = ETH_TX_GAS_PRICE_GWEI;
     const gasLimit = ETH_TX_GAS_LIMIT;
 
     const nonce = await web3.eth.getTransactionCount(from, 'pending');
+    let gasPrice = await web3.eth.getGasPrice();
+    gasPrice = Math.min(ETH_TX_GAS_PRICE_GWEI * 1e9, gasPrice * 2)  // speed up erc20 txn a bit
 
     const tx = {
       from,
       to: contractAddress,
 
-      gasPrice: web3.utils.toHex(gasPriceGwei * 1e9),
+      gasPrice: web3.utils.toHex(gasPrice),
       gasLimit: web3.utils.toHex(gasLimit),
       value: '0x0',
 
@@ -203,24 +204,38 @@ const eth = {
     const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
     const privKey = Buffer.from(privateKey, 'hex');
     rawTx.sign(privKey);
+
     const serializedTx = rawTx.serialize();
-    // Comment out these four lines if you don't really want to send the TX right now
-    console.log(`Attempting to send signed tx:  ${serializedTx.toString('hex')}\n------------------------`);
+    const tx_hash = '0x' + rawTx.hash().toString('hex');
+
+    console.log(`Attempting to send signed tx ${tx_hash}: ${serializedTx.toString('hex')}\n------------------------`);
 
     try {
-      const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
+      const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).
+        on('transactionHash', txHash => {
+          if (earlyRet) {
+            console.log('sendErc20Transaction: early returning with transactionHash', txHash)
+            callback(null, txHash)
+          } else {
+            console.log('transactionHash:', txHash)
+          }
+        });
+
       console.log('sendErc20Transaction: transaction receipt', receipt)
-      return callback(null, receipt.transactionHash)
+      if (earlyRet) {
+        return null, tx_hash
+      }
+      callback(null, receipt.transactionHash)
+      return null, receipt.transactionHash
     } catch (err) {
       console.error('[Error] sendErc20Transaction', err)
       return callback(err)
     }
   },
 
-  async fundEthForGasFee(privateKey, from, to, amount, callback) {
+  async fundEthForGasFee(privateKey, from, to, amount, earlyRet, callback) {
     const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
 
-    const gasPriceGwei = ETH_TX_GAS_PRICE_GWEI;
     const gasLimit = ETH_TX_GAS_LIMIT;
 
     const nonce = await web3.eth.getTransactionCount(from, 'pending');
@@ -244,12 +259,25 @@ const eth = {
     const privKey = Buffer.from(privateKey, 'hex');
     rawTx.sign(privKey);
     const serializedTx = rawTx.serialize();
-    // Comment out these four lines if you don't really want to send the TX right now
-    console.log(`Attempting to send signed tx:  ${serializedTx.toString('hex')}\n------------------------`);
+    const tx_hash = '0x' + rawTx.hash().toString('hex');
+
+    console.log(`Attempting to send signed tx ${tx_hash}: ${serializedTx.toString('hex')}\n------------------------`);
 
     try {
-      const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
-      console.log('transaction receipt', receipt)
+      const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).
+        on('transactionHash', txHash => {
+          if (earlyRet) {
+            console.log('fundEthForGasFee: early returning with transactionHash', txHash)
+            callback(null, txHash)
+          } else {
+            console.log('transactionHash:', txHash)
+          }
+        });
+
+      console.log('fundEthForGasFee: transaction receipt', receipt)
+      if (earlyRet) {
+        return null, tx_hash
+      }
       callback(null, receipt.transactionHash)
       return null, receipt.transactionHash
     } catch (err) {
@@ -309,7 +337,7 @@ if (process.env.RUN) {
       }
       console.log(`==== One balance: ${balance} ONE`);
 
-      eth.sendErc20Transaction(contractAddress, privateKey, from, to, amount, (err, hash) => {
+      eth.sendErc20Transaction(contractAddress, privateKey, from, to, amount, false /* earlyRet */, (err, hash) => {
         if (err) {
           console.error(err);
           return;

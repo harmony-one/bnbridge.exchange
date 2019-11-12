@@ -3,6 +3,7 @@ const axios = require('axios');
 const config = require('../config')
 
 const os = require('os');
+const promiseSeries = require('promise.series')
 
 const pty = require('node-pty');
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
@@ -34,21 +35,13 @@ const bnb = {
   },
 
   validateAddress(address) {
-    const addressValid = BnbApiClient.crypto.checkAddress(address);
+    const addressValid = BnbApiClient.crypto.checkAddress(address, config.prefix);
     return addressValid
   },
 
   getFees(callback) {
     const url = `${config.api}api/v1/fees`;
-
-    httpClient
-      .get(url)
-      .then((res) => {
-        callback(null, res)
-      })
-      .catch((error) => {
-        callback(error)
-      });
+    return callbackPromise(url, callback)
   },
 
   createKey(name, password, callback) {
@@ -124,7 +117,6 @@ const bnb = {
         }
       }
 
-
       if (data.includes("override the existing name")) {
         // ptyProcess.write('n\r');
         // ptyProcess.write('exit\r');
@@ -195,6 +187,8 @@ const bnb = {
   },
 
   transfer(mnemonic, publicTo, amount, asset, message, callback) {
+    const bnbClient = new BnbApiClient(config.api);
+    bnbClient.chooseNetwork(config.network);
 
     mnemonic = mnemonic.replace(/(\r\n|\n|\r)/gm, "");
 
@@ -203,35 +197,21 @@ const bnb = {
 
     const sequenceURL = `${config.api}api/v1/account/${publicFrom}/sequence`;
 
-    console.log('private key', privateFrom, 'publicFrom', publicFrom);
-    console.log('mnemonic, publicTo, amount, asset, message', mnemonic, publicTo, amount, asset, message);
-    console.log('sequenceURL', sequenceURL);
+    // console.log('private key', privateFrom, 'publicFrom', publicFrom);
+    // console.log('mnemonic, publicTo, amount, asset, message', mnemonic, publicTo, amount, asset, message);
+    // console.log('sequenceURL', sequenceURL);
 
-    const bnbClient = new BnbApiClient(config.api);
-    bnbClient.chooseNetwork(config.network);
-
-    return Promise.all([
-      bnbClient.setPrivateKey(privateFrom),
-      bnbClient.initChain(),
-    ]).then(() => {
-      return httpClient.get(sequenceURL).then((res) => {
-        const sequence = res.data.sequence || 0
-        // console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
-        //   publicFrom, publicTo, amount, asset, message, sequence);
-        return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
-      }).then((result) => {
-        if (result.status === 200) {
-          callback(null, result)
-        } else {
-          callback(result)
-        }
-      }).catch((error) => {
-        callback(error)
-      });
-    });
+    return callbackSequencePromise(bnbClient, privateFrom, sequenceURL, (bnbClient, sequence) => {
+      // console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
+      //   publicFrom, publicTo, amount, asset, message, sequence);
+      return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
+    }, callback);
   },
 
   transferWithPrivateKey(privateFrom, publicTo, amount, asset, message, callback) {
+    const bnbClient = new BnbApiClient(config.api);
+    bnbClient.chooseNetwork(config.network);
+
     const publicFrom = BnbApiClient.crypto.getAddressFromPrivateKey(privateFrom, config.prefix);
 
     const sequenceURL = `https://dex.binance.org/api/v1/account/${publicFrom}/sequence`;
@@ -242,28 +222,11 @@ const bnb = {
     // console.log('sequenceURL', sequenceURL);
     // console.log('##########################################');
 
-    const bnbClient = new BnbApiClient(config.api);
-    bnbClient.chooseNetwork(config.network);
-
-    return Promise.all([
-      bnbClient.setPrivateKey(privateFrom),
-      bnbClient.initChain(),
-    ]).then(() => {
-      return httpClient.get(sequenceURL).then((res) => {
-        const sequence = res.data.sequence || 0
-        // console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
-        //   publicFrom, publicTo, amount, asset, message, sequence);
-        return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
-      }).then((result) => {
-        if (result.status === 200) {
-          callback(null, result)
-        } else {
-          callback(result)
-        }
-      }).catch((error) => {
-        callback(error)
-      });
-    });
+    return callbackSequencePromise(bnbClient, privateFrom, sequenceURL, (bnbClient, sequence) => {
+      // console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
+      //   publicFrom, publicTo, amount, asset, message, sequence);
+      return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
+    }, callback);
   },
 
   freeze(amount, symbol, keyName, callback) {
@@ -294,9 +257,13 @@ const bnb = {
 
   getBalance(address, callback) {
     const bnbClient = new BnbApiClient(config.api);
+    bnbClient.chooseNetwork(config.network);
     bnbClient.getBalance(address).then((balances) => {
       // console.log(address, balances);
-      callback(null, [address, balances])
+      if (callback) {
+        callback(null, [address, balances])
+      }
+      return [address, balances]
     });
   },
 
@@ -483,57 +450,87 @@ const bnb = {
 
   },
 
-  createAccountWithKeystore() {
-    bncClient.createAccountWithKeystore(password)
+  createAccountWithKeystore(password) {
+    const bnbClient = new BnbApiClient(config.api);
+    bnbClient.chooseNetwork(config.network);
+    const result = bnbclient.createAccountWithKeystore(password)
+    return result
   },
 
-  createAccountWithMneomnic(password) {
+  createAccountWithMneomnic() {
     const bnbClient = new BnbApiClient(config.api);
-    bnbClient.chooseNetwork(config.network)
-
-    let result = bnbClient.createAccountWithMneomnic()
-
+    bnbClient.chooseNetwork(config.network);
+    const result = bnbClient.createAccountWithMneomnic()
     return result
   },
 
   generateKeyStore(privateKey, password) {
     const result = BnbApiClient.crypto.generateKeyStore(privateKey, password);
-
     return result
   },
 
   getTx(txHash, callback) {
+    const bnbClient = new BnbApiClient(config.api);
+    bnbClient.chooseNetwork(config.network);
     const url = `${config.api}api/v1/tx/${txHash}?format=json`;
-
-    httpClient
-      .get(url)
-      .then((res) => {
-        callback(null, res)
-      })
-      .catch((error) => {
-        callback(error)
-      });
+    return callbackPromise(url, callback)
   },
 
   getTransactionsForAddress(address, symbol, side, startTime, endTime, limit, callback) {
+    const bnbClient = new BnbApiClient(config.api);
+    bnbClient.chooseNetwork(config.network);
     // https://docs.binance.org/api-reference/dex-api/paths.html#apiv1transactions
     let url = `${config.api}api/v1/transactions?address=${address}&txType=TRANSFER&txAsset=${symbol}` +
       `&side=${side}&startTime=${startTime}&endTime=${endTime}`;
     if (limit && limit > 0) {
       url += `&limit=${limit}`
     }
+    return callbackPromise(url, callback)
+  },
 
-    httpClient
-      .get(url)
-      .then((res) => {
-        callback(null, res)
-      })
-      .catch((error) => {
-        callback(error)
-      });
+}
 
+function callbackPromise(url, callback) {
+  const ret = httpClient.get(url)
+
+  if (!callback) {
+    return ret;
   }
 
+  ret.then((res) => {
+    callback(null, res)
+  }).catch((error) => {
+    callback(error)
+  });
+
+  return ret
+}
+
+function callbackSequencePromise(bnbClient, privateFrom, sequenceURL, callbackInner, callback) {
+  return promiseSeries([
+    () => bnbClient.initChain(),
+    () => bnbClient.setPrivateKey(privateFrom),
+  ]).then(() => {
+    return httpClient.get(sequenceURL).then((res) => {
+      const sequence = res.data.sequence || 0
+      return callbackInner(sequence)
+    }).then((result) => {
+      if (!callback) {
+        return results;
+      }
+
+      if (result.status === 200) {
+        callback(null, result)
+      } else {
+        callback(result)
+      }
+    }).catch((error) => {
+      if (!callback) {
+        throw error
+      }
+      callback(error)
+    });
+  });
 }
 
 module.exports = bnb

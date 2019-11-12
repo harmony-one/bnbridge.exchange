@@ -20,6 +20,7 @@
     "fs": "0.0.1-security",
     "node-pty": "^0.8.1",
     "pg-promise": "^8.7.5",
+    "promise.series": "^0.2.0",
     "web3": "1.0.0-beta.53"
   }
 }

@@ -19,7 +19,7 @@ function getTransactions(contractAddress, accountAddress, depositAddress, callba
   .then((events) => {
     let returnEvents = events.filter((event) => {
       if(event.returnValues._from.toUpperCase() == accountAddress.toUpperCase() && event.returnValues._to.toUpperCase() == depositAddress.toUpperCase()) {
-        let amount = parseFloat(web3.utils.fromWei(event.returnValues._value._hex, 'ether'))
+        let amount = parseFloat(web3.utils.fromWei(event.returnValues._value, 'ether'))
         console.log(amount)
         return true
       }
