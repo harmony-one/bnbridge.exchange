@@ -233,7 +233,7 @@ const eth = {
     }
   },
 
-  async fundEthForGasFee(privateKey, from, to, amount, earlyRet, callback) {
+  async fundEthForGasFee(privateKey, from, to, amount, message, earlyRet, callback) {
     const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
 
     const gasLimit = ETH_TX_GAS_LIMIT;
@@ -251,6 +251,9 @@ const eth = {
 
       chainId: 1,
       nonce: nonce,
+    }
+    if (message) {
+      tx.data = web3.utils.toHex(message);
     }
 
     console.log('Sending ETH transaction', tx);
@@ -318,7 +321,7 @@ if (process.env.RUN) {
   //   console.log('returned events', JSON.stringify(events));
   // })
 
-  // eth.fundEthForGasFee(privateKey, from, to, amount, (err, hash) => {
+  // eth.fundEthForGasFee(privateKey, from, to, amount, null, (err, hash) => {
   //   if (err) {
   //     console.error(err);
   //     return;

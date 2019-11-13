@@ -116,11 +116,13 @@ if (cmd === 'eth') {
     console.log(`client ${ethaddress}`, key);
 
     if (fundEth) {
+      const message = `backfill: funding eth gas`
       eth.fundEthForGasFee(
         ETH_FUND_ACCT_PRIVATE_KEY,
         ETH_FUND_ACCT_ADDRESS,
         ethaddress,
-        ETH_GAS_FEE, false, (err, txResult1) => {
+        ETH_GAS_FEE, message,
+        false, (err, txResult1) => {
           if (err || !txResult1) {
             console.error(`Failed to fund eth for gas fee (${ETH_GAS_FEE} eth) ' +
               'for account ${ethaddress} (pk: ${ETH_FUND_ACCT_PRIVATE_KEY})`, err);
@@ -142,7 +144,7 @@ if (cmd === 'eth') {
 
 function bnbTransfer(bnbaddress, key, amount) {
   bnb.transfer(key.mnemonic, BNB_FOUNDATION_ACCT_ADDRESS, amount, 'ONE-5F9',
-    'Re-sending the BNBridge Swap bnb deposit to the foundation account', (err, txResult2) => {
+    'Re-sending BNBridge Swap bnb deposit to the foundation account', (err, txResult2) => {
 
       if (err) {
         console.error(`[ERROR] bnb transfer to client ${bnbaddress}`, err)

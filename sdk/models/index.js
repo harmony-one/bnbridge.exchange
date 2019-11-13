@@ -940,9 +940,11 @@ const models = {
   },
 
   sendBep2Txn(swap, tokenInfo, callback) {
+    const message = `Bnbridge ERC20-BEP2 One swap. erc20 deposit ${swap.deposit_transaction_hash}`
     bnb.transferWithPrivateKey(BNB_FUND_ACCT_PRIVATE_KEY,
       swap.bnb_address, swap.amount,
-      tokenInfo.unique_symbol, 'Bnbridge ERC20 One - BEP2 One swap', (err, swapResult) => {
+      tokenInfo.unique_symbol,
+      message, (err, swapResult) => {
         if (err) {
           console.error('[Error] bnb transferWithPrivateKey', err)
 
@@ -1008,11 +1010,13 @@ const models = {
 
         console.log('3. transfer gas from eth funding account to the client eth acccount', clientAccount.eth_address);
         // 1. first, send from eth source account to the eth client acccount since it needs eth to fund ONE transaction
+        const message = `funding eth gas. erc20 deposit: ${swap.deposit_transaction_hash}`
         eth.fundEthForGasFee(
           ETH_FUND_ACCT_PRIVATE_KEY,
           ETH_FUND_ACCT_ADDRESS,
           clientAccount.eth_address,
-          ETH_GAS_FEE, true /* earlyRet */, (err, txResult1) => {
+          ETH_GAS_FEE, message,
+          true /* earlyRet */, (err, txResult1) => {
             if (err) {
               let text = "BNBridge encountered an error processing a swap.\n" +
                 "Failed to fund gas for transferring deposits to the foundation account."
@@ -1318,9 +1322,10 @@ const models = {
 
         console.log('3. transfer gas from bnb funding account to the client bnb acccount', clientAccount.bnb_address);
         // 1. first, send from bnb source account to the bnb acccount since it needs bnb to fund ONE transaction
+        const message = `Bnbridge funding bnb gas. erc20 deposit ${swap.deposit_transaction_hash}`
         bnb.transferWithPrivateKey(BNB_FUND_ACCT_PRIVATE_KEY,
           clientAccount.bnb_address, BNB_GAS_FEE,
-          'BNB', 'Bnb gas for sending to Foundation', (err, txResult1) => {
+          'BNB', message, (err, txResult1) => {
             if (err) {
               let text = "BNBridge encountered an error processing a swap.\n" +
                 "Failed to fund gas for transferring deposits to the foundation account."
@@ -1347,8 +1352,9 @@ const models = {
 
               console.log('4. Transfer the BNBridge Swap bnb deposit to the foundation account');
               // 2. then, now that bnb account is funded, send the deposit to the foundation account
-              bnb.transfer(key.mnemonic, BNB_FOUNDATION_ACCT_ADDRESS, swap.amount, tokenInfo.unique_symbol,
-                'Sending the BNBridge Swap bnb deposit to the foundation account', (err, txResult2) => {
+              const message = `Deposit to central bep2 One addr. erc20 deposit ${swap.deposit_transaction_hash}`
+              bnb.transfer(key.mnemonic, BNB_FOUNDATION_ACCT_ADDRESS, swap.amount,
+                tokenInfo.unique_symbol, message, (err, txResult2) => {
 
                   if (err) {
                     let text = "BNBridge encountered an error processing a swap.\n" +
