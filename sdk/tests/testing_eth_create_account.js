@@ -10,7 +10,7 @@ function createAccount(callback) {
 
 createAccount((err, account) => {
   if(err) {
-    console.log(err)
+    console.error(err)
   }
   console.log(account.address)
   console.log(account.privateKey)

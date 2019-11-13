@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# if test -f "env_var_setup.sh"; then
-#  echo "running env_var_setup.sh"
-#  source env_var_setup.sh
-# fi
+if test -f "env_var_setup.sh"; then
+ echo "running env_var_setup.sh"
+ source env_var_setup.sh
+fi
 
 if [[ -z $DBUSER ]]; then
   echo "Export DBUSER to environment variable"
@@ -154,7 +154,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
     '$ERC20_ADDRESS',
     'erc_account_uuid', 'bnb_account_uuid',
     true, true, 'list_proposal_uuid',
-    true, timezone('utc', now()), true, 0, 0, timezone('utc', now()), true, false
+    true, timezone('utc', now()), true, 0, 0, timezone('utc', now()), true, true
   );
 "
 

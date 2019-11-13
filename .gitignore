@@ -19,7 +19,10 @@
 
 cli/node-binary
 accounts/
-db_dump
+sdk/sql/db_dump.sql
+
+# etherscan data exports
+processing/exports
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
