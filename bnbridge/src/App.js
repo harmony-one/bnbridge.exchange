@@ -19,7 +19,12 @@ function App() {
     <MuiThemeProvider theme={ createMuiTheme(bnbridgeTheme) }>
       <CssBaseline />
       <Grid
-        style={{ padding: '3.0rem 20.0rem'}}
+        style={{
+          padding: '5% 10% 5% 10%',
+          width: '50%',
+          'min-width': 'fit-content',
+          'margin-left': '15%',
+        }}
         container
         justify="center"
         alignItems="center"
@@ -32,7 +37,7 @@ function App() {
         </Grid>
       </Grid>
       <Grid
-        style={{ padding: '0.0rem 12.0rem 0.0rem 12.0rem', display: 'table'}}
+        style={{ padding: '0% 10%', display: 'table'}}
         container
         justify="center"
         alignItems="center"

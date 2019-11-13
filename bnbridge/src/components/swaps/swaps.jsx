@@ -234,14 +234,13 @@ class Swaps extends Component {
     return this.state.swapsDisplay
       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
       .map((swap) => {
-        let from, fromLink, to, toLink, amount, depositHash, depositLink, receiveHash, receiveLink, direction;
+        let from, fromLink, to, toLink, depositHash, depositLink, receiveHash, receiveLink, direction;
 
         if (swap.direction === 'BinanceToEthereum') {
           from = swap.bnb_address;
           fromLink = `https://explorer.binance.org/address/${swap.bnb_address}`
           to = swap.eth_address;
           toLink = `https://etherscan.io/address/${swap.eth_address}#tokentxns`
-          amount = swap.amount;
           depositHash = swap.deposit_transaction_hash;
           depositLink = "https://explorer.binance.org/tx/" + swap.deposit_transaction_hash;
           receiveHash = swap.transfer_transaction_hash;
@@ -252,7 +251,6 @@ class Swaps extends Component {
           fromLink = `https://etherscan.io/address/${swap.eth_address}#tokentxns`
           to = swap.bnb_address;
           toLink = `https://explorer.binance.org/address/${swap.bnb_address}`
-          amount = swap.amount;
           depositHash = swap.deposit_transaction_hash;
           depositLink = "https://etherscan.io/tx/" + swap.deposit_transaction_hash;
           receiveHash = swap.transfer_transaction_hash;
@@ -267,6 +265,7 @@ class Swaps extends Component {
         const toShort = to ? to.substring(0, 12) : ''
         const depositHashShort = depositHash ? depositHash.substring(0, 12) : ''
         const receiveHashShort = receiveHash ? receiveHash.substring(0, 12) : ''
+        const amount = parseFloat(swap.amount).toFixed(4)
 
         return <TableRow key={swap.transfer_transaction_hash}>
           <TableCell component="th" scope="row" style={{ padding: '8px' }}>
