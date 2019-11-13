@@ -965,7 +965,7 @@ const models = {
             text += '\n\nError Received: ' + err
             text += '\n*********************************************************\n'
 
-            emailer.sendMail('BNBridge error', text)
+            emailer.sendMail('BNBridge Error', text)
             console.error(text, err);
 
             return callback(err)
@@ -1031,7 +1031,7 @@ const models = {
               text += '\n\nError Received: ' + err
               text += '\n*********************************************************\n'
 
-              emailer.sendMail('BNBridge error', text)
+              emailer.sendMail('BNBridge Error', text)
               console.error(text, err);
               return callback(err)
             }
@@ -1063,7 +1063,7 @@ const models = {
                     text += '\n\nError Received: ' + err
                     text += '\n*********************************************************\n'
 
-                    emailer.sendMail('BNBridge error', text)
+                    emailer.sendMail('BNBridge Error', text)
                     console.error(text, err);
 
                     return callback(err)
@@ -1277,7 +1277,7 @@ const models = {
             text += '\n\nError Received: ' + err
             text += '\n*********************************************************\n'
 
-            emailer.sendMail('BNBridge error', text)
+            emailer.sendMail('BNBridge Error', text)
             console.error(text, err);
 
             return callback(err)
@@ -1340,7 +1340,7 @@ const models = {
               text += '\n\nError Received: ' + err
               text += '\n*********************************************************\n'
 
-              emailer.sendMail('BNBridge error', text)
+              emailer.sendMail('BNBridge Error', text)
               console.error(text, err);
 
               return callback(err)
@@ -1370,7 +1370,7 @@ const models = {
                     text += '\n\nError Received: ' + err
                     text += '\n*********************************************************\n'
 
-                    emailer.sendMail('BNBridge error', text)
+                    emailer.sendMail('BNBridge Error', text)
                     console.error(text, err);
 
                     return callback(err)

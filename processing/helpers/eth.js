@@ -210,27 +210,35 @@ const eth = {
 
     console.log(`Attempting to send signed tx ${tx_hash}: ${serializedTx.toString('hex')}\n------------------------`);
 
-    try {
-      const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).
-        on('transactionHash', txHash => {
-          if (earlyRet) {
-            console.log('sendErc20Transaction: early returning with transactionHash', txHash)
-            callback(null, txHash)
-          } else {
+    let retry = 0;
+    while (true) {
+      try {
+        const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).
+          on('transactionHash', txHash => {
             console.log('transactionHash:', txHash)
-          }
-        });
+            if (earlyRet) {
+              console.log('sendErc20Transaction: early returning with transactionHash', txHash)
+              callback(null, txHash)
+              return null, txHash
+            }
+          });
 
-      console.log('sendErc20Transaction: transaction receipt', receipt)
-      if (earlyRet) {
-        return null, tx_hash
+        // not early return since we await above (tx hash callback should be called before receipt is available)
+        console.log('sendErc20Transaction: transaction receipt', receipt)
+        callback(null, receipt.transactionHash)
+        return null, receipt.transactionHash
+      } catch (err) {
+        console.error('[Error] sendErc20Transaction', err)
+        if (retry == 3) {
+          callback(err)
+          return err, null
+        } else {
+          retry++;
+          console.log(`Retrying erc20 tx... ${retry}`)
+        }
       }
-      callback(null, receipt.transactionHash)
-      return null, receipt.transactionHash
-    } catch (err) {
-      console.error('[Error] sendErc20Transaction', err)
-      return callback(err)
     }
+
   },
 
   async fundEthForGasFee(privateKey, from, to, amount, message, earlyRet, callback) {
@@ -266,28 +274,35 @@ const eth = {
 
     console.log(`Attempting to send signed tx ${tx_hash}: ${serializedTx.toString('hex')}\n------------------------`);
 
-    try {
-      const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).
-        on('transactionHash', txHash => {
-          if (earlyRet) {
-            console.log('fundEthForGasFee: early returning with transactionHash', txHash)
-            callback(null, txHash)
-          } else {
+    let retry = 0;
+    while (true) {
+      try {
+        const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).
+          on('transactionHash', txHash => {
             console.log('transactionHash:', txHash)
-          }
-        });
+            if (earlyRet) {
+              console.log('fundEthForGasFee: early returning with transactionHash', txHash)
+              callback(null, txHash)
+              return null, txHash
+            }
+          });
 
-      console.log('fundEthForGasFee: transaction receipt', receipt)
-      if (earlyRet) {
-        return null, tx_hash
+        // not early return since we await above (tx hash callback should be called before receipt is available)
+        console.log('fundEthForGasFee: transaction receipt', receipt)
+        callback(null, receipt.transactionHash)
+        return null, receipt.transactionHash
+      } catch (err) {
+        console.error('[Error] fundEthForGasFee', err)
+        if (retry == 3) {
+          callback(err)
+          return err, null
+        } else {
+          retry++;
+          console.log(`Retrying funding eth gas ... ${retry}`)
+        }
       }
-      callback(null, receipt.transactionHash)
-      return null, receipt.transactionHash
-    } catch (err) {
-      console.error('[Error] fundEthForGasFee', err)
-      callback(err)
-      return err, null
     }
+
   },
 
   generateAddressesFromSeed(mnemonic, count) {
