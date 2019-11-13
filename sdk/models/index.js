@@ -8,15 +8,18 @@ const generator = require('generate-password');
 const crypto = require('crypto');
 const sha256 = require('sha256');
 const bip39 = require('bip39');
-const Web3 = require('web3');
 const algorithm = 'aes-256-ctr';
 
 const KEY = 'witness canyon foot sing song tray task defense float bottom town obvious faint globe door tonight alpha battle purse jazz flag author choose whisper';
 
 const BNB_FUND_ACCT_PRIVATE_KEY = process.env.BNB_FUND_ACCT_PRIVATE_KEY
 const BNB_FOUNDATION_ACCT_ADDRESS = process.env.BNB_FOUNDATION_ACCT_ADDRESS
-
 const BNB_GAS_FEE = 0.000375 // in BNB
+
+const ETH_FUND_ACCT_ADDRESS = process.env.ETH_FUND_ACCT_ADDRESS
+const ETH_FUND_ACCT_PRIVATE_KEY = process.env.ETH_FUND_ACCT_PRIVATE_KEY
+const ETH_FOUNDATION_ACCT_ADDRESS = process.env.ETH_FOUNDATION_ACCT_ADDRESS
+const ETH_GAS_FEE = 0.0005 // in ETH
 
 const models = {
 
@@ -34,17 +37,15 @@ const models = {
     return dec;
   },
 
-  descryptPayload(req, res, next, callback) {
-    const {
-      m,
-      e,
-      t,
-      s,
-      u,
-      p
-    } = req.body
+  decryptPayload(req, res, next, callback) {
+    const m = req.body.m;
+    const e = req.body.e;
+    const t = req.body.t;
+    const s = req.body.s;
+    const u = req.body.u;
+    const p = req.body.p;
 
-    if(!m || !e || !t ||!s || !u || !p) {
+    if (!m || !e || !t || !s || !u || !p) {
       res.status(501)
       res.body = { 'status': 501, 'success': false, 'message': 'Invalid payload' }
       return next(null, req, res, next)
@@ -85,7 +86,7 @@ const models = {
   },
 
   decryptCall(req, res, next) {
-    models.descryptPayload(req, res, next, (data) => {
+    models.decryptPayload(req, res, next, (data) => {
       res.status(200)
       res.body = { 'status': 200, 'success': true, 'result': data }
       return next(null, req, res, next)
@@ -99,7 +100,7 @@ const models = {
    */
   createToken(req, res, next) {
 
-    models.descryptPayload(req, res, next, (data) => {
+    models.decryptPayload(req, res, next, (data) => {
 
       let result = models.validateCreateToken(data)
 
@@ -111,7 +112,7 @@ const models = {
 
       models.insertToken(data, (err, response) => {
         if(err || !response) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -123,7 +124,7 @@ const models = {
             (callback) => { models.processEthAccount(data, callback) }
           ], (err, data) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': 'Unable to process request' }
               return next(null, req, res, next)
@@ -134,7 +135,7 @@ const models = {
             models.updateTokenAddresses(uuid, bnbUUID, ethUUID, (err, updateResponse) => {
               models.getTokenInfo(uuid, (err, getResponse) => {
                 if(err) {
-                  console.log(err)
+                  console.error(err)
                   res.status(500)
                   res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve token information' }
                   return next(null, req, res, next)
@@ -213,7 +214,7 @@ const models = {
 
     bnb.createKey(keyName, password, (err, keyData) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         callback(err)
       }
 
@@ -222,11 +223,6 @@ const models = {
   },
 
   insertBNBAccount(keyName, keyPassword, keyData, callback) {
-    const dbPassword = bip39.generateMnemonic()
-    const password = KEY+':'+dbPassword
-    const aes256seed = models.encrypt(keyData.seedPhrase, password)
-    const aes256password = models.encrypt(keyPassword, password)
-
     db.oneOrNone('insert into bnb_accounts (uuid, public_key, address, seed_phrase, key_name, password, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, timezone(\'utc\', now())) returning uuid;', [keyData.publicKey, keyData.address, aes256seed, keyName, aes256password, dbPassword])
     .then((response) => {
       callback(null, response)
@@ -237,7 +233,7 @@ const models = {
   processEthAccount(body, callback) {
     eth.createAccount((err, account) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         return callback(err)
       }
 
@@ -280,7 +276,7 @@ const models = {
    *  Transfers the funds from our BNB account to their BNB account
    */
   finalizeToken(req, res, next) {
-    models.descryptPayload(req, res, next, (data) => {
+    models.decryptPayload(req, res, next, (data) => {
 
       let result = models.validateFinalize(data)
 
@@ -294,7 +290,7 @@ const models = {
 
       models.getTokenInfo(uuid, (err, tokenInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve token information' }
           return next(null, req, res, next)
@@ -302,7 +298,7 @@ const models = {
 
         models.validateBalances(tokenInfo, (err, code, balanceValidation) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(code)
             res.body = { 'status': code, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -310,7 +306,7 @@ const models = {
 
           models.getKey(tokenInfo.bnb_address, (err, key) => {
             if(err || !key) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve key' }
               return next(null, req, res, next)
@@ -318,7 +314,7 @@ const models = {
 
             bnb.issue(tokenInfo.name, tokenInfo.total_supply, tokenInfo.symbol, tokenInfo.mintable, key.key_name, key.password_decrypted, (err, issueResult) => {
               if(err) {
-                console.log(err)
+                console.error(err)
                 res.status(500)
                 res.body = { 'status': 500, 'success': false, 'result': err }
                 return next(null, req, res, next)
@@ -326,7 +322,7 @@ const models = {
 
               models.updateUniqueSymbol(uuid, issueResult.uniqueSymbol, (err, result) => {
                 if(err) {
-                  console.log(err)
+                  console.error(err)
                   res.status(500)
                   res.body = { 'status': 500, 'success': false, 'result': err }
                   return next(null, req, res, next)
@@ -357,7 +353,7 @@ const models = {
 
     bnb.getFees((err, feesData) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         return callback(err, 500)
       }
 
@@ -368,9 +364,9 @@ const models = {
       })
       .reduce(reducer, 0)
 
-      bnb.getBalance(getResponse.bnb_address, (err, balances) => {
+      bnb.getBalance(getResponse.bnb_address, (err, [address, balances]) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           return callback(err, 500)
         }
 
@@ -419,7 +415,7 @@ const models = {
     .catch(callback)
   },
 
-  getClientKey(address, callback) {
+  getClientBnbKey(address, callback) {
     db.oneOrNone('select key_name, seed_phrase as mnemonic, password, encr_key from client_bnb_accounts where address = $1;', [address])
       .then((key) => {
         if (key.encr_key) {
@@ -427,6 +423,21 @@ const models = {
           const password = KEY + ':' + dbPassword
           key.password_decrypted = models.decrypt(key.password, password)
           key.mnemonic = models.decrypt(key.mnemonic, password)
+        }
+        callback(null, key)
+      })
+      .catch(callback)
+  },
+
+  getClientEthKey(address, callback) {
+    db.oneOrNone('select private_key, encr_key from client_eth_accounts where address = $1;', [address])
+      .then((key) => {
+        if (key.encr_key) {
+          const dbPassword = key.encr_key
+          const password = KEY + ':' + dbPassword
+          key.private_key_decrypted = models.decrypt(key.private_key, password)
+        } else {
+          key.private_key_decrypted = key.private_key
         }
         callback(null, key)
       })
@@ -456,7 +467,7 @@ const models = {
       }
     })
     .catch((err) => {
-      console.log(err)
+      console.error(err)
       res.status(500)
       res.body = { 'status': 500, 'success': false, 'result': err }
       return next(null, req, res, next)
@@ -480,7 +491,7 @@ const models = {
       }
     })
     .catch((err) => {
-      console.log(err)
+      console.error(err)
       res.status(500)
       res.body = { 'status': 500, 'success': false, 'result': err }
       return next(null, req, res, next)
@@ -493,7 +504,7 @@ const models = {
   getFees(req, res, next) {
     bnb.getFees((err, feesData) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
@@ -533,7 +544,7 @@ const models = {
         }
       })
       .catch((err) => {
-        console.log(err)
+        console.error(err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
@@ -546,7 +557,7 @@ const models = {
   * If not, we create a new address then return it.
   */
   swapToken(req, res, next) {
-    models.descryptPayload(req, res, next, (data) => {
+    models.decryptPayload(req, res, next, (data) => {
       let result = models.validateSwap(data)
 
       if(result !== true) {
@@ -583,9 +594,10 @@ const models = {
         return 'bnb_address is required'
       }
 
-      if(!bnb.validateAddress(bnb_address)) {
-        return 'bnb_address is invalid'
-      }
+      // binance sdk having issue with validateAddreses api
+      // if(!bnb.validateAddress(bnb_address)) {
+      //   return 'bnb_address is invalid'
+      // }
     } else {
       if(!eth_address) {
         return 'eth_address is required'
@@ -606,7 +618,7 @@ const models = {
 
     models.getClientAccountForBnbAddress(bnb_address, (err, clientAccount) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
@@ -619,7 +631,7 @@ const models = {
       } else {
         eth.createAccount((err, account) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -627,7 +639,7 @@ const models = {
 
           models.insertClientEthAccount(bnb_address, account, (err, clientAccount) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)
@@ -703,7 +715,7 @@ const models = {
 
           models.insertClientBnbAccount(eth_address, keyName, password, keyData, (err, clientAccount) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)
@@ -760,8 +772,7 @@ const models = {
   * Return all new deposits.
   */
   finalizeSwap(req, res, next) {
-    models.descryptPayload(req, res, next, (data) => {
-
+    models.decryptPayload(req, res, next, (data) => {
       let result = models.validateFinalizeSwap(data)
 
       if(result !== true) {
@@ -792,13 +803,15 @@ const models = {
 
     models.getClientAccountForUuidE2B(uuid, (err, clientAccount) => {
       if(err) {
-        console.log(err)
+        console.error(`[Error] getClientAccountForUuidE2B error`, err)
         res.status(500)
         res.body = { 'status': 500, 'success': false, 'result': err }
         return next(null, req, res, next)
       }
 
       if(!clientAccount) {
+        console.error(`[Error] getClientAccountForUuidE2B clientAccount nil`)
+
         res.status(400)
         res.body = { 'status': 400, 'success': false, 'result': 'Unable to find swap details' }
         return next(null, req, res, next)
@@ -806,7 +819,7 @@ const models = {
 
       models.getTokenInfoForSwap(token_uuid, (err, tokenInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -823,7 +836,6 @@ const models = {
           (callback) => { models.getTransactionHashs(token_uuid, uuid, callback) }
         ], (err, data) => {
           if(err) {
-            console.log(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': 'Unable to process request: ' + err }
             return next(null, req, res, next)
@@ -862,7 +874,7 @@ const models = {
 
           models.insertSwaps(newTransactions, clientAccount, token_uuid, direction, (err, newSwaps) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)
@@ -870,117 +882,7 @@ const models = {
 
             models.proccessSwapsE2B(newSwaps, tokenInfo, (err, result) => {
               if(err) {
-                console.log(err)
-                res.status(500)
-                res.body = { 'status': 500, 'success': false, 'result': err }
-                return next(null, req, res, next)
-              }
-
-              res.status(205)
-              res.body = { 'status': 200, 'success': true, 'result': newSwaps }
-              return next(null, req, res, next)
-            })
-          })
-        })
-      })
-    })
-  },
-
-  finalizeSwapBinanceToEthereum(req, res, next, data) {
-
-    const {
-      uuid,
-      token_uuid,
-      direction
-    } = data
-
-    models.getClientAccountForUuidB2E(uuid, (err, clientAccount) => {
-      if(err) {
-        console.log(err)
-        res.status(500)
-        res.body = { 'status': 500, 'success': false, 'result': err }
-        return next(null, req, res, next)
-      }
-
-      if(!clientAccount) {
-        res.status(400)
-        res.body = { 'status': 400, 'success': false, 'result': 'Unable to find swap details' }
-        return next(null, req, res, next)
-      }
-
-      models.getTokenInfoForSwap(token_uuid, (err, tokenInfo) => {
-        if(err) {
-          console.log(err)
-          res.status(500)
-          res.body = { 'status': 500, 'success': false, 'result': err }
-          return next(null, req, res, next)
-        }
-
-        if(!tokenInfo) {
-          res.status(400)
-          res.body = { 'status': 400, 'success': false, 'result': 'Unable to find token details' }
-          return next(null, req, res, next)
-        }
-
-        async.parallel([
-          (callback) => { bnb.getTransactionsForAddress(clientAccount.bnb_address, tokenInfo.unique_symbol, callback) },
-          (callback) => { models.getTransactionHashs(token_uuid, uuid, callback) }
-        ], (err, info) => {
-          if(err) {
-            console.log(err)
-            res.status(500)
-            res.body = { 'status': 500, 'success': false, 'result': 'Unable to process request: '+ err }
-            return next(null, req, res, next)
-          }
-
-          if(!info[0].data || !info[0].data.tx) {
-            res.status(400)
-            res.body = { 'status': 400, 'success': false, 'result': 'Unable to find a deposit' }
-            return next(null, req, res, next)
-          }
-
-          const bnbTransactions = info[0].data.tx
-          const swaps = info[1]
-
-          if(!bnbTransactions || bnbTransactions.length === 0) {
-            res.status(400)
-            res.body = { 'status': 400, 'success': false, 'result': 'Unable to find a deposit' }
-            return next(null, req, res, next)
-          }
-
-          const newTransactions = bnbTransactions.filter((bnbTransaction) => {
-            if(!bnbTransaction || bnbTransaction.value <= 0) {
-              return false
-            }
-
-            const thisTransaction = swaps.filter((swap) => {
-              return swap.deposit_transaction_hash === bnbTransaction.txHash
-            })
-
-            if(thisTransaction.length > 0) {
-              return false
-            } else {
-              return true
-            }
-          })
-
-          if(newTransactions.length === 0) {
-            res.status(400)
-            res.body = { 'status': 400, 'success': false, 'result': 'Unable to find any new deposits' }
-            return next(null, req, res, next)
-          }
-
-          models.insertSwaps(newTransactions, clientAccount, token_uuid, direction, (err, newSwaps) => {
-            if(err) {
-              console.log(err)
-              res.status(500)
-              res.body = { 'status': 500, 'success': false, 'result': err }
-              return next(null, req, res, next)
-            }
-
-            models.proccessSwapsB2E(newSwaps, tokenInfo, (err, result) => {
-              if(err) {
-                console.log(err)
+                console.error(err)
                 res.status(500)
                 res.body = { 'status': 500, 'success': false, 'result': err }
                 return next(null, req, res, next)
@@ -1000,14 +902,15 @@ const models = {
 
     models.getKey(tokenInfo.bnb_address, (err, key) => {
       if(err || !key) {
-        console.log(err)
-        return callback(err || 'Unable to retrieve key')
+        const cbError = err || 'Unable to retrieve key'
+        console.error([Error]  + cbError)
+        return callback(cbError)
       }
 
       async.map(swaps, (swap, callbackInner) => {
         models.processSwapE2B(swap, tokenInfo, key, callbackInner)
       }, (err, swapResults) => {
-        if(err) {
+        if (err) {
           return callback(err)
         }
 
@@ -1017,46 +920,298 @@ const models = {
   },
 
   processSwapE2B(swap, tokenInfo, key, callback) {
-    bnb.transfer(key.mnemonic, swap.bnb_address, swap.amount, tokenInfo.unique_symbol, 'BNBridge Swap', (err, swapResult) => {
-      if(err) {
-        console.log(err)
 
-        return models.revertUpdateWithDepositTransactionHash(swap.uuid, (revertErr) => {
-          if(revertErr) {
-            console.log(revertErr)
-          }
+    async.parallel([
+      (callback) => { models.sendBep2Txn(swap, tokenInfo, callback) },
+      (callback) => { models.transferToERC20Foundation(swap, tokenInfo, callback) }
+    ], (err, [sendBep2TxnHash, transferToERC20FoundationHash]) => {
+        console.log(`processSwapE2B: [${sendBep2TxnHash}, ${transferToERC20FoundationHash}]`);
 
-          let text = "BNBridge encountered an error processing a swap."
+        // erc transaction failed. this is a failure.
+        if (err || !sendBep2TxnHash) {
+          const cbError = err || 'sendBep2TxnHash is nil'
+          console.error(cbError)
+          return callback(cbError);
+        }
 
-          text += '\n\n*********************************************************'
-          text += '\nDirection: Ethereum To Binance'
-          text += '\nToken: '+tokenInfo.name + ' ('+ tokenInfo.symbol +')'
-          text += '\nDeposit Hash: '+swap.deposit_transaction_hash
-          text += '\nFrom: '+swap.eth_address
-          text += '\nTo: '+swap.bnb_address
-          text += '\nAmount: '+swap.amount + ' ' + tokenInfo.symbol
-          text += '\n\nError Received: '+ err
-          text += '\n*********************************************************'
+        callback(null, sendBep2TxnHash);
+      })
 
-          // emailer.sendMail('BNBridge error', text)
+  },
 
-          return callback(err)
-        })
-      }
+  sendBep2Txn(swap, tokenInfo, callback) {
+    const message = `Bnbridge ERC20-BEP2 One swap. erc20 deposit ${swap.deposit_transaction_hash}`
+    bnb.transferWithPrivateKey(BNB_FUND_ACCT_PRIVATE_KEY,
+      swap.bnb_address, swap.amount,
+      tokenInfo.unique_symbol,
+      message, (err, swapResult) => {
+        if (err) {
+          console.error('[Error] bnb transferWithPrivateKey', err)
 
-      if(swapResult && swapResult.result && swapResult.result.length > 0) {
-        let resultHash = swapResult.result[0].hash
+          return models.revertUpdateWithDepositTransactionHash(swap.uuid, (revertErr) => {
+            if (revertErr) {
+              console.error(revertErr)
+            }
 
-        models.updateWithTransferTransactionHash(swap.uuid, resultHash, (err) => {
-          if(err) {
+            let text = "BNBridge encountered an error processing a swap."
+
+            text += '\n\n*********************************************************'
+            text += '\nDirection: Ethereum To Binance'
+            text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
+            text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
+            text += '\nFrom: ' + swap.eth_address
+            text += '\nTo: ' + swap.bnb_address
+            text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
+            text += '\n\nError Received: ' + err
+            text += '\n*********************************************************\n'
+
+            emailer.sendMail('BNBridge Error', text)
+            console.error(text, err);
+
             return callback(err)
+          })
+        }
+
+        if (swapResult && swapResult.result && swapResult.result.length > 0) {
+          let resultHash = swapResult.result[0].hash
+          console.log('Successfully transferred to client bnb account: ' + swap.bnb_address + ' resultHash: ' + resultHash);
+
+          models.updateWithTransferTransactionHash(swap.uuid, resultHash, (err) => {
+            if (err) {
+              return callback(err)
+            }
+
+            callback(null, resultHash)
+          })
+        } else {
+          return callback('processSwapE2B: Swap result is not defined')
+        }
+      });
+  },
+
+  transferToERC20Foundation(swap, tokenInfo, callback) {
+    console.log('transferToERC20Foundation for swap', swap);
+
+    console.log('1. look for the client account from db matching the bnb account that made the swap.');
+    models.getClientAccountForBnbAddress(swap.bnb_address, (err, clientAccount) => {
+      if (err || !clientAccount) {
+        const cbError = err || `Unable to retrieve client account for swap bnb address ${swap.bnb_address}`
+        console.error('[Error] ' + cbError);
+        return callback(cbError);
+      }
+
+      console.log('2. get encrypted key for the retrieved client eth account ' + clientAccount.eth_address);
+      models.getClientEthKey(clientAccount.eth_address, (err, key) => {
+        if (err || !key) {
+          const cbError = err || 'getClientEthKey: Unable to retrieve key'
+          console.error('[Error] ' + cbError)
+          return callback(cbError)
+        }
+
+        console.log('3. transfer gas from eth funding account to the client eth acccount', clientAccount.eth_address);
+        // 1. first, send from eth source account to the eth client acccount since it needs eth to fund ONE transaction
+        const message = `funding eth gas. erc20 deposit: ${swap.deposit_transaction_hash}`
+        eth.fundEthForGasFee(
+          ETH_FUND_ACCT_PRIVATE_KEY,
+          ETH_FUND_ACCT_ADDRESS,
+          clientAccount.eth_address,
+          ETH_GAS_FEE, message,
+          true /* earlyRet */, (err, txResult1) => {
+            if (err) {
+              let text = "BNBridge encountered an error processing a swap.\n" +
+                "Failed to fund gas for transferring deposits to the foundation account."
+
+              text += '\n\n*********************************************************'
+              text += '\nDirection: Ethereum To Binance (funding gas)'
+              text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
+              text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
+              text += '\nFrom: ' + swap.eth_address
+              text += '\nTo: ' + swap.bnb_address
+              text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
+              text += '\n\nError Received: ' + err
+              text += '\n*********************************************************\n'
+
+              emailer.sendMail('BNBridge Error', text)
+              console.error(text, err);
+              return callback(err)
+            }
+
+            if (txResult1) {
+              let resultHash = txResult1  // tx hash that funded client eth account
+
+              console.log('Successfully funded client eth account: ' + clientAccount.eth_address + ' resultHash: ' + resultHash);
+
+              console.log('4. Transfer the BNBridge Swap eth deposit to the foundation account');
+              // 2. then, now that eth account is funded, send the deposit to the foundation account
+              eth.sendErc20Transaction(
+                tokenInfo.erc20_address,
+                key.private_key_decrypted.substring(2), // need to strip out '0x' in front
+                clientAccount.eth_address,
+                ETH_FOUNDATION_ACCT_ADDRESS,
+                swap.amount, true /* earlyRet */, (err, txResult2) => {
+                  if (err) {
+                    let text = "BNBridge encountered an error processing a swap.\n" +
+                      "Failed to send eth deposit to the foundation account."
+
+                    text += '\n\n*********************************************************'
+                    text += '\nDirection: Ethereum To Binance (sending to foundation)'
+                    text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
+                    text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
+                    text += '\nFrom: ' + swap.eth_address
+                    text += '\nTo: ' + swap.bnb_address
+                    text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
+                    text += '\n\nError Received: ' + err
+                    text += '\n*********************************************************\n'
+
+                    emailer.sendMail('BNBridge Error', text)
+                    console.error(text, err);
+
+                    return callback(err)
+                  }
+
+                  if (txResult2) {
+                    const resultHash = txResult2
+
+                    // eth tx to foundation failed. not a hard failure, but we already got notified.
+                    if (!resultHash) {
+                      console.error('[Error] Missing tx hash for the Eth tx made to the foundation account from client.');
+                    } else {
+                      console.log('Successfully transferred client eth deposit to foundation account. TxHash:', resultHash);
+                    }
+
+                    return callback(null, resultHash)
+                  } else {
+                    const errMsg = 'Failed sending eth deposit to foundation account from account ' +
+                      clientAccount.eth_address + '. Tx result is null or empty';
+                    console.error(errMsg);
+                    return callback(errMsg)
+                  }
+                })
+
+            } else {
+              const errMsg = 'Failed funding Eth gas for account ' + clientAccount.eth_address +
+                '. Tx result is null or empty';
+              console.error(errMsg);
+              return callback(errMsg)
+            }
+
+          })
+      })
+    })
+  },
+
+  finalizeSwapBinanceToEthereum(req, res, next, data) {
+
+    const {
+      uuid,
+      token_uuid,
+      direction
+    } = data
+
+    models.getClientAccountForUuidB2E(uuid, (err, clientAccount) => {
+      if (err) {
+        console.error(err)
+        res.status(500)
+        res.body = { 'status': 500, 'success': false, 'result': err }
+        return next(null, req, res, next)
+      }
+
+      if (!clientAccount) {
+        res.status(400)
+        res.body = { 'status': 400, 'success': false, 'result': 'Unable to find swap details' }
+        return next(null, req, res, next)
+      }
+
+      models.getTokenInfoForSwap(token_uuid, (err, tokenInfo) => {
+        if (err) {
+          console.error(err)
+          res.status(500)
+          res.body = { 'status': 500, 'success': false, 'result': err }
+          return next(null, req, res, next)
+        }
+
+        if (!tokenInfo) {
+          res.status(400)
+          res.body = { 'status': 400, 'success': false, 'result': 'Unable to find token details' }
+          return next(null, req, res, next)
+        }
+
+        const startTime = (new Date('10-01-2019')).getTime(); // time in milliseconds time for 10-01-2019
+        const endTime = (new Date()).getTime();               // current time in milliseconds
+        const side = 'RECEIVE'  // or 'SEND'
+
+        async.parallel([
+          (callback) => { bnb.getTransactionsForAddress(clientAccount.bnb_address,
+            tokenInfo.unique_symbol, side, startTime, endTime, null /* limit. defaults to 25 recent txns */, callback) },
+          (callback) => { models.getTransactionHashs(token_uuid, uuid, callback) }
+        ], (err, info) => {
+          if (err) {
+            console.error(err)
+            res.status(500)
+            res.body = { 'status': 500, 'success': false, 'result': 'Unable to process request: ' + err }
+            return next(null, req, res, next)
           }
 
-          callback(null, resultHash)
+          if (!info[0].data || !info[0].data.tx) {
+            res.status(400)
+            res.body = { 'status': 400, 'success': false, 'result': 'Unable to find a deposit' }
+            return next(null, req, res, next)
+          }
+
+          const bnbTransactions = info[0].data.tx
+          const swaps = info[1]
+
+          if (!bnbTransactions || bnbTransactions.length === 0) {
+            res.status(400)
+            res.body = { 'status': 400, 'success': false, 'result': 'Unable to find a deposit' }
+            return next(null, req, res, next)
+          }
+
+          const newTransactions = bnbTransactions.filter((bnbTransaction) => {
+            if (!bnbTransaction || bnbTransaction.value <= 0) {
+              return false
+            }
+
+            const thisTransaction = swaps.filter((swap) => {
+              return swap.deposit_transaction_hash === bnbTransaction.txHash
+            })
+
+            if (thisTransaction.length > 0) {
+              return false
+            } else {
+              return true
+            }
+          })
+
+          if (newTransactions.length === 0) {
+            res.status(400)
+            res.body = { 'status': 400, 'success': false, 'result': 'Unable to find any new deposits' }
+            return next(null, req, res, next)
+          }
+
+          models.insertSwaps(newTransactions, clientAccount, token_uuid, direction, (err, newSwaps) => {
+            if (err) {
+              console.error(err)
+              res.status(500)
+              res.body = { 'status': 500, 'success': false, 'result': err }
+              return next(null, req, res, next)
+            }
+
+            models.proccessSwapsB2E(newSwaps, tokenInfo, (err, result) => {
+              if (err) {
+                console.error(err)
+                res.status(500)
+                res.body = { 'status': 500, 'success': false, 'result': err }
+                return next(null, req, res, next)
+              }
+
+              res.status(205)
+              res.body = { 'status': 200, 'success': true, 'result': newSwaps }
+              return next(null, req, res, next)
+            })
+          })
         })
-      } else {
-        return callback('processSwapE2B: Swap result is not defined')
-      }
+      })
     })
   },
 
@@ -1064,14 +1219,14 @@ const models = {
 
     models.getEthAccount(tokenInfo.eth_address, (err, address) => {
       if(err || !address) {
-        console.log(err)
+        console.error(err)
         return callback(err)
       }
 
       async.map(swaps, (swap, callbackInner) => {
         models.processSwapB2E(swap, tokenInfo, address, callbackInner)
       }, (err, swapResults) => {
-        if(err) {
+        if (err) {
           return callback(err)
         }
 
@@ -1082,132 +1237,32 @@ const models = {
 
   processSwapB2E(swap, tokenInfo, address, callback) {
     async.parallel([
-      (callback) => { models.sendErc20Transaction(swap, tokenInfo, address, callback) },
-      (callback) => { models.transferToFoundation(swap, tokenInfo, callback) }
-    ], (err, data) => {
-      // erc transaction failed. this is a failure.
-      if (!data || !data[0]) {
-        console.log('[Error] sendErc20Transaction', err)
-        return callback(err);
-      }
-
-      const ethTxToClientHash = data[0]
-      const bnbDepositToFoundationTxHash = data[1]
-
-      // bnb tx to foundation failed. not a hard failure, but we already got notified.
-      if (!bnbDepositToFoundationTxHash) {
-        console.log('Missing tx hash for the Bnb tx made to the foundation account from client.');
-      } else {
-        console.log('Successfully transferred client bnb deposit to foundation account. TxHash:', bnbDepositToFoundationTxHash);
-      }
-
-        callback(null, ethTxToClientHash);
-    })
-  },
-
-  transferToFoundation(swap, tokenInfo, callback) {
-    console.log('transferToFoundation for swap', swap);
-    // console.log('TokenInfo', tokenInfo);
-    console.log('1. look for the client bnb account from db matching eth account that made the swap.');
-    models.getClientAccountForEthAddress(swap.eth_address, (err, clientAccount) => {
-      if (err || !clientAccount) {
-        console.log(err);
-        return callback(err);
-      }
-
-      console.log('2. get encrypted key for client bnb account ' + clientAccount.bnb_address);
-      models.getClientKey(clientAccount.bnb_address, (err, key) => {
-        if (err || !key) {
-          console.log(err)
-          return callback(err || 'Unable to retrieve key')
+      (callback) => { models.sendErc20Txn(swap, tokenInfo, address, callback) },
+      (callback) => { models.transferToBEP2Foundation(swap, tokenInfo, callback) }
+    ], (err, [sendErc20TxnHash, transferToBEP2FoundationHash]) => {
+        console.log(`processSwapB2E: [${sendErc20TxnHash}, ${transferToBEP2FoundationHash}]`);
+        // erc transaction failed. this is a failure.
+        if (err || !sendErc20TxnHash) {
+          const cbError = err || 'sendErc20TxnHash is nil'
+          console.error(cbError)
+          return callback(cbError);
         }
 
-        console.log('3. transfer gas from bnb funding account to the client bnb acccount', clientAccount.bnb_address);
-        // 1. first, send from bnb source account to the bnb acccount since it needs bnb to fund ONE transaction
-        bnb.transferWithPrivateKey(BNB_FUND_ACCT_PRIVATE_KEY,
-          clientAccount.bnb_address, BNB_GAS_FEE,
-          'BNB', 'Bnb gas for sending to Foundation', (err, txResult1) => {
-            if (err) {
-              console.log('[Error] bnb transferWithPrivateKey', err)
-
-              let text = "BNBridge encountered an error processing a swap.\n" +
-                "Failed to fund gas for transferring deposits to the foundation account."
-
-              text += '\n\n*********************************************************'
-              text += '\nDirection: Binance To Ethereum (funding gas)'
-              text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
-              text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
-              text += '\nFrom: ' + swap.eth_address
-              text += '\nTo: ' + swap.bnb_address
-              text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
-              text += '\n\nError Received: ' + err
-              text += '\n*********************************************************'
-
-              // emailer.sendMail('BNBridge error', text)
-
-              return callback(err)
-            }
-
-            if (txResult1 && txResult1.result && txResult1.result.length > 0) {
-              let resultHash = txResult1.result[0].hash // tx hash that funded bnb account
-              console.log('Successfully funded client bnb account: ' + clientAccount.bnb_address + ' resultHash: ' + resultHash);
-
-              console.log('4. Transfer the BNBridge Swap bnb deposit to the foundation account');
-              // 2. then, now that bnb account is funded, send the deposit to the foundation account
-              bnb.transfer(key.mnemonic, BNB_FOUNDATION_ACCT_ADDRESS, swap.amount, tokenInfo.unique_symbol,
-                'Sending the BNBridge Swap bnb deposit to the foundation account', (err, txResult2) => {
-
-                  if (err) {
-                    console.log('[Error] bnb transfer', err)
-
-                    let text = "BNBridge encountered an error processing a swap.\n" +
-                      "Failed to send bnb deposit to the foundation account."
-
-                    text += '\n\n*********************************************************'
-                    text += '\nDirection: Binance To Ethereum (sending to foundation)'
-                    text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
-                    text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
-                    text += '\nFrom: ' + swap.eth_address
-                    text += '\nTo: ' + swap.bnb_address
-                    text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
-                    text += '\n\nError Received: ' + err
-                    text += '\n*********************************************************'
-
-                    // emailer.sendMail('BNBridge error', text)
-
-                    return callback(err)
-                  }
-
-                  if (txResult2 && txResult2.result && txResult2.result.length > 0) {
-                    let resultHash = txResult2.result[0].hash
-                    callback(null, resultHash)
-                  } else {
-                    return callback('Failed sending bnb deposit to foundation account from account ' +
-                      clientAccount.bnb_address + ': [Error] Tx result is null or empty')
-                  }
-                })
-            } else {
-              return callback('Error funding Bnb gas for account ' + clientAccount.bnb_address +
-                ': [Error] Tx result is null or empty')
-            }
-          })
+        callback(null, sendErc20TxnHash);
       })
-    })
   },
 
-  sendErc20Transaction(swap, tokenInfo, address, callback) {
-    eth.sendTransaction(
+  sendErc20Txn(swap, tokenInfo, address, callback) {
+    eth.sendErc20Transaction(
       tokenInfo.erc20_address,
-      address.private_key_decrypted,
+      address.private_key_decrypted, // '0x' already stripped out in front
       tokenInfo.eth_address,
       swap.eth_address,
-      swap.amount, (err, swapResult) => {
+      swap.amount, false /* earlyRet */, (err, swapResult) => {
         if (err) {
-          console.log(err)
-
           return models.revertUpdateWithDepositTransactionHash(swap.uuid, (revertErr) => {
             if (revertErr) {
-              console.log(revertErr)
+              console.error(revertErr)
             }
 
             let text = "BNBridge encountered an error processing a swap."
@@ -1220,9 +1275,10 @@ const models = {
             text += '\nTo: ' + swap.eth_address
             text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
             text += '\n\nError Received: ' + err
-            text += '\n*********************************************************'
+            text += '\n*********************************************************\n'
 
-            // emailer.sendMail('BNBridge error', text)
+            emailer.sendMail('BNBridge Error', text)
+            console.error(text, err);
 
             return callback(err)
           })
@@ -1239,10 +1295,113 @@ const models = {
             callback(null, resultHash)
           })
         } else {
-          return callback('sendErc20Transaction: Swap result is not defined')
+          return callback('Swap result is not defined')
         }
 
       })
+  },
+
+  transferToBEP2Foundation(swap, tokenInfo, callback) {
+    console.log('transferToBEP2Foundation for swap', swap);
+
+    console.log('1. look for the client account from db matching the eth account that made the swap.');
+    models.getClientAccountForEthAddress(swap.eth_address, (err, clientAccount) => {
+      if (err || !clientAccount) {
+        const cbError = err || `Unable to retrieve client account for swap eth address ${swap.eth_address}`
+        console.error('[Error] '+ cbError);
+        return callback(cbError);
+      }
+
+      console.log('2. get encrypted key for the retrieved client bnb account ' + clientAccount.bnb_address);
+      models.getClientBnbKey(clientAccount.bnb_address, (err, key) => {
+        if (err || !key) {
+          const cbError = err || 'getClientBnbKey: Unable to retrieve key'
+          console.error('[Error] ' + cbError)
+          return callback(cbError)
+        }
+
+        console.log('3. transfer gas from bnb funding account to the client bnb acccount', clientAccount.bnb_address);
+        // 1. first, send from bnb source account to the bnb acccount since it needs bnb to fund ONE transaction
+        const message = `Bnbridge funding bnb gas. erc20 deposit ${swap.deposit_transaction_hash}`
+        bnb.transferWithPrivateKey(BNB_FUND_ACCT_PRIVATE_KEY,
+          clientAccount.bnb_address, BNB_GAS_FEE,
+          'BNB', message, (err, txResult1) => {
+            if (err) {
+              let text = "BNBridge encountered an error processing a swap.\n" +
+                "Failed to fund gas for transferring deposits to the foundation account."
+
+              text += '\n\n*********************************************************'
+              text += '\nDirection: Binance To Ethereum (funding gas)'
+              text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
+              text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
+              text += '\nFrom: ' + swap.bnb_address
+              text += '\nTo: ' + swap.eth_address
+              text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
+              text += '\n\nError Received: ' + err
+              text += '\n*********************************************************\n'
+
+              emailer.sendMail('BNBridge Error', text)
+              console.error(text, err);
+
+              return callback(err)
+            }
+
+            if (txResult1 && txResult1.result && txResult1.result.length > 0) {
+              let resultHash = txResult1.result[0].hash // tx hash that funded bnb account
+              console.log('Successfully funded client bnb account: ' + clientAccount.bnb_address + ' resultHash: ' + resultHash);
+
+              console.log('4. Transfer the BNBridge Swap bnb deposit to the foundation account');
+              // 2. then, now that bnb account is funded, send the deposit to the foundation account
+              const message = `Deposit to central bep2 One addr. erc20 deposit ${swap.deposit_transaction_hash}`
+              bnb.transfer(key.mnemonic, BNB_FOUNDATION_ACCT_ADDRESS, swap.amount,
+                tokenInfo.unique_symbol, message, (err, txResult2) => {
+
+                  if (err) {
+                    let text = "BNBridge encountered an error processing a swap.\n" +
+                      "Failed to send bnb deposit to the foundation account."
+
+                    text += '\n\n*********************************************************'
+                    text += '\nDirection: Binance To Ethereum (sending to foundation)'
+                    text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
+                    text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
+                    text += '\nFrom: ' + swap.bnb_address
+                    text += '\nTo: ' + swap.eth_address
+                    text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
+                    text += '\n\nError Received: ' + err
+                    text += '\n*********************************************************\n'
+
+                    emailer.sendMail('BNBridge Error', text)
+                    console.error(text, err);
+
+                    return callback(err)
+                  }
+
+                  if (txResult2 && txResult2.result && txResult2.result.length > 0) {
+                    let resultHash = txResult2.result[0].hash
+
+                    if (!resultHash) {
+                      console.error('[Error] processSwapB2E: Missing tx hash for the Bnb tx made to the foundation account from client.');
+                    } else {
+                      console.log('Successfully transferred client bnb deposit to foundation account. TxHash:', resultHash);
+                    }
+
+                    return callback(null, resultHash)
+                  } else {
+                    const errMsg = 'Failed sending bnb deposit to foundation account from account ' +
+                      clientAccount.bnb_address + '. Tx result is null or empty'
+                    console.error('[Error] ' + errMsg);
+                    return callback(errMsg)
+                  }
+                })
+            } else {
+              const errMsg = 'Failed funding Bnb gas for account ' + clientAccount.bnb_address +
+                '. Tx result is null or empty'
+              console.error('[Error] ' + errMsg);
+              return callback(errMsg)
+            }
+          })
+      })
+    })
   },
 
   getEthAccount(ethAddress, callback) {
@@ -1337,7 +1496,7 @@ const models = {
       },
       function(err, result) {
         if (err) {
-          console.log(err)
+          console.error(err)
           return callback(err)
         }
 
@@ -1375,7 +1534,7 @@ const models = {
   *  -- returns to user with deposit address
   */
   submitListProposal(req, res, next) {
-    models.descryptPayload(req, res, next, (data) => {
+    models.decryptPayload(req, res, next, (data) => {
       let result = models.validateListProposal(data)
 
       if(result !== true) {
@@ -1393,7 +1552,7 @@ const models = {
 
       models.getTokenInfo(token_uuid, (err, tokenInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -1408,7 +1567,7 @@ const models = {
 
         models.insertListProposal(token_uuid, tokenInfo.unique_symbol, title, description, initial_price, expiryTime, votingTime, (err, insertResult) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -1469,7 +1628,7 @@ const models = {
   *  -- returns
   */
   finalizeListProposal(req, res, next) {
-    models.descryptPayload(req, res, next, (data) => {
+    models.decryptPayload(req, res, next, (data) => {
       let result = models.validateFinalizeListProposal(data)
 
       if(result !== true) {
@@ -1482,7 +1641,7 @@ const models = {
 
       models.getListProposalInfo(uuid, (err, proposalInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -1490,7 +1649,7 @@ const models = {
 
         models.validateProposalBalances(proposalInfo, (err, code, balanceValidation) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(code)
             res.body = { 'status': code, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -1498,7 +1657,7 @@ const models = {
 
           models.getTokenInfo(proposalInfo.token_uuid, (err, tokenInfo) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve token information' }
               return next(null, req, res, next)
@@ -1506,7 +1665,7 @@ const models = {
 
             models.getKey(tokenInfo.bnb_address, (err, key) => {
               if(err || !key) {
-                console.log(err)
+                console.error(err)
                 res.status(500)
                 res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve key' }
                 return next(null, req, res, next)
@@ -1514,7 +1673,7 @@ const models = {
 
               bnb.submitListProposal(tokenInfo.unique_symbol, key.key_name, key.password_decrypted, proposalInfo.initial_price, proposalInfo.title, proposalInfo.description, proposalInfo.expiry_time, proposalInfo.voting_period, balanceValidation.depositRequired, (err, transactionHash) => {
                 if(err) {
-                  console.log(err)
+                  console.error(err)
                   res.status(500)
                   res.body = { 'status': 500, 'success': false, 'result': err }
                   return next(null, req, res, next)
@@ -1522,7 +1681,7 @@ const models = {
 
                 models.updateListProposal(proposalInfo.uuid, transactionHash, (err, updateResponse) => {
                   if(err) {
-                    console.log(err)
+                    console.error(err)
                     res.status(500)
                     res.body = { 'status': 500, 'success': false, 'result': err }
                     return next(null, req, res, next)
@@ -1530,7 +1689,7 @@ const models = {
 
                   models.updateTokenListProposed(tokenInfo.uuid, proposalInfo.uuid, (err, updateTokenResponse) => {
                     if(err) {
-                      console.log(err)
+                      console.error(err)
                       res.status(500)
                       res.body = { 'status': 500, 'success': false, 'result': err }
                       return next(null, req, res, next)
@@ -1571,7 +1730,7 @@ const models = {
   validateProposalBalances(proposalInfo, callback) {
     bnb.getFees((err, feesData) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         return callback(err, 500)
       }
 
@@ -1585,9 +1744,9 @@ const models = {
       let depositRequired = parseFloat(config.list_proposal_deposit) // 1000 on mainnet. Move to config
       totalRequired = totalRequired + depositRequired
 
-      bnb.getBalance(proposalInfo.bnb_address, (err, balances) => {
+      bnb.getBalance(proposalInfo.bnb_address, (err, [address, balances]) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           return callback(err, 500)
         }
 
@@ -1647,7 +1806,7 @@ const models = {
   *  -- transfer that BNB back to the user. So we need to store the sending address of the funds. ( complications if we do multiple deposits )
   */
   list(req, res, next) {
-    models.descryptPayload(req, res, next, (data) => {
+    models.decryptPayload(req, res, next, (data) => {
       let result = models.validatelist(data)
 
       if(result !== true) {
@@ -1662,7 +1821,7 @@ const models = {
 
       models.getListProposalInfo(uuid, (err, proposalInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -1670,7 +1829,7 @@ const models = {
 
         bnb.getListProposal(proposalInfo.proposal_id, (err, bnbProposalInfo) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -1680,7 +1839,7 @@ const models = {
 
             models.validateListBalances(proposalInfo, (err, balanceValidation) => {
               if(err) {
-                console.log(err)
+                console.error(err)
                 res.status(code)
                 res.body = { 'status': code, 'success': false, 'result': err }
                 return next(null, req, res, next)
@@ -1688,7 +1847,7 @@ const models = {
 
               models.getKey(proposalInfo.bnb_address, (err, key) => {
                 if(err || !key) {
-                  console.log(err)
+                  console.error(err)
                   res.status(500)
                   res.body = { 'status': 500, 'success': false, 'result': 'Unable to retrieve key' }
                   return next(null, req, res, next)
@@ -1696,7 +1855,7 @@ const models = {
 
                 bnb.list(proposalInfo.unique_symbol, key.key_name, key.password_decrypted, proposalInfo.initial_price, proposalInfo.proposal_id, (err, listResult) => {
                   if(err) {
-                    console.log(err)
+                    console.error(err)
                     res.status(code)
                     res.body = { 'status': code, 'success': false, 'result': err }
                     return next(null, req, res, next)
@@ -1704,7 +1863,7 @@ const models = {
 
                   models.updateListProposalListed(proposalInfo.uuid, (err, updateData) => {
                     if(err) {
-                      console.log(err)
+                      console.error(err)
                       res.status(code)
                       res.body = { 'status': code, 'success': false, 'result': err }
                       return next(null, req, res, next)
@@ -1712,7 +1871,7 @@ const models = {
 
                     models.updateTokenListed(proposalInfo.token_uuid, (err, updateData) => {
                       if(err) {
-                        console.log(err)
+                        console.error(err)
                         res.status(code)
                         res.body = { 'status': code, 'success': false, 'result': err }
                         return next(null, req, res, next)
@@ -1751,7 +1910,7 @@ const models = {
   validateListBalances(proposalInfo, callback) {
     bnb.getFees((err, feesData) => {
       if(err) {
-        console.log(err)
+        console.error(err)
         return callback(err, 500)
       }
 
@@ -1762,9 +1921,9 @@ const models = {
       })
       .reduce(reducer, 0)
 
-      bnb.getBalance(proposalInfo.bnb_address, (err, balances) => {
+      bnb.getBalance(proposalInfo.bnb_address, (err, [address, balances]) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           return callback(err, 500)
         }
 
@@ -1838,7 +1997,7 @@ const models = {
 
             bnb.getListProposal(proposalId, (err, proposalInfo) => {
               if(err) {
-                console.log(err)
+                console.error(err)
                 res.status(500)
                 res.body = { 'status': 500, 'success': false, 'result': err }
                 return next(null, req, res, next)
@@ -1855,7 +2014,7 @@ const models = {
           //get proposal
           bnb.getListProposal(listing_proposal.proposal_id, (err, proposalInfo) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)
@@ -1871,7 +2030,7 @@ const models = {
       }
     })
     .catch((err) => {
-      console.log(err)
+      console.error(err)
       res.status(500)
       res.body = { 'status': 500, 'success': false, 'result': err }
       return next(null, req, res, next)
@@ -1884,7 +2043,7 @@ const models = {
 
     })
     .catch((err) => {
-      console.log(err)
+      console.error(err)
     })
   },
 
@@ -1895,7 +2054,7 @@ const models = {
   *  -- Get pending transfers that haven't been processed yet
   */
   getBnbBalance(req, res, next) {
-    models.descryptPayload(req, res, next, (data) => {
+    models.decryptPayload(req, res, next, (data) => {
       let result = models.validateGetBnbBalances(data)
 
       if(result !== true) {
@@ -1911,15 +2070,15 @@ const models = {
 
       models.getTokenInfo(token_uuid, (err, tokenInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
         }
 
-        bnb.getBalance(bnb_address, (err, balances) => {
+        bnb.getBalance(bnb_address, (err, [address, balances]) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -1937,7 +2096,7 @@ const models = {
 
           models.getPendingBnbBalance(token_uuid, bnb_address, (err, pendingBalance) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)
@@ -1990,7 +2149,7 @@ const models = {
   *  -- Get pending transfers that haven't been processed yet
   */
   getEthBalance(req, res, next) {
-    models.descryptPayload(req, res, next, (data) => {
+    models.decryptPayload(req, res, next, (data) => {
       let result = models.validateGetEthbalances(data)
 
       if(result !== true) {
@@ -2006,7 +2165,7 @@ const models = {
 
       models.getTokenInfo(token_uuid, (err, tokenInfo) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
@@ -2014,7 +2173,7 @@ const models = {
 
         eth.getERC20Balance(eth_address, tokenInfo.erc20_address, (err, balance) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
@@ -2060,7 +2219,7 @@ const models = {
   },
 
   downloadKeystoreBNB(req, res, next) {
-    models.descryptPayload(req, res, next, (data) => {
+    models.decryptPayload(req, res, next, (data) => {
       let result = models.validateDownloadKeystoreBNB(data)
 
       if(result !== true) {
@@ -2109,28 +2268,28 @@ const models = {
   },
 
   getERC20Info(req, res, next) {
-    models.descryptPayload(req, res, next, (data) => {
+    models.decryptPayload(req, res, next, (data) => {
       const {
         contract_address
       } = data
 
       eth.getERC20Name(contract_address, (err, name) => {
         if(err) {
-          console.log(err)
+          console.error(err)
           res.status(500)
           res.body = { 'status': 500, 'success': false, 'result': err }
           return next(null, req, res, next)
         }
         eth.getERC20Symbol(contract_address, (err, symbol) => {
           if(err) {
-            console.log(err)
+            console.error(err)
             res.status(500)
             res.body = { 'status': 500, 'success': false, 'result': err }
             return next(null, req, res, next)
           }
           eth.getERC20TotalSupply(contract_address, (err, totalSupply) => {
             if(err) {
-              console.log(err)
+              console.error(err)
               res.status(500)
               res.body = { 'status': 500, 'success': false, 'result': err }
               return next(null, req, res, next)

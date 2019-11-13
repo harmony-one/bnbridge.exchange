@@ -19,8 +19,8 @@ const config = {
 	network: 'mainnet',
 
 	// Emailer
-	emailerUser: "",
-	emailerPassword: "",
+	emailerUser: process.env.EMAIL_USER,
+	emailerPassword: process.env.EMAIL_PASSWORD,
 
 	//Ethereum
 	provider: 'https://mainnet.infura.io/v3/981292667b474eb593bfce7d7cffe047',

@@ -19,25 +19,25 @@ function App() {
     <MuiThemeProvider theme={ createMuiTheme(bnbridgeTheme) }>
       <CssBaseline />
       <Grid
-        style={{ padding: '5.0rem 30.0rem'}}
+        style={{ padding: '3.0rem 20.0rem'}}
         container
         justify="center"
         alignItems="center"
         direction="row">
-        <Grid item align='right'>
+        <Grid item align='center' xs={6}>
           <Instructions />
         </Grid>
-        <Grid item align="left">
+        <Grid item align="center" xs={6}>
           <Controller />
         </Grid>
       </Grid>
       <Grid
-        style={{ padding: '5.0rem 20%', display: 'inline-block'}}
+        style={{ padding: '0.0rem 12.0rem 0.0rem 12.0rem', display: 'table'}}
         container
         justify="center"
         alignItems="center"
         direction="row">
-        <Grid item align="left" style={{ width: '100%' }}>
+        <Grid item align="center">
           <Swaps />
         </Grid>
       </Grid>

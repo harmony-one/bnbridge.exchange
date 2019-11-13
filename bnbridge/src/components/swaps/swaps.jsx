@@ -18,6 +18,8 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPage from "@material-ui/icons/LastPage";
 
+import Tooltip from "react-simple-tooltip"
+
 import {
   SWAPS_UPDATED,
   GET_SWAPS,
@@ -150,10 +152,10 @@ class Swaps extends Component {
   swapsUpdated = () => {
     const swaps = store.getStore('swaps')
 
-    let swapsDisplay = swaps.map((swap) => {
+    const swapsDisplay = swaps.map((swap) => {
       return {
-        // eth_address: swap.eth_address,
-        // bnb_address: swap.bnb_address,
+        eth_address: swap.eth_address,
+        bnb_address: swap.bnb_address,
         amount: swap.amount,
         deposit_transaction_hash: swap.deposit_transaction_hash,
         transfer_transaction_hash: swap.transfer_transaction_hash,
@@ -176,15 +178,30 @@ class Swaps extends Component {
     const emptyRows = rowsPerPageNum - Math.min(rowsPerPageNum, swaps.length - page * rowsPerPageNum);
 
     return (
-      <Table className={classes.table}>
+      <Table className={classes.table} style={{ tableLayout: 'fixed', marginBottom: '10rem', marginTop: '5rem' }} fixedHeader={false}>
         <TableHead>
           <TableRow>
-            <TableCell>Time (UTC)</TableCell>
-            {/* <TableCell align="left">ETH Addr</TableCell>
-            <TableCell align="left">BNB Addr</TableCell> */}
-            <TableCell align="left">Amount (ONE)</TableCell>
-            <TableCell align="left">Deposit (BEP2)</TableCell>
-            <TableCell align="left">Receive (ERC20) </TableCell>
+            <TableCell align="center">
+              <Tooltip content="Time zone in UTC">Time</Tooltip>
+            </TableCell>
+            <TableCell align="center">
+              <Tooltip content="Source account that made the deposit for swap.">From</Tooltip>
+            </TableCell>
+            <TableCell align="center">
+              <Tooltip content="Destination account that received the swapped token.">To</Tooltip>
+            </TableCell>
+            <TableCell align="center">
+              <Tooltip content="Unit is in One">Amount</Tooltip>
+            </TableCell>
+            <TableCell align="center">
+              <Tooltip content="Deposit transaction hash">Deposit</Tooltip>
+            </TableCell>
+            <TableCell align="center">
+              <Tooltip content="Receive transaction hash">Receive</Tooltip>
+            </TableCell>
+            <TableCell align="center">
+              <Tooltip content="Swap direction">Direction</Tooltip>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -199,6 +216,7 @@ class Swaps extends Component {
         </TableBody>
         <TableFooter>
           <TableRow>
+            <div style={{ marginTop: '5rem' }}></div>
             <TablePagination rowsPerPageOptions={[5, 10, 25]} colSpan={3} count={swaps.length} rowsPerPage={rowsPerPageNum} page={page}
               SelectProps={{ native: true }} onChangePage={this.handleChangePage} onChangeRowsPerPage={this.handleChangeRowsPerPage}
               ActionsComponent={TablePaginationActionsWrapped} />
@@ -216,23 +234,67 @@ class Swaps extends Component {
     return this.state.swapsDisplay
       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
       .map((swap) => {
+        let from, fromLink, to, toLink, amount, depositHash, depositLink, receiveHash, receiveLink, direction;
+
+        if (swap.direction === 'BinanceToEthereum') {
+          from = swap.bnb_address;
+          fromLink = `https://explorer.binance.org/address/${swap.bnb_address}`
+          to = swap.eth_address;
+          toLink = `https://etherscan.io/address/${swap.eth_address}#tokentxns`
+          amount = swap.amount;
+          depositHash = swap.deposit_transaction_hash;
+          depositLink = "https://explorer.binance.org/tx/" + swap.deposit_transaction_hash;
+          receiveHash = swap.transfer_transaction_hash;
+          receiveLink = "https://etherscan.io/tx/" + swap.transfer_transaction_hash;
+          direction = 'B2E';
+        } else {
+          from = swap.eth_address;
+          fromLink = `https://etherscan.io/address/${swap.eth_address}#tokentxns`
+          to = swap.bnb_address;
+          toLink = `https://explorer.binance.org/address/${swap.bnb_address}`
+          amount = swap.amount;
+          depositHash = swap.deposit_transaction_hash;
+          depositLink = "https://etherscan.io/tx/" + swap.deposit_transaction_hash;
+          receiveHash = swap.transfer_transaction_hash;
+          receiveLink = "https://explorer.binance.org/tx/" + swap.transfer_transaction_hash;
+          direction = 'E2B';
+        }
+
+        const timetokens = swap.created.split('T');
+        const date = timetokens[0];
+        const time = timetokens[1].replace('Z', '')
+        const fromShort = from ? from.substring(0, 12) : ''
+        const toShort = to ? to.substring(0, 12) : ''
+        const depositHashShort = depositHash ? depositHash.substring(0, 12) : ''
+        const receiveHashShort = receiveHash ? receiveHash.substring(0, 12) : ''
+
         return <TableRow key={swap.transfer_transaction_hash}>
-          <TableCell component="th" scope="row">
-            {swap.created}
+          <TableCell component="th" scope="row" style={{ padding: '8px' }}>
+            <div style={{ marginTop: '4px', marginLeft: '20%' }}>{date}</div>
+            <div style={{ marginBottom: '4px', marginLeft: '20%' }}>{time}</div>
           </TableCell>
-          {/* <TableCell align="left">{swap.eth_address}</TableCell>
-          <TableCell align="left">{swap.bnb_address}</TableCell> */}
-          <TableCell align="left">{swap.amount}</TableCell>
-          <TableCell align="left">
-            <a href={"https://explorer.binance.org/tx/" + swap.deposit_transaction_hash} rel="noopener noreferrer" target="_blank">
-              {swap.deposit_transaction_hash ? swap.deposit_transaction_hash.substring(0, 12) : '' }
+          <TableCell align="center">
+            <a href={fromLink} rel="noopener noreferrer" target="_blank">
+              <Tooltip content={from}>{fromShort}</Tooltip>
             </a>
           </TableCell>
-          <TableCell align="left">
-            <a href={"https://etherscan.io/tx/" + swap.transfer_transaction_hash} rel="noopener noreferrer" target="_blank">
-              {swap.transfer_transaction_hash ? swap.transfer_transaction_hash.substring(0, 12) : '' }
+          <TableCell align="center">
+            <a href={toLink} rel="noopener noreferrer" target="_blank">
+              <Tooltip content={to}>{toShort}</Tooltip>
             </a>
           </TableCell>
+          <TableCell align="center">{amount}</TableCell>
+          <TableCell align="center">
+            <a href={depositLink} rel="noopener noreferrer" target="_blank">
+              <Tooltip content={depositHash}>{depositHashShort}</Tooltip>
+            </a>
+          </TableCell>
+          <TableCell align="center">
+            <a href={receiveLink} rel="noopener noreferrer" target="_blank">
+              <Tooltip content={receiveHash}>{receiveHashShort}</Tooltip>
+            </a>
+          </TableCell>
+          <TableCell align="center"><Tooltip content={swap.direction}>{direction}</Tooltip></TableCell>
         </TableRow>
       })
   }
