@@ -310,11 +310,18 @@ class Swap extends Component {
     let direction = swapDirection==='EthereumToBinance'?'BinanceToEthereum':'EthereumToBinance'
 
     if(selectedToken){
-      if(!selectedToken.eth_to_bnb_enabled && direction === 'EthereumToBinance') {
+
+      let eth_to_bnb_enabled = selectedToken.eth_to_bnb_enabled;
+      if (process.env.NODE_ENV === "development") {
+        eth_to_bnb_enabled = true;  // for testing eth to bnb swap on development environment
+      }
+      let bnb_to_eth_enabled = selectedToken.bnb_to_eth_enabled;
+
+      if(!eth_to_bnb_enabled && direction === 'EthereumToBinance') {
         direction = 'BinanceToEthereum'
       }
 
-      if(!selectedToken.bnb_to_eth_enabled && direction === 'BinanceToEthereum') {
+      if(!bnb_to_eth_enabled && direction === 'BinanceToEthereum') {
         direction = 'EthereumToBinance'
       }
     }
@@ -380,19 +387,25 @@ class Swap extends Component {
 
     this.setState({ token: value, selectedToken: theToken[0] })
 
-    if(!theToken[0].eth_to_bnb_enabled && !theToken[0].bnb_to_eth_enabled) {
+    let eth_to_bnb_enabled = theToken[0].eth_to_bnb_enabled;
+    if (process.env.NODE_ENV === "development") {
+      eth_to_bnb_enabled = true;  // for testing eth to bnb swap on development environment
+    }
+    let bnb_to_eth_enabled = theToken[0].bnb_to_eth_enabled;
+
+    if(!eth_to_bnb_enabled && !bnb_to_eth_enabled) {
       this.setState({ swapDirection: null })
       return false
     }
 
     let direction = swapDirection
 
-    if(!theToken[0].eth_to_bnb_enabled && swapDirection === 'EthereumToBinance') {
+    if(!eth_to_bnb_enabled && swapDirection === 'EthereumToBinance') {
       direction = 'BinanceToEthereum'
       this.setState({ swapDirection: direction })
     }
 
-    if(!theToken[0].bnb_to_eth_enabled && swapDirection === 'BinanceToEthereum') {
+    if(!bnb_to_eth_enabled && swapDirection === 'BinanceToEthereum') {
       direction = 'EthereumToBinance'
       this.setState({ swapDirection: direction })
     }
@@ -508,8 +521,6 @@ class Swap extends Component {
         <Grid item xs={12}
           overrideStyle={{ marginTop: '12px', marginBottom: '12px' }}>
           {
-
-
             (selectedToken && !selectedToken.eth_to_bnb_enabled && !selectedToken.bnb_to_eth_enabled) ?
               <React.Fragment>
               </React.Fragment>

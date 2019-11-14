@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "antonnell.crypto@gmail.com",
+  "author": "dennis@harmony.one",
   "license": "MIT",
   "dependencies": {
     "@binance-chain/javascript-sdk": "^2.16.1",

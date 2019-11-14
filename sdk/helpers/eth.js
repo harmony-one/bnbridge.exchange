@@ -230,8 +230,10 @@ const eth = {
       } catch (err) {
         console.error('[Error] sendErc20Transaction', err)
         if (retry == 3) {
-          callback(err)
-          return err, null
+          if (!earlyRet) {
+            callback(err)
+          }
+          return err, tx_hash
         } else {
           retry++;
           console.log(`Retrying erc20 tx... ${retry}`)
@@ -294,8 +296,10 @@ const eth = {
       } catch (err) {
         console.error('[Error] fundEthForGasFee', err)
         if (retry == 3) {
-          callback(err)
-          return err, null
+          if (!earlyRet) {
+            callback(err)
+          }
+          return err, tx_hash
         } else {
           retry++;
           console.log(`Retrying funding eth gas ... ${retry}`)
