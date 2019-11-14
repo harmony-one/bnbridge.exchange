@@ -176,62 +176,71 @@ const eth = {
   },
 
   async sendErc20Transaction(contractAddress, privateKey, from, to, amount, earlyRet, callback) {
-    const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
-    const consumerContract = new web3.eth.Contract(config.erc20ABI, contractAddress);
-    const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
-
-    const gasLimit = ETH_TX_GAS_LIMIT;
-
-    const nonce = await web3.eth.getTransactionCount(from, 'pending');
-    let gasPrice = await web3.eth.getGasPrice();
-    gasPrice = Math.min(ETH_TX_GAS_PRICE_GWEI * 1e9, gasPrice * 2)  // speed up erc20 txn a bit
-
-    const tx = {
-      from,
-      to: contractAddress,
-
-      gasPrice: web3.utils.toHex(gasPrice),
-      gasLimit: web3.utils.toHex(gasLimit),
-      value: '0x0',
-
-      chainId: 1,
-      nonce: nonce,
-      data: myData
-    }
-
-    console.log('Sending ERC20 transaction', tx);
-
-    const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
-    const privKey = Buffer.from(privateKey, 'hex');
-    rawTx.sign(privKey);
-
-    const serializedTx = rawTx.serialize();
-    const tx_hash = '0x' + rawTx.hash().toString('hex');
-
-    console.log(`Attempting to send signed tx ${tx_hash}: ${serializedTx.toString('hex')}\n------------------------`);
-
     let retry = 0;
+    let callbackCalled = false;
+
     while (true) {
+      const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
+      const consumerContract = new web3.eth.Contract(config.erc20ABI, contractAddress);
+      const myData = consumerContract.methods.transfer(to, sendAmount).encodeABI();
+
+      const gasLimit = ETH_TX_GAS_LIMIT;
+
+      const nonce = await web3.eth.getTransactionCount(from, 'pending');
+      let gasPrice = await web3.eth.getGasPrice();
+      gasPrice = Math.min(ETH_TX_GAS_PRICE_GWEI * 1e9, gasPrice * 2)  // speed up erc20 txn a bit
+
+      const tx = {
+        from,
+        to: contractAddress,
+
+        gasPrice: web3.utils.toHex(gasPrice),
+        gasLimit: web3.utils.toHex(gasLimit),
+        value: '0x0',
+
+        chainId: 1,
+        nonce: nonce,
+        data: myData
+      }
+
+      console.log(`Sending ERC20 transaction (retry num: ${retry})`, tx);
+
+      const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
+      const privKey = Buffer.from(privateKey, 'hex');
+      rawTx.sign(privKey);
+
+      const serializedTx = rawTx.serialize();
+      const tx_hash = '0x' + rawTx.hash().toString('hex');
+
+      console.log(`Attempting to send signed tx ${tx_hash}: ${serializedTx.toString('hex')}\n------------------------`);
+
       try {
         const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).
           on('transactionHash', txHash => {
             console.log('transactionHash:', txHash)
             if (earlyRet) {
               console.log('sendErc20Transaction: early returning with transactionHash', txHash)
-              callback(null, txHash)
+              if (!callbackCalled) {
+                callback(null, txHash)
+                callbackCalled = true
+              }
               return null, txHash
             }
           });
 
         // not early return since we await above (tx hash callback should be called before receipt is available)
         console.log('sendErc20Transaction: transaction receipt', receipt)
-        callback(null, receipt.transactionHash)
+        if (!callbackCalled) {
+          callback(null, receipt.transactionHash)
+          callbackCalled = true
+        }
         return null, receipt.transactionHash
       } catch (err) {
         console.error('[Error] sendErc20Transaction', err)
         if (retry == 3) {
-          if (!earlyRet) {
+          if (!callbackCalled) {
             callback(err)
+            callbackCalled = true
           }
           return err, tx_hash
         } else {
@@ -244,60 +253,68 @@ const eth = {
   },
 
   async fundEthForGasFee(privateKey, from, to, amount, message, earlyRet, callback) {
-    const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
-
-    const gasLimit = ETH_TX_GAS_LIMIT;
-
-    const nonce = await web3.eth.getTransactionCount(from, 'pending');
-    const gasPrice = await web3.eth.getGasPrice();
-
-    const tx = {
-      from,
-      to,
-
-      gasPrice: web3.utils.toHex(gasPrice),
-      gasLimit: web3.utils.toHex(gasLimit),
-      value: web3.utils.toHex(sendAmount),
-
-      chainId: 1,
-      nonce: nonce,
-    }
-    if (message) {
-      tx.data = web3.utils.toHex(message);
-    }
-
-    console.log('Sending ETH transaction', tx);
-
-    const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
-    const privKey = Buffer.from(privateKey, 'hex');
-    rawTx.sign(privKey);
-    const serializedTx = rawTx.serialize();
-    const tx_hash = '0x' + rawTx.hash().toString('hex');
-
-    console.log(`Attempting to send signed tx ${tx_hash}: ${serializedTx.toString('hex')}\n------------------------`);
-
     let retry = 0;
+    let callbackCalled = false;
+
     while (true) {
+      const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
+
+      const gasLimit = ETH_TX_GAS_LIMIT;
+
+      const nonce = await web3.eth.getTransactionCount(from, 'pending');
+      const gasPrice = await web3.eth.getGasPrice();
+
+      const tx = {
+        from,
+        to,
+
+        gasPrice: web3.utils.toHex(gasPrice),
+        gasLimit: web3.utils.toHex(gasLimit),
+        value: web3.utils.toHex(sendAmount),
+
+        chainId: 1,
+        nonce: nonce,
+      }
+      if (message) {
+        tx.data = web3.utils.toHex(message);
+      }
+
+      console.log(`Sending ETH transaction (retry num: ${retry})`, tx);
+
+      const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
+      const privKey = Buffer.from(privateKey, 'hex');
+      rawTx.sign(privKey);
+      const serializedTx = rawTx.serialize();
+      const tx_hash = '0x' + rawTx.hash().toString('hex');
+
+      console.log(`Attempting to send signed tx ${tx_hash}: ${serializedTx.toString('hex')}\n------------------------`);
+
       try {
         const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).
           on('transactionHash', txHash => {
             console.log('transactionHash:', txHash)
             if (earlyRet) {
               console.log('fundEthForGasFee: early returning with transactionHash', txHash)
-              callback(null, txHash)
+              if (!callbackCalled) {
+                callback(null, txHash)
+                callbackCalled = true
+              }
               return null, txHash
             }
           });
 
         // not early return since we await above (tx hash callback should be called before receipt is available)
         console.log('fundEthForGasFee: transaction receipt', receipt)
-        callback(null, receipt.transactionHash)
+        if (!callbackCalled) {
+          callback(null, receipt.transactionHash)
+          callbackCalled = true
+        }
         return null, receipt.transactionHash
       } catch (err) {
-        console.error('[Error] fundEthForGasFee', err)
         if (retry == 3) {
-          if (!earlyRet) {
+          if (!callbackCalled) {
             callback(err)
+            callbackCalled = true
           }
           return err, tx_hash
         } else {

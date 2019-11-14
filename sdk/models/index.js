@@ -927,13 +927,14 @@ const models = {
     ], (err, [sendBep2TxnHash, transferToERC20FoundationHash]) => {
         console.log(`processSwapE2B: [${sendBep2TxnHash}, ${transferToERC20FoundationHash}]`);
 
-        // erc transaction failed. this is a failure.
-        if (err || !sendBep2TxnHash) {
-          const cbError = err || 'sendBep2TxnHash is nil'
-          console.error(cbError)
-          return callback(cbError);
+        // bep2 transaction failed. this is a hard failure.
+        // Note that this overall callback will only be executed sendBep2Txn finishes
+        // whether the silent failure cases (sending erc20 deposits to the central eth account) occurs or not
+        // so err will only be errors from sendBep2Txn if not null
+        // (unless a clear code bug causes the error for transferToERC20Foundation)
+        if (err) {
+          return callback(err);
         }
-
         callback(null, sendBep2TxnHash);
       })
 
@@ -1011,12 +1012,13 @@ const models = {
         console.log('3. transfer gas from eth funding account to the client eth acccount', clientAccount.eth_address);
         // 1. first, send from eth source account to the eth client acccount since it needs eth to fund ONE transaction
         const message = `funding eth gas. erc20 deposit: ${swap.deposit_transaction_hash}`
+        const earlyRet = true
         eth.fundEthForGasFee(
           ETH_FUND_ACCT_PRIVATE_KEY,
           ETH_FUND_ACCT_ADDRESS,
           clientAccount.eth_address,
           ETH_GAS_FEE, message,
-          true /* earlyRet */, (err, txResult1) => {
+          earlyRet, (err, txResult1) => {
             if (err) {
               let text = "BNBridge encountered an error processing a swap.\n" +
                 "Failed to fund gas for transferring deposits to the foundation account."
@@ -1033,67 +1035,47 @@ const models = {
 
               emailer.sendMail('BNBridge Error', text)
               console.error(text, err);
-              return callback(err)
+
+              // erc20 transfer to foundation account flow is a silent falure.
+              // on failures, only notify the error and exit early.
+              return callback(null, txResult1)
             }
 
-            if (txResult1) {
-              let resultHash = txResult1  // tx hash that funded client eth account
+            console.log('Successfully funded client eth account: ' + clientAccount.eth_address + ' resultHash: ' + txResult1);
 
-              console.log('Successfully funded client eth account: ' + clientAccount.eth_address + ' resultHash: ' + resultHash);
+            console.log('4. Transfer the BNBridge Swap eth deposit to the foundation account');
+            // 2. then, now that eth account is funded, send the deposit to the foundation account
+            eth.sendErc20Transaction(
+              tokenInfo.erc20_address,
+              key.private_key_decrypted.substring(2), // need to strip out '0x' in front
+              clientAccount.eth_address,
+              ETH_FOUNDATION_ACCT_ADDRESS,
+              swap.amount, true /* earlyRet */, (err, txResult2) => {
+                if (err) {
+                  let text = "BNBridge encountered an error processing a swap.\n" +
+                    "Failed to send erc 20 deposit to the foundation account."
 
-              console.log('4. Transfer the BNBridge Swap eth deposit to the foundation account');
-              // 2. then, now that eth account is funded, send the deposit to the foundation account
-              eth.sendErc20Transaction(
-                tokenInfo.erc20_address,
-                key.private_key_decrypted.substring(2), // need to strip out '0x' in front
-                clientAccount.eth_address,
-                ETH_FOUNDATION_ACCT_ADDRESS,
-                swap.amount, true /* earlyRet */, (err, txResult2) => {
-                  if (err) {
-                    let text = "BNBridge encountered an error processing a swap.\n" +
-                      "Failed to send eth deposit to the foundation account."
+                  text += '\n\n*********************************************************'
+                  text += '\nDirection: Ethereum To Binance (sending to foundation)'
+                  text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
+                  text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
+                  text += '\nFrom: ' + swap.eth_address
+                  text += '\nTo: ' + swap.bnb_address
+                  text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
+                  text += '\n\nError Received: ' + err
+                  text += '\n*********************************************************\n'
 
-                    text += '\n\n*********************************************************'
-                    text += '\nDirection: Ethereum To Binance (sending to foundation)'
-                    text += '\nToken: ' + tokenInfo.name + ' (' + tokenInfo.symbol + ')'
-                    text += '\nDeposit Hash: ' + swap.deposit_transaction_hash
-                    text += '\nFrom: ' + swap.eth_address
-                    text += '\nTo: ' + swap.bnb_address
-                    text += '\nAmount: ' + swap.amount + ' ' + tokenInfo.symbol
-                    text += '\n\nError Received: ' + err
-                    text += '\n*********************************************************\n'
+                  emailer.sendMail('BNBridge Error', text)
+                  console.error(text, err);
 
-                    emailer.sendMail('BNBridge Error', text)
-                    console.error(text, err);
+                  // erc20 transfer to foundation account flow is a silent falure.
+                  // on failures, only notify the error and exit early.
+                  return callback(null, txResult2)
+                }
 
-                    return callback(err)
-                  }
-
-                  if (txResult2) {
-                    const resultHash = txResult2
-
-                    // eth tx to foundation failed. not a hard failure, but we already got notified.
-                    if (!resultHash) {
-                      console.error('[Error] Missing tx hash for the Eth tx made to the foundation account from client.');
-                    } else {
-                      console.log('Successfully transferred client eth deposit to foundation account. TxHash:', resultHash);
-                    }
-
-                    return callback(null, resultHash)
-                  } else {
-                    const errMsg = 'Failed sending eth deposit to foundation account from account ' +
-                      clientAccount.eth_address + '. Tx result is null or empty';
-                    console.error(errMsg);
-                    return callback(errMsg)
-                  }
-                })
-
-            } else {
-              const errMsg = 'Failed funding Eth gas for account ' + clientAccount.eth_address +
-                '. Tx result is null or empty';
-              console.error(errMsg);
-              return callback(errMsg)
-            }
+                console.log('Successfully transferred client eth deposit to foundation account. TxHash:', txResult2);
+                return callback(null, txResult2)
+              })
 
           })
       })
@@ -1258,7 +1240,7 @@ const models = {
       address.private_key_decrypted, // '0x' already stripped out in front
       tokenInfo.eth_address,
       swap.eth_address,
-      swap.amount, false /* earlyRet */, (err, swapResult) => {
+      swap.amount, false /* earlyRet */, (err, resultHash) => {
         if (err) {
           return models.revertUpdateWithDepositTransactionHash(swap.uuid, (revertErr) => {
             if (revertErr) {
@@ -1284,20 +1266,13 @@ const models = {
           })
         }
 
-        if (swapResult) {
-          let resultHash = swapResult
+        models.updateWithTransferTransactionHash(swap.uuid, resultHash, (err) => {
+          if (err) {
+            return callback(err)
+          }
 
-          models.updateWithTransferTransactionHash(swap.uuid, resultHash, (err) => {
-            if (err) {
-              return callback(err)
-            }
-
-            callback(null, resultHash)
-          })
-        } else {
-          return callback('Swap result is not defined')
-        }
-
+          callback(null, resultHash)
+        })
       })
   },
 
