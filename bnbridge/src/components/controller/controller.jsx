@@ -40,7 +40,7 @@ class Controller extends Component {
     errorOpen: false
   };
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(FEES_UPDATED, this.feesUpdated);
     // dispatcher.dispatch({type: GET_FEES, content: {} })
   };

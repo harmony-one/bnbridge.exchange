@@ -140,7 +140,7 @@ class Swaps extends Component {
     this.setState({ page: 0, rowsPerPage: event.target.value });
   };
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(SWAPS_UPDATED, this.swapsUpdated);
     dispatcher.dispatch({ type: GET_SWAPS, content: {} })
   };

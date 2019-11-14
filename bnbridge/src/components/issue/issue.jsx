@@ -97,7 +97,7 @@ class Issue extends Component {
     erc20Info: null
   };
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(TOKEN_ISSUED, this.tokenIssued);
     emitter.on(TOKEN_FINALIZED, this.tokenFinalized);
     emitter.on(ERC20_INFO_UPDATED, this.erc20InfoUpdated);

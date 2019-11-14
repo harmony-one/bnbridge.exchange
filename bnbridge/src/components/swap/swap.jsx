@@ -151,7 +151,7 @@ class Swap extends Component {
     swapDirection: 'BinanceToEthereum'
   };
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(TOKENS_UPDATED, this.tokensUpdated);
     emitter.on(TOKEN_SWAPPED, this.tokenSwapped);
     emitter.on(TOKEN_SWAP_FINALIZED, this.tokenSwapFinalized);
@@ -519,7 +519,7 @@ class Swap extends Component {
         { this.renderSwapDirection() }
         <AssetSelection onIssue={ onIssue } onTokenSelected={ this.onTokenSelected } disabled={ loading } />
         <Grid item xs={12}
-          overrideStyle={{ marginTop: '12px', marginBottom: '12px' }}>
+          overridestyle={{ marginTop: '12px', marginBottom: '12px' }}>
           {
             (selectedToken && !selectedToken.eth_to_bnb_enabled && !selectedToken.bnb_to_eth_enabled) ?
               <React.Fragment>
@@ -714,7 +714,7 @@ class Swap extends Component {
 
       return (
         <React.Fragment>
-          <Label label={'Swap direction'} overrideStyle={{ marginTop: '12px', marginBottom: '12px' }} />
+          <Label label={'Swap direction'} overridestyle={{ marginTop: '12px', marginBottom: '12px' }} />
           <Typography>No available swaps for selectedToken.symbol</Typography>
         </React.Fragment>
       )
@@ -722,7 +722,7 @@ class Swap extends Component {
 
     return (
       <React.Fragment>
-        <Label label={'Swap direction'} overrideStyle={{ marginTop: '12px', marginBottom: '12px' }} />
+        <Label label={'Swap direction'} overridestyle={{ marginTop: '12px', marginBottom: '12px' }} />
         <Grid item xs={ 5 } onClick={ this.onSwapDirectionClick } className={ classes.gridClick } >
           <div className={ classes.icon }>
             <img

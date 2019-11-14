@@ -110,7 +110,7 @@ class Swap extends Component {
     validateEnabled: false
   };
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(ERROR, this.error);
     emitter.on(BNB_ACCOUNT_CREATED, this.bnbAccountCreated)
     emitter.on(BNB_KEYSTORE_DOWNLOADED, this.bnbKeystoreDownloaded)

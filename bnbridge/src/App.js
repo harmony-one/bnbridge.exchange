@@ -22,7 +22,7 @@ function App() {
         style={{
           padding: '5% 10% 5% 10%',
           width: '50%',
-          'min-width': 'fit-content',
+          minWidth: 'fit-content',
           'margin-left': '15%',
         }}
         container
