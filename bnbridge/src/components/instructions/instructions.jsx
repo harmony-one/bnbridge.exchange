@@ -60,7 +60,7 @@ class Instructions extends Component {
     fees: []
   };
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(FEES_UPDATED, this.feesUpdated);
   };
 

@@ -35,7 +35,7 @@ class AssetSelection extends Component {
     tokenOptions: []
   };
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(TOKENS_UPDATED, this.tokensUpdated);
     dispatcher.dispatch({type: GET_TOKENS, content: {} })
   };

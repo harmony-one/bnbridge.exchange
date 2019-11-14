@@ -112,7 +112,7 @@ class List extends Component {
     depositFee: 2000,
   };
 
-  componentWillMount() {
+  componentDidMount() {
     emitter.on(TOKEN_LISTED, this.tokenListed);
     emitter.on(LIST_PROPOSAL_SUBMITTED, this.listProposalSubmitted);
     emitter.on(LIST_PROPOSAL_FINALIZED, this.listProposalFinalized);
