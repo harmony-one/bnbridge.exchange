@@ -63,6 +63,13 @@ const bnbridgeTheme =  {
         }
       }
     },
+    MuiTableRow: {
+      footer: {
+        position: "absolute",
+        left: "33%",
+        marginTop: "15px",
+      },
+    }
   },
   palette: {
     primary: {

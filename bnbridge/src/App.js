@@ -23,7 +23,7 @@ function App() {
           padding: '5% 10% 5% 10%',
           width: '50%',
           minWidth: 'fit-content',
-          'margin-left': '15%',
+          marginLeft: '15%',
         }}
         container
         justify="center"

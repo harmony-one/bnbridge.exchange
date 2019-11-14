@@ -178,7 +178,7 @@ class Swaps extends Component {
     const emptyRows = rowsPerPageNum - Math.min(rowsPerPageNum, swaps.length - page * rowsPerPageNum);
 
     return (
-      <Table className={classes.table} style={{ tableLayout: 'fixed', marginBottom: '10rem', marginTop: '5rem' }} fixedHeader={false}>
+      <Table className={classes.table} style={{ tableLayout: 'fixed', marginBottom: '10rem', marginTop: '5rem' }} fixedheader={"false"}>
         <TableHead>
           <TableRow>
             <TableCell align="center">
@@ -214,9 +214,8 @@ class Swaps extends Component {
             )
           }
         </TableBody>
-        <TableFooter>
-          <TableRow>
-            <div style={{ marginTop: '5rem' }}></div>
+        <TableFooter className={classes.footer}>
+          <TableRow className={classes.footer}>
             <TablePagination rowsPerPageOptions={[5, 10, 25]} colSpan={3} count={swaps.length} rowsPerPage={rowsPerPageNum} page={page}
               SelectProps={{ native: true }} onChangePage={this.handleChangePage} onChangeRowsPerPage={this.handleChangeRowsPerPage}
               ActionsComponent={TablePaginationActionsWrapped} />
