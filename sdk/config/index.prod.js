@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const config = {
 	host: process.env.DBHOST || "127.0.0.1",
 	database: process.env.DBNAME || "harmonyone",
@@ -16,244 +18,256 @@ const config = {
 	prefix: 'bnb',
 	network: 'mainnet',
 
-	//Ethereum
-	provider: 'https://mainnet.infura.io/v3/4a1a3bdd85e7423a86c6031a792a9e63', //live
+	// Emailer
+	emailerUser: process.env.EMAIL_USER,
+	emailerPassword: process.env.EMAIL_PASSWORD,
 
-  erc20ABI: [
-  	{
-  		"constant": false,
-  		"inputs": [
-  			{
-  				"name": "_spender",
-  				"type": "address"
-  			},
-  			{
-  				"name": "_value",
-  				"type": "uint256"
-  			}
-  		],
-  		"name": "approve",
-  		"outputs": [
-  			{
-  				"name": "success",
-  				"type": "bool"
-  			}
-  		],
-  		"payable": false,
-  		"stateMutability": "nonpayable",
-  		"type": "function"
-  	},
-  	{
-  		"constant": false,
-  		"inputs": [
-  			{
-  				"name": "_to",
-  				"type": "address"
-  			},
-  			{
-  				"name": "_value",
-  				"type": "uint256"
-  			}
-  		],
-  		"name": "showMeTheMoney",
-  		"outputs": [],
-  		"payable": false,
-  		"stateMutability": "nonpayable",
-  		"type": "function"
-  	},
-  	{
-  		"constant": false,
-  		"inputs": [
-  			{
-  				"name": "_to",
-  				"type": "address"
-  			},
-  			{
-  				"name": "_value",
-  				"type": "uint256"
-  			}
-  		],
-  		"name": "transfer",
-  		"outputs": [
-  			{
-  				"name": "success",
-  				"type": "bool"
-  			}
-  		],
-  		"payable": false,
-  		"stateMutability": "nonpayable",
-  		"type": "function"
-  	},
-  	{
-  		"constant": false,
-  		"inputs": [
-  			{
-  				"name": "_from",
-  				"type": "address"
-  			},
-  			{
-  				"name": "_to",
-  				"type": "address"
-  			},
-  			{
-  				"name": "_value",
-  				"type": "uint256"
-  			}
-  		],
-  		"name": "transferFrom",
-  		"outputs": [
-  			{
-  				"name": "success",
-  				"type": "bool"
-  			}
-  		],
-  		"payable": false,
-  		"stateMutability": "nonpayable",
-  		"type": "function"
-  	},
-  	{
-  		"anonymous": false,
-  		"inputs": [
-  			{
-  				"indexed": true,
-  				"name": "_from",
-  				"type": "address"
-  			},
-  			{
-  				"indexed": true,
-  				"name": "_to",
-  				"type": "address"
-  			},
-  			{
-  				"indexed": false,
-  				"name": "_value",
-  				"type": "uint256"
-  			}
-  		],
-  		"name": "Transfer",
-  		"type": "event"
-  	},
-  	{
-  		"anonymous": false,
-  		"inputs": [
-  			{
-  				"indexed": true,
-  				"name": "_owner",
-  				"type": "address"
-  			},
-  			{
-  				"indexed": true,
-  				"name": "_spender",
-  				"type": "address"
-  			},
-  			{
-  				"indexed": false,
-  				"name": "_value",
-  				"type": "uint256"
-  			}
-  		],
-  		"name": "Approval",
-  		"type": "event"
-  	},
-  	{
-  		"constant": true,
-  		"inputs": [
-  			{
-  				"name": "_owner",
-  				"type": "address"
-  			},
-  			{
-  				"name": "_spender",
-  				"type": "address"
-  			}
-  		],
-  		"name": "allowance",
-  		"outputs": [
-  			{
-  				"name": "remaining",
-  				"type": "uint256"
-  			}
-  		],
-  		"payable": false,
-  		"stateMutability": "view",
-  		"type": "function"
-  	},
-  	{
-  		"constant": true,
-  		"inputs": [
-  			{
-  				"name": "_owner",
-  				"type": "address"
-  			}
-  		],
-  		"name": "balanceOf",
-  		"outputs": [
-  			{
-  				"name": "balance",
-  				"type": "uint256"
-  			}
-  		],
-  		"payable": false,
-  		"stateMutability": "view",
-  		"type": "function"
-  	},
-  	{
-  		"constant": true,
-  		"inputs": [],
-  		"name": "decimals",
-  		"outputs": [
-  			{
-  				"name": "",
-  				"type": "uint256"
-  			}
-  		],
-  		"payable": false,
-  		"stateMutability": "view",
-  		"type": "function"
-  	},
-  	{
-  		"constant": true,
-  		"inputs": [],
-  		"name": "name",
-  		"outputs": [
-  			{
-  				"name": "",
-  				"type": "string"
-  			}
-  		],
-  		"payable": false,
-  		"stateMutability": "view",
-  		"type": "function"
-  	},
-  	{
-  		"constant": true,
-  		"inputs": [],
-  		"name": "symbol",
-  		"outputs": [
-  			{
-  				"name": "",
-  				"type": "string"
-  			}
-  		],
-  		"payable": false,
-  		"stateMutability": "view",
-  		"type": "function"
-  	},
-  	{
-  		"constant": true,
-  		"inputs": [],
-  		"name": "totalSupply",
-  		"outputs": [
-  			{
-  				"name": "",
-  				"type": "uint256"
-  			}
-  		],
-  		"payable": false,
-  		"stateMutability": "view",
-  		"type": "function"
-  	}
-  ]
+	//Ethereum
+	provider: 'https://mainnet.infura.io/v3/981292667b474eb593bfce7d7cffe047',
+
+	erc20ABI: [
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "_spender",
+					"type": "address"
+				},
+				{
+					"name": "_value",
+					"type": "uint256"
+				}
+			],
+			"name": "approve",
+			"outputs": [
+				{
+					"name": "success",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "_to",
+					"type": "address"
+				},
+				{
+					"name": "_value",
+					"type": "uint256"
+				}
+			],
+			"name": "showMeTheMoney",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "_to",
+					"type": "address"
+				},
+				{
+					"name": "_value",
+					"type": "uint256"
+				}
+			],
+			"name": "transfer",
+			"outputs": [
+				{
+					"name": "success",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"constant": false,
+			"inputs": [
+				{
+					"name": "_from",
+					"type": "address"
+				},
+				{
+					"name": "_to",
+					"type": "address"
+				},
+				{
+					"name": "_value",
+					"type": "uint256"
+				}
+			],
+			"name": "transferFrom",
+			"outputs": [
+				{
+					"name": "success",
+					"type": "bool"
+				}
+			],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "_from",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"name": "_to",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "_value",
+					"type": "uint256"
+				}
+			],
+			"name": "Transfer",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": true,
+					"name": "_owner",
+					"type": "address"
+				},
+				{
+					"indexed": true,
+					"name": "_spender",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"name": "_value",
+					"type": "uint256"
+				}
+			],
+			"name": "Approval",
+			"type": "event"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "_owner",
+					"type": "address"
+				},
+				{
+					"name": "_spender",
+					"type": "address"
+				}
+			],
+			"name": "allowance",
+			"outputs": [
+				{
+					"name": "remaining",
+					"type": "uint256"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [
+				{
+					"name": "_owner",
+					"type": "address"
+				}
+			],
+			"name": "balanceOf",
+			"outputs": [
+				{
+					"name": "balance",
+					"type": "uint256"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [],
+			"name": "decimals",
+			"outputs": [
+				{
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [],
+			"name": "name",
+			"outputs": [
+				{
+					"name": "",
+					"type": "string"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [],
+			"name": "symbol",
+			"outputs": [
+				{
+					"name": "",
+					"type": "string"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"constant": true,
+			"inputs": [],
+			"name": "totalSupply",
+			"outputs": [
+				{
+					"name": "",
+					"type": "uint256"
+				}
+			],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}
+	]
 }
+
+let configCopy = Object.assign({}, config);
+delete configCopy.erc20ABI
+delete configCopy.host
+delete configCopy.database
+delete configCopy.user
+delete configCopy.password
+console.log(configCopy);
 
 module.exports = config

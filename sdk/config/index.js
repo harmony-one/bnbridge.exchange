@@ -264,6 +264,10 @@ const config = {
 
 let configCopy = Object.assign({}, config);
 delete configCopy.erc20ABI
+delete configCopy.host
+delete configCopy.database
+delete configCopy.user
+delete configCopy.password
 console.log(configCopy);
 
 module.exports = config
