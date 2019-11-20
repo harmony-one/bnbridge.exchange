@@ -4,8 +4,8 @@
   "description": "Token swap utility for Harmony to Binance Chain",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start api.bnbridge.exchange.js --name 'sdk_prod'",
-    "dev": "API_PORT=5001 pm2 start api.bnbridge.exchange.js --name 'sdk_dev' --watch --ignore-watch='node_modules'",
+    "start": "API_PORT=$API_PROD_PORT pm2 start api.bnbridge.exchange.js --name 'sdk_prod'",
+    "dev": "API_PORT=$API_DEV_PORT pm2 start api.bnbridge.exchange.js --name 'sdk_dev' --watch --ignore-watch='node_modules'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "dennis@harmony.one",

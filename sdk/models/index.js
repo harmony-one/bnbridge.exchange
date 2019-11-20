@@ -14,6 +14,7 @@ const KEY = 'witness canyon foot sing song tray task defense float bottom town o
 
 const BNB_FUND_ACCT_PRIVATE_KEY = process.env.BNB_FUND_ACCT_PRIVATE_KEY
 const BNB_FOUNDATION_ACCT_ADDRESS = process.env.BNB_FOUNDATION_ACCT_ADDRESS
+const BNB_FOUNDATION_ACCT_PRIVATE_KEY = process.env.BNB_FOUNDATION_ACCT_PRIVATE_KEY
 const BNB_GAS_FEE = 0.000375 // in BNB
 
 const ETH_FUND_ACCT_ADDRESS = process.env.ETH_FUND_ACCT_ADDRESS
@@ -942,7 +943,7 @@ const models = {
 
   sendBep2Txn(swap, tokenInfo, callback) {
     const message = `Bnbridge ERC20-BEP2 One swap. erc20 deposit ${swap.deposit_transaction_hash}`
-    bnb.transferWithPrivateKey(BNB_FUND_ACCT_PRIVATE_KEY,
+    bnb.transferWithPrivateKey(BNB_FOUNDATION_ACCT_PRIVATE_KEY,
       swap.bnb_address, swap.amount,
       tokenInfo.unique_symbol,
       message, (err, swapResult) => {
