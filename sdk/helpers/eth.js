@@ -188,7 +188,7 @@ const eth = {
 
       const nonce = await web3.eth.getTransactionCount(from, 'pending');
       let gasPrice = await web3.eth.getGasPrice();
-      gasPrice = Math.min(ETH_TX_GAS_PRICE_GWEI * 1e9, gasPrice * 2)  // speed up erc20 txn a bit
+      gasPrice = Math.max(ETH_TX_GAS_PRICE_GWEI * 1e9, gasPrice * 2 * (retry+1))  // speed up erc20 txn a bit
 
       const tx = {
         from,

@@ -845,19 +845,22 @@ const models = {
           const ethTransactions = data[0]
           const swaps = data[1]
 
+          console.log(ethTransactions);
+
           if(!ethTransactions || ethTransactions.length === 0) {
             res.status(400)
             res.body = { 'status': 400, 'success': false, 'result': 'Unable to find a deposit' }
             return next(null, req, res, next)
           }
 
-          const newTransactions = ethTransactions.filter((ethTransaction) => {
+          let newTransactions = ethTransactions.filter((ethTransaction) => {
             if(!ethTransaction || ethTransaction.amount <= 0) {
               return false
             }
 
             const thisTransaction = swaps.filter((swap) => {
-              return swap.deposit_transaction_hash === ethTransaction.transactionHash
+              return swap.deposit_transaction_hash === ethTransaction.transactionHash &&
+                swap.transfer_transaction_hash  // for passing through previously failed swaps
             })
 
             if(thisTransaction.length > 0) {
@@ -872,6 +875,9 @@ const models = {
             res.body = { 'status': 400, 'success': false, 'result': 'Unable to find any new deposits' }
             return next(null, req, res, next)
           }
+
+          // choose only 1 at a time, because we have seen binance sdk txn failing when multiple txns are sent in parallel
+          newTransactions = newTransactions.slice(0, 1)
 
           models.insertSwaps(newTransactions, clientAccount, token_uuid, direction, (err, newSwaps) => {
             if(err) {
@@ -924,7 +930,7 @@ const models = {
 
     async.parallel([
       (callback) => { models.sendBep2Txn(swap, tokenInfo, callback) },
-      (callback) => { models.transferToERC20Foundation(swap, tokenInfo, callback) }
+      // (callback) => { models.transferToERC20Foundation(swap, tokenInfo, callback) }
     ], (err, [sendBep2TxnHash, transferToERC20FoundationHash]) => {
         console.log(`processSwapE2B: [${sendBep2TxnHash}, ${transferToERC20FoundationHash}]`);
 
@@ -1171,6 +1177,9 @@ const models = {
             res.body = { 'status': 400, 'success': false, 'result': 'Unable to find any new deposits' }
             return next(null, req, res, next)
           }
+
+          // choose only 1 at a time, because we have seen binance sdk txn failing when multiple txns are sent in parallel
+          newTransactions = newTransactions.slice(0, 1)
 
           models.insertSwaps(newTransactions, clientAccount, token_uuid, direction, (err, newSwaps) => {
             if (err) {
