@@ -312,9 +312,6 @@ class Swap extends Component {
     if(selectedToken){
 
       let eth_to_bnb_enabled = selectedToken.eth_to_bnb_enabled;
-      if (process.env.NODE_ENV === "development") {
-        eth_to_bnb_enabled = true;  // for testing eth to bnb swap on development environment
-      }
       let bnb_to_eth_enabled = selectedToken.bnb_to_eth_enabled;
 
       if(!eth_to_bnb_enabled && direction === 'EthereumToBinance') {
@@ -388,9 +385,6 @@ class Swap extends Component {
     this.setState({ token: value, selectedToken: theToken[0] })
 
     let eth_to_bnb_enabled = theToken[0].eth_to_bnb_enabled;
-    if (process.env.NODE_ENV === "development") {
-      eth_to_bnb_enabled = true;  // for testing eth to bnb swap on development environment
-    }
     let bnb_to_eth_enabled = theToken[0].bnb_to_eth_enabled;
 
     if(!eth_to_bnb_enabled && !bnb_to_eth_enabled) {

@@ -500,6 +500,7 @@ function callbackPromise(url, callback) {
   ret.then((res) => {
     callback(null, res)
   }).catch((error) => {
+    console.error(error);
     callback(error)
   });
 

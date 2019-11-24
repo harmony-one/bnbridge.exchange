@@ -2,7 +2,7 @@
 
 if test -f "env_var_setup.sh"; then
  echo "running env_var_setup.sh"
- source env_var_setup.sh
+ source './env_var_setup.sh'
 fi
 
 if [[ -z $DBUSER ]]; then
@@ -66,7 +66,7 @@ echo "eth_private_key = ${ETH_PRIVATE_KEY}"
 
 set -o history
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
+sudo -u $DBSUPERUSER psql $DBNAME -c "
   insert into eth_accounts (uuid, private_key, address) VALUES (
     'erc_account_uuid',
     '$ETH_PRIVATE_KEY',
@@ -74,7 +74,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
   );
 "
 
-# psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
+# sudo -u $DBSUPERUSER psql $DBNAME -c "
 #   insert into client_accounts_eth VALUES (
 #     'erc_account_uuid',
 #     '$ETH_ACCOUNT_ADDRESS',
@@ -83,7 +83,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
 #   );
 # "
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
+sudo -u $DBSUPERUSER psql $DBNAME -c "
   INSERT INTO bnb_accounts VALUES (
     'bnb_account_uuid',
     '$bnbPubKey',
@@ -110,7 +110,7 @@ psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
 # echo "clientBnbPubKey = $clientBnbPubKey"
 # echo "clientBnbAddress = $clientBnbAddress"
 
-# psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
+# sudo -u $DBSUPERUSER psql $DBNAME -c "
 #   INSERT INTO client_bnb_accounts VALUES (
 #     'bnb_account_uuid_client',
 #     '$clientBnbPubKey',
@@ -128,7 +128,7 @@ token_uuid=Harmony_One
 # "owner":"bnb1a03uvqmnqzl85csnxnsx2xy28m76gkkht46f2l","symbol":"ONE-5F9",
 # "total_supply":"12600000000.00000000"}
 
-psql --user $DBUSER "postgresql://$DBUSER:$DBPASSWORD@$DBHOST/$DBNAME" -c "
+sudo -u $DBSUPERUSER psql $DBNAME -c "
   insert into tokens (
     uuid,
     name,
@@ -166,6 +166,7 @@ unset DBHOST
 unset DBNAME
 unset DBUSER
 unset DBPASSWORD
+unset DBPASSWORDESC
 
 # Harmony.One token issue bnb account. Note that this data does not equal the actual encription or private key
 # of ONE foundation bnb account. dummy data.

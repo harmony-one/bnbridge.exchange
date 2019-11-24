@@ -928,9 +928,9 @@ const models = {
 
   processSwapE2B(swap, tokenInfo, key, callback) {
 
-    async.parallel([
+    async.series([
       (callback) => { models.sendBep2Txn(swap, tokenInfo, callback) },
-      // (callback) => { models.transferToERC20Foundation(swap, tokenInfo, callback) }
+      (callback) => { models.transferToERC20Foundation(swap, tokenInfo, callback) }
     ], (err, [sendBep2TxnHash, transferToERC20FoundationHash]) => {
         console.log(`processSwapE2B: [${sendBep2TxnHash}, ${transferToERC20FoundationHash}]`);
 
@@ -939,8 +939,10 @@ const models = {
         // whether the silent failure cases (sending erc20 deposits to the central eth account) occurs or not
         // so err will only be errors from sendBep2Txn if not null
         // (unless a clear code bug causes the error for transferToERC20Foundation)
-        if (err) {
-          return callback(err);
+        if (!sendBep2TxnHash) {
+          const cbError = err || 'sendBep2TxnHash is nil'
+          console.error(cbError)
+          return callback(cbError);
         }
         callback(null, sendBep2TxnHash);
       })
@@ -1156,7 +1158,7 @@ const models = {
             return next(null, req, res, next)
           }
 
-          const newTransactions = bnbTransactions.filter((bnbTransaction) => {
+          let newTransactions = bnbTransactions.filter((bnbTransaction) => {
             if (!bnbTransaction || bnbTransaction.value <= 0) {
               return false
             }
@@ -1228,13 +1230,13 @@ const models = {
   },
 
   processSwapB2E(swap, tokenInfo, address, callback) {
-    async.parallel([
+    async.series([
       (callback) => { models.sendErc20Txn(swap, tokenInfo, address, callback) },
       (callback) => { models.transferToBEP2Foundation(swap, tokenInfo, callback) }
     ], (err, [sendErc20TxnHash, transferToBEP2FoundationHash]) => {
         console.log(`processSwapB2E: [${sendErc20TxnHash}, ${transferToBEP2FoundationHash}]`);
         // erc transaction failed. this is a failure.
-        if (err || !sendErc20TxnHash) {
+        if (!sendErc20TxnHash) {
           const cbError = err || 'sendErc20TxnHash is nil'
           console.error(cbError)
           return callback(cbError);
