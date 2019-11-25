@@ -115,12 +115,12 @@ class Instructions extends Component {
       <Grid
         container
         justify="flex-start"
-        alignItems="flex-end">
-        <Grid item xs={12} align='left'>
-          <div style={{ "marginRight": "50px" }} className={classes.root} >
+        display="table">
+        <Grid style={{ display: 'table', }} item xs={12} align='left'>
+          <div style={{ display: 'table', }} className={classes.root} >
             <Typography className={classes.header} style={{ marginTop: '8rem' }}>With bnbridge you can:</Typography>
             <li><Typography className={classes.action}>Swap between ERC20 and BEP2 tokens</Typography></li>
-              <div style={{ margin: '30px', marginTop: '50px' }} />
+              <div style={{  margin: '30px', marginTop: '50px' }} />
               <Typography className={classes.action2}>
                 Please contact <a href="mailto:hello@harmony.one" target="_blank" rel="noopener noreferrer">Harmony team</a> for any additional support
               </Typography>
