@@ -122,7 +122,7 @@ app.use(function(err, req, res, next) {
 
 var options = {}
 https.globalAgent.maxSockets = 50
-app.set('port', process.env.API_PORT)
+app.set('port', process.env.API_PORT || 5000)
 var server = null
 server = require('http').Server(app)
 server.listen(app.get('port'), function () {

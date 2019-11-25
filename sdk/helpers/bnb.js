@@ -202,9 +202,9 @@ const bnb = {
     // console.log('sequenceURL', sequenceURL);
 
     return callbackSequencePromise(bnbClient, privateFrom, sequenceURL, (sequence) => {
-      // console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
-      //   publicFrom, publicTo, amount, asset, message, sequence);
-      return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
+      console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
+        publicFrom, publicTo, amount, asset, message, sequence);
+      return bnbClient.transfer(publicFrom, publicTo, amount, asset, '1', /*message,*/ sequence)
     }, callback);
   },
 
@@ -216,16 +216,16 @@ const bnb = {
 
     const sequenceURL = `https://dex.binance.org/api/v1/account/${publicFrom}/sequence`;
 
-    // console.log('##########################################');
-    // console.log(privateFrom, publicFrom, publicTo, amount, asset, message);
-    // console.log('##########################################');
-    // console.log('sequenceURL', sequenceURL);
-    // console.log('##########################################');
+    console.log('##########################################');
+    console.log(privateFrom, publicFrom, publicTo, amount, asset, message);
+    console.log('##########################################');
+    console.log('sequenceURL', sequenceURL);
+    console.log('##########################################');
 
     return callbackSequencePromise(bnbClient, privateFrom, sequenceURL, (sequence) => {
       console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
         publicFrom, publicTo, amount, asset, message, sequence);
-      return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
+      return bnbClient.transfer(publicFrom, publicTo, amount, asset, '1', /*message,*/ sequence)
     }, callback);
   },
 
@@ -500,6 +500,7 @@ function callbackPromise(url, callback) {
   ret.then((res) => {
     callback(null, res)
   }).catch((error) => {
+    console.error(error);
     callback(error)
   });
 

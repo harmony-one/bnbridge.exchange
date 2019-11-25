@@ -6,7 +6,7 @@ const emailer = {
   sendMail: function(subject, text, callback) {
     const mailOptions = {
       from: '"Harmony BNBridge" <bnbridge@harmony.one>',
-      to: 'dennis@harmony.one',
+      to: 'li@harmony.one',
       cc: ['sahil@harmony.one', 'dennis@harmony.one'],
       subject: subject,
       text: text

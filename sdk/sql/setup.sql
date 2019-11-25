@@ -10,6 +10,7 @@ CREATE TABLE "public"."bnb_accounts" (
   "encr_key" text
 )
 WITH (OIDS=FALSE);
+GRANT ALL PRIVILEGES ON TABLE "public"."bnb_accounts" TO bnbridge;
 
 DROP TABLE IF EXISTS "public"."client_accounts_bnb";
 CREATE TABLE "public"."client_accounts_bnb" (
@@ -19,6 +20,7 @@ CREATE TABLE "public"."client_accounts_bnb" (
   "created" timestamp(6)
 )
 WITH (OIDS=FALSE);
+GRANT ALL PRIVILEGES ON TABLE "public"."client_accounts_bnb" TO bnbridge;
 
 DROP TABLE IF EXISTS "public"."client_accounts_eth";
 CREATE TABLE "public"."client_accounts_eth" (
@@ -28,6 +30,7 @@ CREATE TABLE "public"."client_accounts_eth" (
   "created" timestamp(6)
 )
 WITH (OIDS=FALSE);
+GRANT ALL PRIVILEGES ON TABLE "public"."client_accounts_eth" TO bnbridge;
 
 DROP TABLE IF EXISTS "public"."client_bnb_accounts";
 CREATE TABLE "public"."client_bnb_accounts" (
@@ -41,6 +44,7 @@ CREATE TABLE "public"."client_bnb_accounts" (
   "encr_key" text
 )
 WITH (OIDS=FALSE);
+GRANT ALL PRIVILEGES ON TABLE "public"."client_bnb_accounts" TO bnbridge;
 
 DROP TABLE IF EXISTS "public"."client_eth_accounts";
 CREATE TABLE "public"."client_eth_accounts" (
@@ -51,6 +55,7 @@ CREATE TABLE "public"."client_eth_accounts" (
   "encr_key" text
 )
 WITH (OIDS=FALSE);
+GRANT ALL PRIVILEGES ON TABLE "public"."client_eth_accounts" TO bnbridge;
 
 DROP TABLE IF EXISTS "public"."eth_accounts";
 CREATE TABLE "public"."eth_accounts" (
@@ -61,6 +66,7 @@ CREATE TABLE "public"."eth_accounts" (
   "encr_key" text
 )
 WITH (OIDS=FALSE);
+GRANT ALL PRIVILEGES ON TABLE "public"."eth_accounts" TO bnbridge;
 
 DROP TABLE IF EXISTS "public"."list_proposals";
 CREATE TABLE "public"."list_proposals" (
@@ -80,6 +86,7 @@ CREATE TABLE "public"."list_proposals" (
   "created" timestamp(6)
 )
 WITH (OIDS=FALSE);
+GRANT ALL PRIVILEGES ON TABLE "public"."list_proposals" TO bnbridge;
 
 DROP TABLE IF EXISTS "public"."swaps";
 CREATE TABLE "public"."swaps" (
@@ -96,6 +103,7 @@ CREATE TABLE "public"."swaps" (
   "direction" text
 )
 WITH (OIDS=FALSE);
+GRANT ALL PRIVILEGES ON TABLE "public"."swaps" TO bnbridge;
 
 DROP TABLE IF EXISTS "public"."tokens";
 CREATE TABLE "public"."tokens" (
@@ -120,6 +128,7 @@ CREATE TABLE "public"."tokens" (
   "eth_to_bnb_enabled" boolean
 )
 WITH (OIDS=FALSE);
+GRANT ALL PRIVILEGES ON TABLE "public"."tokens" TO bnbridge;
 
 ALTER TABLE "public"."bnb_accounts" ADD PRIMARY KEY ("uuid");
 
