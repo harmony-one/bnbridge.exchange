@@ -21,18 +21,19 @@ function App() {
       <Grid
         style={{
           padding: '5% 10% 5% 10%',
-          width: '50%',
+          //width: '50%',
           minWidth: 'fit-content',
-          marginLeft: '15%',
+          //marginLeft: '15%',
         }}
         container
-        justify="center"
+        justify="space-evenly"
         alignItems="center"
-        direction="row">
-        <Grid item align='center' xs={6}>
+        direction="row"
+        >
+        <Grid item style={{ padding: '0% 3%', display: 'table', }} align='center' xs={6}>
           <Instructions />
         </Grid>
-        <Grid item align="center" xs={6}>
+        <Grid item style={{ padding: '0% 3%', display: 'table', }} align="center" xs={6}>
           <Controller />
         </Grid>
       </Grid>
