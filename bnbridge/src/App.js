@@ -20,8 +20,9 @@ function App() {
       <CssBaseline />
       <Grid
         style={{
-          padding: '5% 10% 5% 10%',
+          padding: '5% 25% 5% 10%',
           minWidth: 'fit-content',
+          marginLeft: '10%',
         }}
         container
         justify="space-evenly"
