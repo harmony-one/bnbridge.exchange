@@ -21,9 +21,7 @@ function App() {
       <Grid
         style={{
           padding: '5% 10% 5% 10%',
-          //width: '50%',
           minWidth: 'fit-content',
-          //marginLeft: '15%',
         }}
         container
         justify="space-evenly"
