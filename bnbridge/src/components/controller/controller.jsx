@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import {
   Tabs,
-  Tab
+  Tab,
+  Typography,
 } from '@material-ui/core';
 
 import {
@@ -15,6 +16,7 @@ import List from "../list";
 import Swap from "../swap";
 import ErrorSnackbar from '../errorSnackbar';
 import CreateAccount from '../createAccount';
+import { colors } from '../../theme'
 
 import Store from "../../stores";
 const emitter = Store.emitter
@@ -27,7 +29,13 @@ const styles = theme => ({
   tabs: {
     marginTop: '24px',
     marginBottom: '24px'
-  }
+  },
+  action2: {
+    fontSize: '0.85rem',
+    color: colors.lightBlack,
+    display: 'inline-block',
+    marginTop: "0.5rem"
+  },
 });
 
 class Controller extends Component {
@@ -142,13 +150,15 @@ class Controller extends Component {
     return (
       <React.Fragment>
         <Tabs value={tabValue} onChange={this.handleChange} className={ classes.tabs } variant="fullWidth" indicatorColor="primary" textColor="inherit">
-          <Tab label="Swap" />
-          {/* <Tab label="List" />
-          <Tab label="Issue" /> */}
+          <Tab style={{fontSize:'20px'}} label="Swap" />
         </Tabs>
         {tabValue === 0 && <Swap onIssue={ this.onIssue } showError={ this.showError } onCreateAccount={ this.onCreateAccount } />}
         {tabValue === 1 && <List onIssue={ this.onIssue } showError={ this.showError } />}
         {tabValue === 2 && <Issue onBack={ this.onIssueBack }  issueFee={ issueFee } showError={ this.showError } />}
+        <div style={{ margin: '10px', marginTop: '20px'}} />
+      <Typography className={classes.action2}>
+        Please contact <a href="mailto:hello@harmony.one" target="_blank" rel="noopener noreferrer">Harmony team</a> for any additional support
+      </Typography>
       </React.Fragment>
     )
   };

@@ -104,10 +104,12 @@ const styles = theme => ({
     verticalAlign: 'middle'
   },
   swapDirection: {
-    margin: '14px 12px 18px 12px'
+    margin: '14px 12px 18px 12px',
+    textAlign: 'center',
   },
   gridClick: {
-    cursor: 'pointer'
+    cursor: 'pointer',
+    textAlign: 'center',
   }
 });
 
@@ -140,6 +142,8 @@ class Swap extends Component {
     page: 0,
     token: '',
     tokenError: false,
+    bnbMemo: '',
+    bnbMemoError: false,
     bnbReceiveAddress: '',
     bnbReceiveAddressError: false,
     ethReceiveAddress: '',
@@ -213,13 +217,15 @@ class Swap extends Component {
     const {
       token,
       swapDirection,
+      bnbMemo,
       bnbReceiveAddress,
-      ethReceiveAddress
+      ethReceiveAddress,
     } = this.state
 
     const content =  {
       token_uuid: token,
       direction: swapDirection,
+      bnb_memo: bnbMemo,
       bnb_address: bnbReceiveAddress,
       eth_address: ethReceiveAddress,
     }
@@ -250,6 +256,7 @@ class Swap extends Component {
 
     this.setState({
       tokenError: false,
+      bnbMemoError: false,
       bnbReceiveAddressError: false,
       ethReceiveAddressError: false,
     })
@@ -257,6 +264,7 @@ class Swap extends Component {
     const {
       token,
       swapDirection,
+      bnbMemo,
       bnbReceiveAddress,
       ethReceiveAddress,
     } = this.state
@@ -325,6 +333,7 @@ class Swap extends Component {
 
     this.setState({
       swapDirection: direction,
+      bnbMemo: '',
       ethReceiveAddress: '',
       bnbReceiveAddress: '',
       ethBalances: null,
@@ -337,6 +346,8 @@ class Swap extends Component {
       page: 0,
       token: '',
       tokenError: false,
+      bnbMemo: '',
+      bnbMemoError: '',
       bnbReceiveAddress: '',
       bnbReceiveAddressError: false,
       ethReceiveAddress: '',
@@ -491,6 +502,8 @@ class Swap extends Component {
   renderPage0 = () => {
 
     const {
+      bnbMemo,
+      bnbMemoError,
       bnbReceiveAddress,
       bnbReceiveAddressError,
       ethReceiveAddress,
@@ -528,6 +541,17 @@ class Swap extends Component {
                   placeholder="eg: bnb1mmxvnhkyqrvd2dpskvsgl8lmft4tnrcs97apr3"
                   value={ bnbReceiveAddress }
                   error={ bnbReceiveAddressError }
+                  onChange={ this.onChange }
+                  disabled={ loading }
+                />
+                <Input
+                  id='bnbMemo'
+                  fullWidth={ true }
+                  label="Deposit Memo (required for binance.com account)"
+                  placeholder="eg: 107800300"
+                  
+                  value={ bnbMemo }
+                  error={ bnbMemoError }
                   onChange={ this.onChange }
                   disabled={ loading }
                 />
@@ -643,6 +667,7 @@ class Swap extends Component {
     const {
       transactions,
       selectedToken,
+      bnbMemo,
       bnbReceiveAddress,
       ethReceiveAddress,
       swapDirection
@@ -705,10 +730,9 @@ class Swap extends Component {
     }
 
     if(selectedToken && !selectedToken.eth_to_bnb_enabled && !selectedToken.bnb_to_eth_enabled) {
-
       return (
         <React.Fragment>
-          <Label label={'Swap direction'} overridestyle={{ marginTop: '12px', marginBottom: '12px' }} />
+          <Label label={'Swap direction'} overridestyle={{marginTop: '10px', marginBottom: '12px' }} />
           <Typography>No available swaps for selectedToken.symbol</Typography>
         </React.Fragment>
       )
@@ -716,8 +740,13 @@ class Swap extends Component {
 
     return (
       <React.Fragment>
-        <Label label={'Swap direction'} overridestyle={{ marginTop: '12px', marginBottom: '12px' }} />
-        <Grid item xs={ 5 } onClick={ this.onSwapDirectionClick } className={ classes.gridClick } >
+        <Label label={'Swap direction'} overridestyle={{ 
+          fontSize:'20px', 
+          marginTop: '10px', 
+          marginBottom: '10px', 
+          textAlign: 'center'
+          }} />
+        <Grid item xs={5} onClick={ this.onSwapDirectionClick } className={ classes.gridClick } >
           <div className={ classes.icon }>
             <img
               alt=""
@@ -726,13 +755,13 @@ class Swap extends Component {
             />
           </div>
           <div className={ classes.iconName }>
-            <Typography  variant='h5'>{ first ==='Binance' ? 'BEP2' : 'ERC20' }</Typography>
+            <Typography variant='h5'>{ first ==='Binance' ? 'BEP2' : 'ERC20' }</Typography>
           </div>
         </Grid>
-        <Grid item xs={2} onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
+        <Grid item onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
           <SwapIcon className={ classes.swapDirection } />
         </Grid>
-        <Grid item xs={5} align='left' onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
+        <Grid item xs={5} onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
           <div className={ classes.icon }>
             <img
               alt=""
