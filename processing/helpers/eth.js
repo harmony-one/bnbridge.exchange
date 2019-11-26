@@ -229,7 +229,7 @@ const eth = {
         return null, receipt.transactionHash
       } catch (err) {
         console.error('[Error] sendErc20Transaction', err)
-        if (retry == 3) {
+        if (retry == 2) {
           callback(err)
           return err, null
         } else {
@@ -293,7 +293,7 @@ const eth = {
         return null, receipt.transactionHash
       } catch (err) {
         console.error('[Error] fundEthForGasFee', err)
-        if (retry == 3) {
+        if (retry == 2) {
           callback(err)
           return err, null
         } else {
