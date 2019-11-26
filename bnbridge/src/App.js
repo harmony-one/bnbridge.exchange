@@ -19,8 +19,9 @@ function App() {
       <CssBaseline />
       <Grid
         style={{
-          padding: '5% 10% 5% 10%',
+          padding: '5% 20% 5% 10%',
           minWidth: 'fit-content',
+          marginLeft: '7%',
         }}
         container
         justify="space-evenly"
@@ -30,7 +31,7 @@ function App() {
         <Grid item style={{ display: 'table', }} align='center' xs={6}>
           <Instructions />
         </Grid>
-        <Grid item style={{ display: 'table', }} align="center" xs={6}>
+        <Grid item style={{ display: 'table', padding: '5%', }} align="center" xs={6}>
           <Controller />
         </Grid>
       </Grid>

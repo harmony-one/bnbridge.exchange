@@ -544,7 +544,6 @@ class Swap extends Component {
                   onChange={ this.onChange }
                   disabled={ loading }
                 />
-              
                 <Input
                   id='bnbMemo'
                   fullWidth={ true }
@@ -556,11 +555,6 @@ class Swap extends Component {
                   onChange={ this.onChange }
                   disabled={ loading }
                 />
-
-                {/*
-                <a style={{fontSize:'12px', marginBottom: '16px'}} href='https://docs.binance.org/memo-validation.html#memo-validation'>Optional BEP12 Transfer MEMO</a>
-                */}
-
                 {
                   bnbBalances &&
                   <React.Fragment>
@@ -736,7 +730,6 @@ class Swap extends Component {
     }
 
     if(selectedToken && !selectedToken.eth_to_bnb_enabled && !selectedToken.bnb_to_eth_enabled) {
-
       return (
         <React.Fragment>
           <Label label={'Swap direction'} overridestyle={{marginTop: '10px', marginBottom: '12px' }} />

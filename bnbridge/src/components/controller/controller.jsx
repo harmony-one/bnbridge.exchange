@@ -155,17 +155,11 @@ class Controller extends Component {
         {tabValue === 0 && <Swap onIssue={ this.onIssue } showError={ this.showError } onCreateAccount={ this.onCreateAccount } />}
         {tabValue === 1 && <List onIssue={ this.onIssue } showError={ this.showError } />}
         {tabValue === 2 && <Issue onBack={ this.onIssueBack }  issueFee={ issueFee } showError={ this.showError } />}
-        
-        <div style={{  margin: '10px', marginTop: '20px' }} />
-
+        <div style={{ margin: '10px', marginTop: '20px'}} />
       <Typography className={classes.action2}>
         Please contact <a href="mailto:hello@harmony.one" target="_blank" rel="noopener noreferrer">Harmony team</a> for any additional support
       </Typography>
-      <Typography className={classes.action2}>
-        Note: UI of this page is not optimized for mobile experience.
-      </Typography>
       </React.Fragment>
-      
     )
   };
 }

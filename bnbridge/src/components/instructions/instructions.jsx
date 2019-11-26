@@ -34,13 +34,13 @@ const styles = theme => ({
     marginTop: "0.5rem"
   },
   actionHighlight: {
-    fontSize: '1rem',
-    color: '#f44336',
+    fontSize: '0.9rem',
+    color: '#000000',
     display: 'inline-block',
-    marginTop: "0.5rem"
+    marginTop: "0.5rem"  
   },
   actionLink: {
-    fontSize: '1rem',
+    fontSize: '0.9rem',
     color: '#2196f3',
     display: 'inline-block',
     marginTop: "0.5rem"
@@ -55,7 +55,7 @@ const styles = theme => ({
     fontSize: '1rem',
     color: colors.lightBlack,
     display: 'inline-block',
-    marginTop: "0.5rem",
+    marginTop: '0.5rem',
     fontWeight: 'bold'
   },
   price: {
@@ -63,7 +63,7 @@ const styles = theme => ({
     fontSize: '1rem',
     color: colors.lightBlack,
     display: 'inline-block',
-    marginTop: "0.5rem"
+    marginTop: '0.5rem'
   }
 });
 
@@ -132,11 +132,14 @@ class Instructions extends Component {
           <div style={{ display: 'table', }} className={classes.root}>
             <Typography className={classes.header} style={{ marginTop: '10px' }}>With bnbridge you can:</Typography>
             <li><Typography className={classes.action}>Swap between ERC20 and BEP2 tokens</Typography></li>
-            <li><Typography className={classes.actionHighlight}>If you are using a binance.com account, you will need to enter in your deposit memo in addition to your ONE (bnb) address.</Typography></li>
-            <li><Typography className={classes.actionHighlight}>Your deposit memo is a 9 digit memo.</Typography></li>
-            <li>
-              <Link href="https://www.binance.vision/tutorials/how-to-deposit"><Typography className={classes.actionLink}> Click Here: How to find your deposit MEMO?</Typography></Link>
-            </li>
+            
+            <Typography className={classes.actionHighlight}>
+              If you are using a binance.com account, your 9 digit ONE deposit memo is required in addition to your ONE address.
+              <br/>
+              <Link href="https://www.binance.vision/tutorials/how-to-deposit">
+                <Typography className={classes.actionLink}> How to find your deposit MEMO?</Typography>
+              </Link>   
+            </Typography>
             <img src={ require('../../assets/images/MEMO_Example.png')} style={{width: '100%'}}></img>
           </div>
         </Grid>
