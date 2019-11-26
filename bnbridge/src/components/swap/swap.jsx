@@ -104,10 +104,12 @@ const styles = theme => ({
     verticalAlign: 'middle'
   },
   swapDirection: {
-    margin: '14px 12px 18px 12px'
+    margin: '14px 12px 18px 12px',
+    textAlign: 'center',
   },
   gridClick: {
-    cursor: 'pointer'
+    cursor: 'pointer',
+    textAlign: 'center',
   }
 });
 
@@ -546,7 +548,7 @@ class Swap extends Component {
                 <Input
                   id='bnbMemo'
                   fullWidth={ true }
-                  label="Memo (Optional in general, but required for some exchanges)"
+                  label="Deposit Memo (required for binance.com account)"
                   placeholder="eg: 107800300"
                   
                   value={ bnbMemo }
@@ -554,7 +556,10 @@ class Swap extends Component {
                   onChange={ this.onChange }
                   disabled={ loading }
                 />
+
+                {/*
                 <a style={{fontSize:'12px', marginBottom: '16px'}} href='https://docs.binance.org/memo-validation.html#memo-validation'>Optional BEP12 Transfer MEMO</a>
+                */}
 
                 {
                   bnbBalances &&
@@ -734,7 +739,7 @@ class Swap extends Component {
 
       return (
         <React.Fragment>
-          <Label label={'Swap direction'} overridestyle={{ marginTop: '12px', marginBottom: '12px' }} />
+          <Label label={'Swap direction'} overridestyle={{marginTop: '10px', marginBottom: '12px' }} />
           <Typography>No available swaps for selectedToken.symbol</Typography>
         </React.Fragment>
       )
@@ -742,8 +747,13 @@ class Swap extends Component {
 
     return (
       <React.Fragment>
-        <Label label={'Swap direction'} overridestyle={{ marginTop: '12px', marginBottom: '12px' }} />
-        <Grid item xs={ 5 } onClick={ this.onSwapDirectionClick } className={ classes.gridClick } >
+        <Label label={'Swap direction'} overridestyle={{ 
+          fontSize:'20px', 
+          marginTop: '10px', 
+          marginBottom: '10px', 
+          textAlign: 'center'
+          }} />
+        <Grid item xs={5} onClick={ this.onSwapDirectionClick } className={ classes.gridClick } >
           <div className={ classes.icon }>
             <img
               alt=""
@@ -752,13 +762,13 @@ class Swap extends Component {
             />
           </div>
           <div className={ classes.iconName }>
-            <Typography  variant='h5'>{ first ==='Binance' ? 'BEP2' : 'ERC20' }</Typography>
+            <Typography variant='h5'>{ first ==='Binance' ? 'BEP2' : 'ERC20' }</Typography>
           </div>
         </Grid>
-        <Grid item xs={2} onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
+        <Grid item onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
           <SwapIcon className={ classes.swapDirection } />
         </Grid>
-        <Grid item xs={5} align='left' onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
+        <Grid item xs={5} onClick={ this.onSwapDirectionClick } className={ classes.gridClick }>
           <div className={ classes.icon }>
             <img
               alt=""

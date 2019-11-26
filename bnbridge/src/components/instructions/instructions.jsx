@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
-  Grid
+  Grid,
+  Link
 } from '@material-ui/core';
 import { colors } from '../../theme'
 
@@ -17,19 +18,30 @@ const store = Store.store
 
 const styles = theme => ({
   root: {
-    width: '400px',
-    marginBottom: '24px'
+    width: '525px',
   },
   header: {
     fontSize: '2.4rem',
     color: colors.yellow,
-    marginBottom: '24px',
-    fontWeight: 400,
+    marginBottom: '10px',
+    fontWeight: 700,
     fontFamily: ['Source Sans Pro', 'sans-serif'].join(","),
   },
   action: {
     fontSize: '1rem',
     color: colors.lightBlack,
+    display: 'inline-block',
+    marginTop: "0.5rem"
+  },
+  actionHighlight: {
+    fontSize: '1rem',
+    color: '#f44336',
+    display: 'inline-block',
+    marginTop: "0.5rem"
+  },
+  actionLink: {
+    fontSize: '1rem',
+    color: '#2196f3',
     display: 'inline-block',
     marginTop: "0.5rem"
   },
@@ -117,26 +129,16 @@ class Instructions extends Component {
         justify="flex-start"
         display="table">
         <Grid style={{ display: 'table', }} item xs={12} align='left'>
-          <div style={{ display: 'table', }} className={classes.root} >
-            <Typography className={classes.header} style={{ marginTop: '8rem' }}>With bnbridge you can:</Typography>
+          <div style={{ display: 'table', }} className={classes.root}>
+            <Typography className={classes.header} style={{ marginTop: '10px' }}>With bnbridge you can:</Typography>
             <li><Typography className={classes.action}>Swap between ERC20 and BEP2 tokens</Typography></li>
-              <div style={{  margin: '30px', marginTop: '50px' }} />
-              <Typography className={classes.action2}>
-                Please contact <a href="mailto:hello@harmony.one" target="_blank" rel="noopener noreferrer">Harmony team</a> for any additional support
-              </Typography>
-            <Typography className={classes.action2}>
-              Note: UI of this page is not optimized for mobile experience.
-            </Typography>
+            <li><Typography className={classes.actionHighlight}>If you are using a binance.com account, you will need to enter in your deposit memo in addition to your ONE (bnb) address.</Typography></li>
+            <li><Typography className={classes.actionHighlight}>Your deposit memo is a 9 digit memo.</Typography></li>
+            <li>
+              <Link href="https://www.binance.vision/tutorials/how-to-deposit"><Typography className={classes.actionLink}> Click Here: How to find your deposit MEMO?</Typography></Link>
+            </li>
+            <img src={ require('../../assets/images/MEMO_Example.png')} style={{width: '100%'}}></img>
           </div>
-          {/* <div className={ classes.root } >
-            <Typography className={ classes.header }>Bnbridge fees:</Typography>
-              <Grid
-                container
-                justify="flex-start"
-                alignItems="flex-end">
-                { this.renderFees() }
-            </Grid>
-          </div> */}
         </Grid>
       </Grid>
     )
