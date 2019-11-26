@@ -140,6 +140,8 @@ class Swap extends Component {
     page: 0,
     token: '',
     tokenError: false,
+    bnbMemo: '',
+    bnbMemoError: false,
     bnbReceiveAddress: '',
     bnbReceiveAddressError: false,
     ethReceiveAddress: '',
@@ -213,13 +215,15 @@ class Swap extends Component {
     const {
       token,
       swapDirection,
+      bnbMemo,
       bnbReceiveAddress,
-      ethReceiveAddress
+      ethReceiveAddress,
     } = this.state
 
     const content =  {
       token_uuid: token,
       direction: swapDirection,
+      bnb_memo: bnbMemo,
       bnb_address: bnbReceiveAddress,
       eth_address: ethReceiveAddress,
     }
@@ -250,6 +254,7 @@ class Swap extends Component {
 
     this.setState({
       tokenError: false,
+      bnbMemoError: false,
       bnbReceiveAddressError: false,
       ethReceiveAddressError: false,
     })
@@ -257,6 +262,7 @@ class Swap extends Component {
     const {
       token,
       swapDirection,
+      bnbMemo,
       bnbReceiveAddress,
       ethReceiveAddress,
     } = this.state
@@ -325,6 +331,7 @@ class Swap extends Component {
 
     this.setState({
       swapDirection: direction,
+      bnbMemo: '',
       ethReceiveAddress: '',
       bnbReceiveAddress: '',
       ethBalances: null,
@@ -337,6 +344,8 @@ class Swap extends Component {
       page: 0,
       token: '',
       tokenError: false,
+      bnbMemo: '',
+      bnbMemoError: '',
       bnbReceiveAddress: '',
       bnbReceiveAddressError: false,
       ethReceiveAddress: '',
@@ -491,6 +500,8 @@ class Swap extends Component {
   renderPage0 = () => {
 
     const {
+      bnbMemo,
+      bnbMemoError,
       bnbReceiveAddress,
       bnbReceiveAddressError,
       ethReceiveAddress,
@@ -531,6 +542,20 @@ class Swap extends Component {
                   onChange={ this.onChange }
                   disabled={ loading }
                 />
+              
+                <Input
+                  id='bnbMemo'
+                  fullWidth={ true }
+                  label="Memo (Optional in general, but required for some exchanges)"
+                  placeholder="eg: 107800300"
+                  
+                  value={ bnbMemo }
+                  error={ bnbMemoError }
+                  onChange={ this.onChange }
+                  disabled={ loading }
+                />
+                <a style={{fontSize:'12px', marginBottom: '16px'}} href='https://docs.binance.org/memo-validation.html#memo-validation'>Optional BEP12 Transfer MEMO</a>
+
                 {
                   bnbBalances &&
                   <React.Fragment>
@@ -643,6 +668,7 @@ class Swap extends Component {
     const {
       transactions,
       selectedToken,
+      bnbMemo,
       bnbReceiveAddress,
       ethReceiveAddress,
       swapDirection
