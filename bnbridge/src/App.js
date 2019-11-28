@@ -18,7 +18,7 @@ class App extends React.Component{
     super(props)
 
     this.state = {
-      swapDir: 1
+      swapDir: 'Bep2ToErc20'
     };
   }
 

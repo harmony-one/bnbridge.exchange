@@ -6,7 +6,7 @@ import {
   Grid,
   Link
 } from '@material-ui/core';
-import { colors } from '../../theme'
+import { colors } from '../../theme';
 
 import {
   FEES_UPDATED
@@ -68,11 +68,6 @@ const styles = theme => ({
 });
 
 class Instructions extends Component {
-  constructor(props) {
-    super(props);
-    console.log(props);
-  }
-
   state = {
     fees: []
   };
@@ -123,7 +118,7 @@ class Instructions extends Component {
     })
   };
 
-  renderBEP2_ERC20() {
+  renderBep2ToErc20() {
     const {
       classes
     } = this.props;
@@ -143,7 +138,7 @@ class Instructions extends Component {
     )
   };
 
-  renderERC20_BEP2() {
+  renderErc20ToBep2() {
     const {
       classes
     } = this.props;
@@ -166,7 +161,7 @@ class Instructions extends Component {
                 <Typography className={classes.actionLink}> How to find your deposit MEMO?</Typography>
               </Link>   
             </Typography>
-            <img src={ require('../../assets/images/MEMO_Example.png')} style={{width: '100%'}}></img>
+            <img src={ require('../../assets/images/MEMO_Example.png')} style={{width: '80%'}} alt="Nature"></img>
           </div>
         </Grid>
       </Grid>
@@ -181,8 +176,8 @@ class Instructions extends Component {
 
     return (
       <Grid container className={ classes.root }>
-          { swapDir === 1 && this.renderBEP2_ERC20() }
-          { swapDir === 2 && this.renderERC20_BEP2() }
+          { swapDir === 'Bep2ToErc20' && this.renderBep2ToErc20() }
+          { swapDir === 'Erc20ToBep2' && this.renderErc20ToBep2() }
       </Grid>
     )
   };

@@ -321,9 +321,9 @@ class Swap extends Component {
     let direction = swapDirection==='EthereumToBinance'?'BinanceToEthereum':'EthereumToBinance'
 
     if (direction === 'BinanceToEthereum') {
-      this.props.changeSwapDir(1)
+      this.props.changeSwapDir('Bep2ToErc20')
     } else if (direction === 'EthereumToBinance') {
-      this.props.changeSwapDir(2)
+      this.props.changeSwapDir('Erc20ToBep2')
     }
 
     if(selectedToken){
@@ -553,12 +553,11 @@ class Swap extends Component {
                   onChange={ this.onChange }
                   disabled={ loading }
                 />
-                <Input
-                  id='bnbMemo'
+                <Input 
+                  id='bnbMemo'         
                   fullWidth={ true }
                   label="Deposit Memo (required for binance.com account)"
                   placeholder="eg: 107800300"
-                  
                   value={ bnbMemo }
                   error={ bnbMemoError }
                   onChange={ this.onChange }
