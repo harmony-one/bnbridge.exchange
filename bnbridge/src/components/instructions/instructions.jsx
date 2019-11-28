@@ -68,6 +68,11 @@ const styles = theme => ({
 });
 
 class Instructions extends Component {
+  constructor(props) {
+    super(props);
+    console.log(props);
+  }
+
   state = {
     fees: []
   };
@@ -118,7 +123,7 @@ class Instructions extends Component {
     })
   };
 
-  render() {
+  renderBEP2_ERC20() {
     const {
       classes
     } = this.props;
@@ -132,7 +137,28 @@ class Instructions extends Component {
           <div style={{ display: 'table', }} className={classes.root}>
             <Typography className={classes.header} style={{ marginTop: '10px' }}>With bnbridge you can:</Typography>
             <li><Typography className={classes.action}>Swap between ERC20 and BEP2 tokens</Typography></li>
-            
+          </div>
+        </Grid>
+      </Grid>
+    )
+  };
+
+  renderERC20_BEP2() {
+    const {
+      classes
+    } = this.props;
+
+    return (
+      <Grid
+        container
+        justify="flex-start"
+        display="table">
+        <Grid style={{ display: 'table', }} item xs={12} align='left'>
+          <div style={{ display: 'table', }} className={classes.root}>
+            <Typography className={classes.header} style={{ marginTop: '10px' }}>With bnbridge you can:</Typography>
+            <li><Typography className={classes.action}>Swap between ERC20 and BEP2 tokens</Typography></li>
+          </div><br/>
+          <div>
             <Typography className={classes.actionHighlight}>
               If you are using a binance.com account, your 9 digit ONE deposit memo is required in addition to your ONE address.
               <br/>
@@ -143,6 +169,20 @@ class Instructions extends Component {
             <img src={ require('../../assets/images/MEMO_Example.png')} style={{width: '100%'}}></img>
           </div>
         </Grid>
+      </Grid>
+    )
+  };
+
+  render() {
+    const {
+      classes,
+      swapDir
+    } = this.props;
+
+    return (
+      <Grid container className={ classes.root }>
+          { swapDir === 1 && this.renderBEP2_ERC20() }
+          { swapDir === 2 && this.renderERC20_BEP2() }
       </Grid>
     )
   };
