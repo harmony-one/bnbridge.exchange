@@ -6,7 +6,7 @@ import {
   Grid,
   Link
 } from '@material-ui/core';
-import { colors } from '../../theme'
+import { colors } from '../../theme';
 
 import {
   FEES_UPDATED
@@ -118,7 +118,7 @@ class Instructions extends Component {
     })
   };
 
-  render() {
+  renderBep2ToErc20() {
     const {
       classes
     } = this.props;
@@ -132,7 +132,28 @@ class Instructions extends Component {
           <div style={{ display: 'table', }} className={classes.root}>
             <Typography className={classes.header} style={{ marginTop: '10px' }}>With bnbridge you can:</Typography>
             <li><Typography className={classes.action}>Swap between ERC20 and BEP2 tokens</Typography></li>
-            
+          </div>
+        </Grid>
+      </Grid>
+    )
+  };
+
+  renderErc20ToBep2() {
+    const {
+      classes
+    } = this.props;
+
+    return (
+      <Grid
+        container
+        justify="flex-start"
+        display="table">
+        <Grid style={{ display: 'table', }} item xs={12} align='left'>
+          <div style={{ display: 'table', }} className={classes.root}>
+            <Typography className={classes.header} style={{ marginTop: '10px' }}>With bnbridge you can:</Typography>
+            <li><Typography className={classes.action}>Swap between ERC20 and BEP2 tokens</Typography></li>
+          </div><br/>
+          <div>
             <Typography className={classes.actionHighlight}>
               If you are using a binance.com account, your 9 digit ONE deposit memo is required in addition to your ONE address.
               <br/>
@@ -140,9 +161,23 @@ class Instructions extends Component {
                 <Typography className={classes.actionLink}> How to find your deposit MEMO?</Typography>
               </Link>   
             </Typography>
-            <img src={ require('../../assets/images/MEMO_Example.png')} style={{width: '100%'}}></img>
+            <img src={ require('../../assets/images/MEMO_Example.png')} style={{width: '80%'}} alt="Nature"></img>
           </div>
         </Grid>
+      </Grid>
+    )
+  };
+
+  render() {
+    const {
+      classes,
+      swapDir
+    } = this.props;
+
+    return (
+      <Grid container className={ classes.root }>
+          { swapDir === 'Bep2ToErc20' && this.renderBep2ToErc20() }
+          { swapDir === 'Erc20ToBep2' && this.renderErc20ToBep2() }
       </Grid>
     )
   };
