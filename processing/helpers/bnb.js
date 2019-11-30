@@ -39,6 +39,25 @@ const bnb = {
     return addressValid
   },
 
+  validateMemo(address, memo) {
+    console.log('66666', address, memo);
+    // For users who use binance exchange address, memo is required.
+    // https://www.binance.vision/tutorials/how-to-deposit
+    const binanaceExchangeAccountAddress = 'bnb136ns6lfw4zs5hg4n85vdthaad7hq5m4gtkgf23';
+    if (address.toLowerCase() === binanaceExchangeAccountAddress) {
+      // https://docs.binance.org/memo-validation.html
+      if (!bnbMemo || bnbMemo.length !== 9 || !bnbMemo.match("^[0-9]+$")) {
+        return 'valid bnb_memo is required for this address'
+      }
+    }
+
+    if (memo && memo.length > 0) {
+      return memo.length <= 128;
+    }
+
+    return true;
+  },
+
   getFees(callback) {
     const url = `${config.api}api/v1/fees`;
     return callbackPromise(url, callback)

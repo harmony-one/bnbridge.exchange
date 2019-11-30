@@ -5,7 +5,8 @@ export const colors = {
   gray: "#e1e1e1",
   lightGray: "#fafafa",
   lightBlack: "#6a6a6a",
-  darkBlack: "#141414"
+  darkBlack: "#141414",
+  harmony: "#23b5e3",
 };
 
 const bnbridgeTheme =  {
@@ -59,7 +60,7 @@ const bnbridgeTheme =  {
       root: {
         borderBottom: "1px solid #dee2e6!important",
         "&$disabled": {
-          color: colors.yellow
+          color: colors.harmony
         }
       }
     },
@@ -73,7 +74,7 @@ const bnbridgeTheme =  {
   },
   palette: {
     primary: {
-      main: colors.yellow
+      main: colors.harmony
     },
     secondary: {
       main: colors.lightBlack
@@ -84,7 +85,7 @@ const bnbridgeTheme =  {
     },
     text: {
       primary: colors.lightBlack,
-      secondary: colors.yellow
+      secondary: colors.harmony
     }
   }
 };

@@ -80,8 +80,8 @@ if (cmd === 'bnb') {
 
     console.log(`client ${bnbaddress}`, key);
     if (fundBnb) {
-      bnb.transferWithPrivateKey(BNB_FUND_ACCT_PRIVATE_KEY, bnbaddress, BNB_GAS_FEE,
-        'BNB', 'Bnb gas for re-sending to Foundation', (err, txResult1) => {
+      bnb.transferWithPrivateKey(BNB_FUND_ACCT_PRIVATE_KEY, bnbaddress, undefined /* bnb_memo */, BNB_GAS_FEE,
+        'BNB', (err, txResult1) => {
           if (err) {
             console.error('[ERROR] bnb transferWithPrivateKey', err)
             return bnbaddress, null
@@ -120,8 +120,7 @@ if (cmd === 'eth') {
       eth.fundEthForGasFee(
         ETH_FUND_ACCT_PRIVATE_KEY,
         ETH_FUND_ACCT_ADDRESS,
-        ethaddress,
-        ETH_GAS_FEE, message,
+        ethaddress, message,
         false, (err, txResult1) => {
           if (err || !txResult1) {
             console.error(`Failed to fund eth for gas fee (${ETH_GAS_FEE} eth) ' +

@@ -51,7 +51,7 @@ const styles = theme => ({
     paddingBottom: '10px',
     textAlign: 'center',
     width: '200px',
-    borderBottom: '2px solid '+colors.yellow
+    borderBottom: '2px solid '+colors.harmony
   },
   frame: {
     border: '1px solid #e1e1e1',

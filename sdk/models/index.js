@@ -20,7 +20,6 @@ const BNB_GAS_FEE = 0.000375 // in BNB
 const ETH_FUND_ACCT_ADDRESS = process.env.ETH_FUND_ACCT_ADDRESS
 const ETH_FUND_ACCT_PRIVATE_KEY = process.env.ETH_FUND_ACCT_PRIVATE_KEY
 const ETH_FOUNDATION_ACCT_ADDRESS = process.env.ETH_FOUNDATION_ACCT_ADDRESS
-const ETH_GAS_FEE = 0.0005 // in ETH
 
 const models = {
 
@@ -47,6 +46,7 @@ const models = {
     const p = req.body.p;
 
     if (!m || !e || !t || !s || !u || !p) {
+      console.log('1111111111');
       res.status(501)
       res.body = { 'status': 501, 'success': false, 'message': 'Invalid payload' }
       return next(null, req, res, next)
@@ -68,6 +68,7 @@ const models = {
     const compareSignature = sha256(seed)
 
     if (compareSignature !== signature) {
+      console.log('2222222');
       res.status(501)
       res.body = { 'status': 501, 'success': false, 'message': 'Signature mismatch' }
       return next(null, req, res, next)
@@ -78,6 +79,8 @@ const models = {
     var data = null
     try {
       data = JSON.parse(payload)
+      console.log('333333', payload, data);
+
       callback(data)
     } catch (ex) {
       res.status(501)
@@ -559,20 +562,24 @@ const models = {
   */
   swapToken(req, res, next) {
     models.decryptPayload(req, res, next, (data) => {
+      console.log('4444444', data);
       let result = models.validateSwap(data)
 
+      console.log('555555', result);
       if(result !== true) {
+        console.log('400400400', result);
         res.status(400)
         res.body = { 'status': 400, 'success': false, 'result': result }
         return next(null, req, res, next)
       }
 
       const {
-        direction
+        direction,
+        bnb_memo,
       } = data
 
       if(direction === 'EthereumToBinance') {
-        models.swapEthereumToBinance(req, res, next, data)
+        models.swapEthereumToBinance(req, res, next, data, result)
       } else {
         models.swapBinanceToEthereum(req, res, next, data)
       }
@@ -582,8 +589,9 @@ const models = {
   validateSwap(body) {
     const {
       direction,
+      bnb_memo,
       bnb_address,
-      eth_address
+      eth_address,
     } = body
 
     if(!direction) {
@@ -595,10 +603,19 @@ const models = {
         return 'bnb_address is required'
       }
 
-      // binance sdk having issue with validateAddreses api
-      // if(!bnb.validateAddress(bnb_address)) {
-      //   return 'bnb_address is invalid'
-      // }
+      if(!bnb.validateAddress(bnb_address)) {
+        return 'bnb_address is invalid'
+      }
+      console.log('}}}}}}}}}}}}}}}}');
+      const res = bnb.validateMemo(bnb_address, bnb_memo)
+
+      console.log('[[[[[[[[[]]]]]]]]]', res, 'valid bnb_memo is required for this address')
+      if (res !== true) {
+        console.log('7777777', body, res);
+        return 'valid bnb_memo is required for this address'
+      }
+      console.log('+++++');
+
     } else {
       if(!eth_address) {
         return 'eth_address is required'
@@ -609,15 +626,20 @@ const models = {
       // }
     }
 
+    console.log('TTTTTATDSTASDTASDT');
+
     return true
   },
 
-  swapEthereumToBinance(req, res, next, data) {
+  swapEthereumToBinance(req, res, next, data, result) {
     const {
-      bnb_address
+      bnb_address,
+      bnb_memo,
     } = data
 
-    models.getClientAccountForBnbAddress(bnb_address, (err, clientAccount) => {
+    console.log('KKLLLLLLLL', result);
+
+    models.getClientAccountForBnbAddress(bnb_address, bnb_memo, (err, clientAccount) => {
       if(err) {
         console.error(err)
         res.status(500)
@@ -638,7 +660,7 @@ const models = {
             return next(null, req, res, next)
           }
 
-          models.insertClientEthAccount(bnb_address, account, (err, clientAccount) => {
+          models.insertClientEthAccount(bnb_address, bnb_memo, account, (err, clientAccount) => {
             if(err) {
               console.error(err)
               res.status(500)
@@ -655,22 +677,23 @@ const models = {
     })
   },
 
-  getClientAccountForBnbAddress(bnbAddress, callback) {
-    db.oneOrNone('select ca.uuid, ca.bnb_address, cea.address as eth_address from client_accounts_bnb ca left join client_eth_accounts cea on cea.uuid = ca.client_eth_account_uuid where ca.bnb_address = $1;', [bnbAddress])
+  getClientAccountForBnbAddress(bnbAddress, bnbMemo, callback) {
+    const query = db.oneOrNone('select ca.uuid, ca.bnb_address, ca.bnb_memo, cea.address as eth_address from client_accounts_bnb ca left join client_eth_accounts cea on cea.uuid = ca.client_eth_account_uuid where ca.bnb_address = $1 and ca.bnb_memo = $2;', [bnbAddress, bnbMemo])
+    query
     .then((response) => {
       callback(null, response)
     })
     .catch(callback)
   },
 
-  insertClientEthAccount(bnbAddress, ethAccount, callback) {
+  insertClientEthAccount(bnbAddress, bnb_memo, ethAccount, callback) {
     const dbPassword = bip39.generateMnemonic()
     const password = KEY+':'+dbPassword
     const aes256private = models.encrypt(ethAccount.privateKey, password)
 
     db.oneOrNone('insert into client_eth_accounts(uuid, private_key, address, encr_key, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, timezone(\'utc\', now())) returning uuid, address;', [aes256private, ethAccount.address, dbPassword])
     .then((returnedEthAccount) => {
-      db.oneOrNone('insert into client_accounts_bnb(uuid, bnb_address, client_eth_account_uuid, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, timezone(\'utc\', now())) returning uuid, bnb_address;', [bnbAddress, returnedEthAccount.uuid])
+      db.oneOrNone('insert into client_accounts_bnb(uuid, bnb_address, bnb_memo, client_eth_account_uuid, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, timezone(\'utc\', now())) returning uuid, bnb_address;', [bnbAddress, bnb_memo, returnedEthAccount.uuid])
       .then((clientAccount) => {
         const returnObj = {
           uuid: clientAccount.uuid,
@@ -845,7 +868,7 @@ const models = {
           const ethTransactions = data[0]
           const swaps = data[1]
 
-          console.log(ethTransactions);
+          // console.log(ethTransactions);
 
           if(!ethTransactions || ethTransactions.length === 0) {
             res.status(400)
@@ -853,31 +876,31 @@ const models = {
             return next(null, req, res, next)
           }
 
-          let newTransactions = ethTransactions.filter((ethTransaction) => {
-            if(!ethTransaction || ethTransaction.amount <= 0) {
-              return false
-            }
+          // let newTransactions = ethTransactions.filter((ethTransaction) => {
+          //   if(!ethTransaction || ethTransaction.amount <= 0) {
+          //     return false
+          //   }
 
-            const thisTransaction = swaps.filter((swap) => {
-              return swap.deposit_transaction_hash === ethTransaction.transactionHash &&
-                swap.transfer_transaction_hash  // for passing through previously failed swaps
-            })
+          //   const thisTransaction = swaps.filter((swap) => {
+          //     return swap.deposit_transaction_hash === ethTransaction.transactionHash &&
+          //       swap.transfer_transaction_hash  // for passing through previously failed swaps
+          //   })
 
-            if(thisTransaction.length > 0) {
-              return false
-            } else {
-              return true
-            }
-          })
+          //   if(thisTransaction.length > 0) {
+          //     return false
+          //   } else {
+          //     return true
+          //   }
+          // })
 
-          if(newTransactions.length === 0) {
-            res.status(400)
-            res.body = { 'status': 400, 'success': false, 'result': 'Unable to find any new deposits' }
-            return next(null, req, res, next)
-          }
+          // if(newTransactions.length === 0) {
+          //   res.status(400)
+          //   res.body = { 'status': 400, 'success': false, 'result': 'Unable to find any new deposits' }
+          //   return next(null, req, res, next)
+          // }
 
           // choose only 1 at a time, because we have seen binance sdk txn failing when multiple txns are sent in parallel
-          newTransactions = newTransactions.slice(0, 1)
+          newTransactions = ethTransactions.slice(0, 1)
 
           models.insertSwaps(newTransactions, clientAccount, token_uuid, direction, (err, newSwaps) => {
             if(err) {
@@ -950,11 +973,9 @@ const models = {
   },
 
   sendBep2Txn(swap, tokenInfo, callback) {
-    const message = `Bnbridge ERC20-BEP2 One swap. erc20 deposit ${swap.deposit_transaction_hash}`
     bnb.transferWithPrivateKey(BNB_FOUNDATION_ACCT_PRIVATE_KEY,
-      swap.bnb_address, swap.amount,
-      tokenInfo.unique_symbol,
-      message, (err, swapResult) => {
+      swap.bnb_address, swap.bnb_memo, swap.amount,
+      tokenInfo.unique_symbol, (err, swapResult) => {
         if (err) {
           console.error('[Error] bnb transferWithPrivateKey', err)
 
@@ -1003,7 +1024,7 @@ const models = {
     console.log('transferToERC20Foundation for swap', swap);
 
     console.log('1. look for the client account from db matching the bnb account that made the swap.');
-    models.getClientAccountForBnbAddress(swap.bnb_address, (err, clientAccount) => {
+    models.getClientAccountForBnbAddress(swap.bnb_address, swap.bnb_memo, (err, clientAccount) => {
       if (err || !clientAccount) {
         const cbError = err || `Unable to retrieve client account for swap bnb address ${swap.bnb_address}`
         console.error('[Error] ' + cbError);
@@ -1026,8 +1047,7 @@ const models = {
           ETH_FUND_ACCT_PRIVATE_KEY,
           ETH_FUND_ACCT_ADDRESS,
           clientAccount.eth_address,
-          ETH_GAS_FEE, message,
-          earlyRet, (err, txResult1) => {
+          message, earlyRet, (err, txResult1) => {
             if (err) {
               let text = "BNBridge encountered an error processing a swap.\n" +
                 "Failed to fund gas for transferring deposits to the foundation account."
@@ -1309,10 +1329,9 @@ const models = {
 
         console.log('3. transfer gas from bnb funding account to the client bnb acccount', clientAccount.bnb_address);
         // 1. first, send from bnb source account to the bnb acccount since it needs bnb to fund ONE transaction
-        const message = `Bnbridge funding bnb gas. erc20 deposit ${swap.deposit_transaction_hash}`
         bnb.transferWithPrivateKey(BNB_FUND_ACCT_PRIVATE_KEY,
-          clientAccount.bnb_address, BNB_GAS_FEE,
-          'BNB', message, (err, txResult1) => {
+          clientAccount.bnb_address, undefined /* bnb_memo */, BNB_GAS_FEE,
+          'BNB', (err, txResult1) => {
             if (err) {
               let text = "BNBridge encountered an error processing a swap.\n" +
                 "Failed to fund gas for transferring deposits to the foundation account."
@@ -1441,7 +1460,7 @@ const models = {
   },
 
   getClientAccountForUuidE2B(uuid, callback) {
-    db.oneOrNone('select ca.uuid, ca.bnb_address, cea.address as eth_address from client_accounts_bnb ca left join client_eth_accounts cea on cea.uuid = ca.client_eth_account_uuid where ca.uuid = $1;', [uuid])
+    db.oneOrNone('select ca.uuid, ca.bnb_address, ca.bnb_memo, cea.address as eth_address from client_accounts_bnb ca left join client_eth_accounts cea on cea.uuid = ca.client_eth_account_uuid where ca.uuid = $1;', [uuid])
     .then((response) => {
       callback(null, response)
     })
@@ -1493,7 +1512,11 @@ const models = {
   },
 
   insertSwapE2B(transaction, clientAccount, tokenUuid, direction, callback) {
-    db.oneOrNone('insert into swaps (uuid, token_uuid, eth_address, bnb_address, amount, client_account_uuid, deposit_transaction_hash, direction, created) values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, $7, timezone(\'utc\', now())) returning uuid, eth_address, bnb_address, amount, deposit_transaction_hash;', [tokenUuid, transaction.from, clientAccount.bnb_address, transaction.amount, clientAccount.uuid, transaction.transactionHash, direction])
+    db.oneOrNone(
+      'insert into swaps (uuid, token_uuid, eth_address, bnb_address, bnb_memo, amount, client_account_uuid, deposit_transaction_hash, direction, created)' +
+      ' values (md5(random()::text || clock_timestamp()::text)::uuid, $1, $2, $3, $4, $5, $6, $7, $8, timezone(\'utc\', now()))' +
+      ' returning uuid, eth_address, bnb_address, bnb_memo, amount, deposit_transaction_hash;',
+      [tokenUuid, transaction.from, clientAccount.bnb_address, clientAccount.bnb_memo, transaction.amount, clientAccount.uuid, transaction.transactionHash, direction])
     .then((response) => {
       callback(null, response)
     })

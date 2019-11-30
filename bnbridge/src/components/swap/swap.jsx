@@ -225,9 +225,9 @@ class Swap extends Component {
     const content =  {
       token_uuid: token,
       direction: swapDirection,
-      bnb_memo: bnbMemo,
-      bnb_address: bnbReceiveAddress,
-      eth_address: ethReceiveAddress,
+      bnb_memo: bnbMemo.trim(),
+      bnb_address: bnbReceiveAddress.trim(),
+      eth_address: ethReceiveAddress.trim(),
     }
 
     dispatcher.dispatch({ type: SWAP_TOKEN, content })
@@ -250,6 +250,24 @@ class Swap extends Component {
     dispatcher.dispatch({type: FINALIZE_SWAP_TOKEN, content })
 
     this.setState({ loading: true })
+  };
+
+  validateBnbMemp = (address, memo) => {
+    // For users who use binance exchange address, memo is required.
+    // https://www.binance.vision/tutorials/how-to-deposit
+    const binanaceExchangeAccountAddress = 'bnb136ns6lfw4zs5hg4n85vdthaad7hq5m4gtkgf23';
+    if (address.toLowerCase() === binanaceExchangeAccountAddress) {
+      // https://docs.binance.org/memo-validation.html
+      if (!memo || memo.length !== 9 || !memo.match("^[0-9]+$")) {
+        return 'valid bnb_memo is required for this address'
+      }
+    }
+
+    if (memo && memo.length > 0) {
+      return memo.length <= 128;
+    }
+
+    return true;
   };
 
   validateSwapToken = () => {
@@ -279,6 +297,11 @@ class Swap extends Component {
     if(swapDirection === 'EthereumToBinance') {
       if(!bnbReceiveAddress || bnbReceiveAddress === '') {
         this.setState({ bnbReceiveAddressError: true })
+        error = true
+      }
+
+      if (!this.validateBnbMemp(bnbReceiveAddress, bnbMemo)) {
+        this.setState({ bnbMemoError: true })
         error = true
       }
     } else {
@@ -547,9 +570,8 @@ class Swap extends Component {
                 <Input
                   id='bnbMemo'
                   fullWidth={ true }
-                  label="Deposit Memo (required for binance.com account)"
+                  label={ bnbMemoError }
                   placeholder="eg: 107800300"
-                  
                   value={ bnbMemo }
                   error={ bnbMemoError }
                   onChange={ this.onChange }
@@ -683,7 +705,13 @@ class Swap extends Component {
     return (
       <React.Fragment key='totalAmount'>
         <Typography className={ classes.instructions }>
-          You will receive another <b>{totalAmount} { swapDirection === 'EthereumToBinance' ? selectedToken.unique_symbol : (selectedToken.symbol+'-ERC20') }</b> in your address <b>{ swapDirection === 'EthereumToBinance' ? bnbReceiveAddress : ethReceiveAddress }</b>
+          You will receive another
+          <b>
+            {totalAmount} {swapDirection === 'EthereumToBinance'
+              ? selectedToken.unique_symbol
+              : (selectedToken.symbol + '-ERC20')}
+          </b> in your address <b>
+            {swapDirection === 'EthereumToBinance' ? (bnbReceiveAddress + (bnbMemo || '')) : ethReceiveAddress }</b>
         </Typography>
       </React.Fragment>
     )
@@ -740,10 +768,10 @@ class Swap extends Component {
 
     return (
       <React.Fragment>
-        <Label label={'Swap direction'} overridestyle={{ 
-          fontSize:'20px', 
-          marginTop: '10px', 
-          marginBottom: '10px', 
+        <Label label={'Swap direction'} overridestyle={{
+          fontSize:'20px',
+          marginTop: '10px',
+          marginBottom: '10px',
           textAlign: 'center'
           }} />
         <Grid item xs={5} onClick={ this.onSwapDirectionClick } className={ classes.gridClick } >

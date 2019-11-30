@@ -97,7 +97,7 @@ const styles = theme => ({
   },
   header: {
     fontSize: '2.4rem',
-    color: colors.yellow,
+    color: colors.harmony,
     marginBottom: '24px',
     fontWeight: 400,
     fontFamily: ['Source Sans Pro', 'sans-serif'].join(","),

@@ -13,6 +13,7 @@ const CONTRACT_MANAGER = process.env.ERC20_CONTRACT_MANAGER
 
 const ETH_TX_GAS_PRICE_GWEI = process.env.ETH_TX_GAS_PRICE_GWEI
 const ETH_TX_GAS_LIMIT = process.env.ETH_TX_GAS_LIMIT
+const ETH_TX_FEE_ETHER = process.env.ETH_TX_FEE_ETHER
 
 // set transactionConfirmationBlocks: https://github.com/trufflesuite/ganache-cli/issues/644
 const web3 = new Web3(new Web3.providers.HttpProvider(config.provider), null, { transactionConfirmationBlocks: 1 });
@@ -187,11 +188,10 @@ const eth = {
       const gasLimit = ETH_TX_GAS_LIMIT;
 
       const nonce = await web3.eth.getTransactionCount(from, 'pending');
-      let gasPrice = await web3.eth.getGasPrice();
-      gasPrice = Math.max(ETH_TX_GAS_PRICE_GWEI * 1e9, gasPrice * 2 * (retry+1))  // speed up erc20 txn a bit
+      const gasPrice = web3.utils.toWei(ETH_TX_GAS_PRICE_GWEI, 'gwei')
 
       const tx = {
-        from,
+        from: from,
         to: contractAddress,
 
         gasPrice: web3.utils.toHex(gasPrice),
@@ -203,9 +203,22 @@ const eth = {
         data: myData
       }
 
-      console.log(`Sending ERC20 transaction (retry num: ${retry})`, tx);
+      console.log(`Sending ERC20 transaction (retry num: ${retry})`, {
+        from: from,
+        to: contractAddress,
+
+        gasPrice: gasPrice,
+        gasLimit: gasLimit,
+        value: '0x0',
+
+        chainId: 1,
+        nonce: nonce,
+        amount: amount,
+        sendAmount: sendAmount,
+      });
 
       const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
+      console.log('const privKey', privateKey);
       const privKey = Buffer.from(privateKey, 'hex');
       rawTx.sign(privKey);
 
@@ -252,17 +265,16 @@ const eth = {
 
   },
 
-  async fundEthForGasFee(privateKey, from, to, amount, message, earlyRet, callback) {
+  async fundEthForGasFee(privateKey, from, to, message, earlyRet, callback) {
     let retry = 0;
     let callbackCalled = false;
 
     while (true) {
-      const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
-
+      const gasPrice = web3.utils.toWei(ETH_TX_GAS_PRICE_GWEI, 'gwei')
       const gasLimit = ETH_TX_GAS_LIMIT;
+      const amount = web3.utils.toWei(ETH_TX_FEE_ETHER, 'ether')
 
       const nonce = await web3.eth.getTransactionCount(from, 'pending');
-      const gasPrice = await web3.eth.getGasPrice();
 
       const tx = {
         from,
@@ -270,7 +282,7 @@ const eth = {
 
         gasPrice: web3.utils.toHex(gasPrice),
         gasLimit: web3.utils.toHex(gasLimit),
-        value: web3.utils.toHex(sendAmount),
+        value: web3.utils.toHex(amount),
 
         chainId: 1,
         nonce: nonce,
@@ -279,7 +291,17 @@ const eth = {
         tx.data = web3.utils.toHex(message);
       }
 
-      console.log(`Sending ETH transaction (retry num: ${retry})`, tx);
+      console.log(`Sending ETH transaction (retry num: ${retry})`, {
+        from: from,
+        to: to,
+
+        gasPrice: gasPrice,
+        gasLimit: gasLimit,
+        value: gasPrice,
+
+        chainId: 1,
+        nonce: nonce,
+      });
 
       const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
       const privKey = Buffer.from(privateKey, 'hex');
@@ -347,42 +369,41 @@ const eth = {
 if (process.env.RUN) {
 
   const contractAddress = '0x799a4202c12ca952cb311598a024c80ed371a41e';
-  const privateKey = ''
-  const from = ''
-  const to = ''
-  const amount = 0.01
+  const privateKey = 'cf25477ed7d228d3781f66b5f9f609f5399d30afacf3740718614df7ed252d36'
+  const from = '0xeD166e6E445246bEa456C6d6243c51675FCcdcD8'
+  const to = '0x6750DB41334e612a6E8Eb60323Cb6579f0a66542'
+  const amount = 124
   const address = ''
 
   // eth.getTransactionsForAddress(contractAddress, address, (err, events) => {
   //   console.log('returned events', JSON.stringify(events));
   // })
 
-  // eth.fundEthForGasFee(privateKey, from, to, amount, null, (err, hash) => {
-  //   if (err) {
-  //     console.error(err);
-  //     return;
-  //   }
-  //   console.log(hash);
-  //   return hash;
-  // })
+  eth.fundEthForGasFee('88BD4B5D68C3F91F94180A1E39754AE7C4B2DD17421B4105BFF512E53E0A443C', '0x666d9dAc081cCEa209091D6e06D76678B09DccA3', from, null, false, (err, hash) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.log(`==== ETH gas fee fund Tx hash: ${hash}`);
 
-  web3.eth.getBalance(from).then((ethBalance) => {
-    console.log(`==== Eth balance: ${web3.utils.fromWei(ethBalance)} ETH`);
+    web3.eth.getBalance(from).then((ethBalance) => {
+      console.log(`==== Eth balance: ${web3.utils.fromWei(ethBalance)} ETH`);
 
-    eth.getERC20Balance(from, contractAddress, (err, balance) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      console.log(`==== One balance: ${balance} ONE`);
-
-      eth.sendErc20Transaction(contractAddress, privateKey, from, to, amount, false /* earlyRet */, (err, hash) => {
+      eth.getERC20Balance(from, contractAddress, (err, balance) => {
         if (err) {
-          console.error(err);
-          return;
+          console.error(err)
+          return
         }
-        console.log(`==== ONE ERC20 Tx hash: ${hash}`);
-        return ethBalance, balance, hash;
+        console.log(`==== One balance: ${balance} ONE`);
+
+        eth.sendErc20Transaction(contractAddress, privateKey, from, to, amount, true /* earlyRet */, (err, hash) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          console.log(`==== ONE ERC20 Tx hash: ${hash}`);
+          return ethBalance, balance, hash;
+        })
       })
     })
   })

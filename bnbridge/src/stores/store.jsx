@@ -441,10 +441,12 @@ class Store {
           return res.json()
         }
 
+        console.log(res);
+
         if (res.ok) {
           return res.json();
         } else {
-          throw Error(res.statusText);
+          throw Error(res.result);
         }
       })
       .then(res => {

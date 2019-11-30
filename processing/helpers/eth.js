@@ -241,7 +241,7 @@ const eth = {
 
   },
 
-  async fundEthForGasFee(privateKey, from, to, amount, message, earlyRet, callback) {
+  async fundEthForGasFee(privateKey, from, to, message, earlyRet, callback) {
     const sendAmount = web3.utils.toWei(amount.toString(), 'ether')
 
     const gasLimit = ETH_TX_GAS_LIMIT;

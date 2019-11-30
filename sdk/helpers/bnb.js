@@ -39,6 +39,28 @@ const bnb = {
     return addressValid
   },
 
+  validateMemo(address, memo) {
+    console.log('66666', address.toLowerCase(), memo);
+    // For users who use binance exchange address, memo is required.
+    // https://www.binance.vision/tutorials/how-to-deposit
+    const binanaceExchangeAccountAddress = 'bnb136ns6lfw4zs5hg4n85vdthaad7hq5m4gtkgf23';
+    if (address.toLowerCase() === binanaceExchangeAccountAddress) {
+      console.log('8888888', memo, memo.length, memo.match("^[0-9]+$"));
+      // https://docs.binance.org/memo-validation.html
+      const matchRes = memo.match("^[0-9]+$")
+      console.log('matchRes', matchRes);
+      if (!memo || memo.length !== 9 || !(matchRes && matchRes != null && matchRes.length > 0 && matchRes[0] === memo)) {
+        return 'valid bnb_memo is required for this address'
+      }
+    }
+
+    if (memo && memo.length > 128) {
+      return 'The length of memo should less than 128'
+    }
+
+    return true;
+  },
+
   getFees(callback) {
     const url = `${config.api}api/v1/fees`;
     return callbackPromise(url, callback)
@@ -204,11 +226,11 @@ const bnb = {
     return callbackSequencePromise(bnbClient, privateFrom, sequenceURL, (sequence) => {
       console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
         publicFrom, publicTo, amount, asset, message, sequence);
-      return bnbClient.transfer(publicFrom, publicTo, amount, asset, '1', /*message,*/ sequence)
+      return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
     }, callback);
   },
 
-  transferWithPrivateKey(privateFrom, publicTo, amount, asset, message, callback) {
+  transferWithPrivateKey(privateFrom, publicTo, memo, amount, asset, callback) {
     const bnbClient = new BnbApiClient(config.api);
     bnbClient.chooseNetwork(config.network);
 
@@ -217,15 +239,17 @@ const bnb = {
     const sequenceURL = `https://dex.binance.org/api/v1/account/${publicFrom}/sequence`;
 
     console.log('##########################################');
-    console.log(privateFrom, publicFrom, publicTo, amount, asset, message);
+    console.log(privateFrom, publicFrom, publicTo, amount, asset, memo);
     console.log('##########################################');
     console.log('sequenceURL', sequenceURL);
     console.log('##########################################');
 
+    const message = memo.trim() || Date.now();
+
     return callbackSequencePromise(bnbClient, privateFrom, sequenceURL, (sequence) => {
       console.log('transfer httpClientgetsequenceURL bnbClient.transfer',
-        publicFrom, publicTo, amount, asset, message, sequence);
-      return bnbClient.transfer(publicFrom, publicTo, amount, asset, '1', /*message,*/ sequence)
+        publicFrom, publicTo, amount, asset, '['+message+']', sequence);
+      return bnbClient.transfer(publicFrom, publicTo, amount, asset, message, sequence)
     }, callback);
   },
 

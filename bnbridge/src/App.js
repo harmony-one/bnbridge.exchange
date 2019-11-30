@@ -36,7 +36,7 @@ function App() {
         </Grid>
       </Grid>
       <Grid
-        style={{ padding: '0% 10%', display: 'table'}}
+        style={{ padding: '0% 10%', marginTop: '-5%', display: 'table'}}
         container
         justify="center"
         alignItems="center"

@@ -22,7 +22,7 @@ const styles = theme => ({
   },
   header: {
     fontSize: '2.4rem',
-    color: colors.yellow,
+    color: colors.harmony,
     marginBottom: '10px',
     fontWeight: 700,
     fontFamily: ['Source Sans Pro', 'sans-serif'].join(","),
@@ -37,7 +37,7 @@ const styles = theme => ({
     fontSize: '0.9rem',
     color: '#000000',
     display: 'inline-block',
-    marginTop: "0.5rem"  
+    marginTop: "0.5rem"
   },
   actionLink: {
     fontSize: '0.9rem',
@@ -131,16 +131,16 @@ class Instructions extends Component {
         <Grid style={{ display: 'table', }} item xs={12} align='left'>
           <div style={{ display: 'table', }} className={classes.root}>
             <Typography className={classes.header} style={{ marginTop: '10px' }}>With bnbridge you can:</Typography>
-            <li><Typography className={classes.action}>Swap between ERC20 and BEP2 tokens</Typography></li>
-            
+            <Typography className={classes.action}>Swap between ERC20 and BEP2 tokens</Typography>
+
             <Typography className={classes.actionHighlight}>
               If you are using a binance.com account, your 9 digit ONE deposit memo is required in addition to your ONE address.
               <br/>
-              <Link href="https://www.binance.vision/tutorials/how-to-deposit">
-                <Typography className={classes.actionLink}> How to find your deposit MEMO?</Typography>
-              </Link>   
+              <Typography component={'span'} className={classes.actionLink}>
+                <Link href="https://www.binance.vision/tutorials/how-to-deposit" rel="noopener noreferrer" target="_blank">How to find your deposit MEMO?</Link>
+              </Typography>
             </Typography>
-            <img src={ require('../../assets/images/MEMO_Example.png')} style={{width: '100%'}}></img>
+            <img src={require('../../assets/images/MEMO_Example.png')} alt="bnb memo example" style={{width: '100%'}}></img>
           </div>
         </Grid>
       </Grid>
