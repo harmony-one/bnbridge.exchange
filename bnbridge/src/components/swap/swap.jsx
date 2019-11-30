@@ -135,8 +135,12 @@ function SwapIcon(props) {
   );
 }
 
-
 class Swap extends Component {
+  constructor(props) {
+    super(props)    
+    this.onSwapDirectionClick = this.onSwapDirectionClick.bind(this)
+  }
+
   state = {
     loading: false,
     page: 0,
@@ -152,7 +156,8 @@ class Swap extends Component {
     selectedToken: null,
     bnbBalances: null,
     ethBalances: null,
-    swapDirection: 'BinanceToEthereum'
+    swapDirection: 'BinanceToEthereum',
+    swapDir: 1
   };
 
   componentDidMount() {
@@ -213,7 +218,6 @@ class Swap extends Component {
   };
 
   callSwapToken = () => {
-
     const {
       token,
       swapDirection,
@@ -328,7 +332,6 @@ class Swap extends Component {
         this.resetPage()
         break;
       default:
-
     }
   };
 
@@ -339,6 +342,12 @@ class Swap extends Component {
     } = this.state
 
     let direction = swapDirection==='EthereumToBinance'?'BinanceToEthereum':'EthereumToBinance'
+
+    if (direction === 'BinanceToEthereum') {
+      this.props.changeSwapDir('Bep2ToErc20')
+    } else if (direction === 'EthereumToBinance') {
+      this.props.changeSwapDir('Erc20ToBep2')
+    }
 
     if(selectedToken){
 
@@ -567,8 +576,8 @@ class Swap extends Component {
                   onChange={ this.onChange }
                   disabled={ loading }
                 />
-                <Input
-                  id='bnbMemo'
+                <Input 
+                  id='bnbMemo'         
                   fullWidth={ true }
                   label={ bnbMemoError }
                   placeholder="eg: 107800300"
@@ -836,7 +845,8 @@ class Swap extends Component {
 }
 
 Swap.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  changeSwapDir: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(Swap);
