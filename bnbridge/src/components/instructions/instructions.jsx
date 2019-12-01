@@ -161,11 +161,7 @@ class Instructions extends Component {
                 <Link href="https://www.binance.vision/tutorials/how-to-deposit" rel="noopener noreferrer" target="_blank">How to find your deposit MEMO?</Link>
               </Typography>
             </Typography>
-<<<<<<< HEAD
-            <img src={require('../../assets/images/MEMO_Example.png')}  stylalt="bnb memo example"e={{width: '100%'}}></img>
-=======
             <img src={ require('../../assets/images/MEMO_Example.png')} style={{width: '80%'}} alt="bnb memo example"></img>
->>>>>>> 3a33a6b98f305aa83b058cdeeec07211a58da3ec
           </div>
         </Grid>
       </Grid>

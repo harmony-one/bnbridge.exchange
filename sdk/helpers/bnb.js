@@ -40,15 +40,12 @@ const bnb = {
   },
 
   validateMemo(address, memo) {
-    console.log('66666', address.toLowerCase(), memo);
     // For users who use binance exchange address, memo is required.
     // https://www.binance.vision/tutorials/how-to-deposit
     const binanaceExchangeAccountAddress = 'bnb136ns6lfw4zs5hg4n85vdthaad7hq5m4gtkgf23';
     if (address.toLowerCase() === binanaceExchangeAccountAddress) {
-      console.log('8888888', memo, memo.length, memo.match("^[0-9]+$"));
       // https://docs.binance.org/memo-validation.html
       const matchRes = memo.match("^[0-9]+$")
-      console.log('matchRes', matchRes);
       if (!memo || memo.length !== 9 || !(matchRes && matchRes != null && matchRes.length > 0 && matchRes[0] === memo)) {
         return 'valid bnb_memo is required for this address'
       }

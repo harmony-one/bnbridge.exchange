@@ -137,7 +137,7 @@ function SwapIcon(props) {
 
 class Swap extends Component {
   constructor(props) {
-    super(props)    
+    super(props)
     this.onSwapDirectionClick = this.onSwapDirectionClick.bind(this)
   }
 
@@ -576,8 +576,8 @@ class Swap extends Component {
                   onChange={ this.onChange }
                   disabled={ loading }
                 />
-                <Input 
-                  id='bnbMemo'         
+                <Input
+                  id='bnbMemo'
                   fullWidth={ true }
                   label={ bnbMemoError }
                   placeholder="eg: 107800300"

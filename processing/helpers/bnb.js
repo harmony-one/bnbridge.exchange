@@ -40,7 +40,6 @@ const bnb = {
   },
 
   validateMemo(address, memo) {
-    console.log('66666', address, memo);
     // For users who use binance exchange address, memo is required.
     // https://www.binance.vision/tutorials/how-to-deposit
     const binanaceExchangeAccountAddress = 'bnb136ns6lfw4zs5hg4n85vdthaad7hq5m4gtkgf23';

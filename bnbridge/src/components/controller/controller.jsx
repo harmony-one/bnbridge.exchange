@@ -39,9 +39,6 @@ const styles = theme => ({
 });
 
 class Controller extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   state = {
     tabValue: 0,

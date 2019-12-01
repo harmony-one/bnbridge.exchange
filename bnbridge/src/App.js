@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import {
@@ -23,7 +23,6 @@ class App extends React.Component{
   }
 
   changeSwapDir = (change) => {
-    console.log(change)
     const swapDir = change
     this.setState({swapDir : swapDir})
   }

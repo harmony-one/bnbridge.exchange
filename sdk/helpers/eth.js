@@ -218,7 +218,6 @@ const eth = {
       });
 
       const rawTx = new Tx.Transaction(tx, { chain: 'mainnet', hardfork: 'petersburg' });
-      console.log('const privKey', privateKey);
       const privKey = Buffer.from(privateKey, 'hex');
       rawTx.sign(privKey);
 
@@ -368,10 +367,10 @@ const eth = {
 
 if (process.env.RUN) {
 
-  const contractAddress = '0x799a4202c12ca952cb311598a024c80ed371a41e';
-  const privateKey = 'cf25477ed7d228d3781f66b5f9f609f5399d30afacf3740718614df7ed252d36'
-  const from = '0xeD166e6E445246bEa456C6d6243c51675FCcdcD8'
-  const to = '0x6750DB41334e612a6E8Eb60323Cb6579f0a66542'
+  const contractAddress = '';
+  const privateKey = ''
+  const from = ''
+  const to = ''
   const amount = 124
   const address = ''
 
@@ -379,7 +378,11 @@ if (process.env.RUN) {
   //   console.log('returned events', JSON.stringify(events));
   // })
 
-  eth.fundEthForGasFee('88BD4B5D68C3F91F94180A1E39754AE7C4B2DD17421B4105BFF512E53E0A443C', '0x666d9dAc081cCEa209091D6e06D76678B09DccA3', from, null, false, (err, hash) => {
+  eth.fundEthForGasFee(
+    '' /* sender private key */,
+    '' /* sender address */,
+    from /* receiver address */,
+    null, false, (err, hash) => {
     if (err) {
       console.error(err);
       return;

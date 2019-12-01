@@ -46,7 +46,6 @@ const models = {
     const p = req.body.p;
 
     if (!m || !e || !t || !s || !u || !p) {
-      console.log('1111111111');
       res.status(501)
       res.body = { 'status': 501, 'success': false, 'message': 'Invalid payload' }
       return next(null, req, res, next)
@@ -68,7 +67,6 @@ const models = {
     const compareSignature = sha256(seed)
 
     if (compareSignature !== signature) {
-      console.log('2222222');
       res.status(501)
       res.body = { 'status': 501, 'success': false, 'message': 'Signature mismatch' }
       return next(null, req, res, next)
@@ -79,8 +77,6 @@ const models = {
     var data = null
     try {
       data = JSON.parse(payload)
-      console.log('333333', payload, data);
-
       callback(data)
     } catch (ex) {
       res.status(501)
@@ -562,12 +558,9 @@ const models = {
   */
   swapToken(req, res, next) {
     models.decryptPayload(req, res, next, (data) => {
-      console.log('4444444', data);
       let result = models.validateSwap(data)
 
-      console.log('555555', result);
       if(result !== true) {
-        console.log('400400400', result);
         res.status(400)
         res.body = { 'status': 400, 'success': false, 'result': result }
         return next(null, req, res, next)
@@ -606,15 +599,11 @@ const models = {
       if(!bnb.validateAddress(bnb_address)) {
         return 'bnb_address is invalid'
       }
-      console.log('}}}}}}}}}}}}}}}}');
       const res = bnb.validateMemo(bnb_address, bnb_memo)
 
-      console.log('[[[[[[[[[]]]]]]]]]', res, 'valid bnb_memo is required for this address')
       if (res !== true) {
-        console.log('7777777', body, res);
         return 'valid bnb_memo is required for this address'
       }
-      console.log('+++++');
 
     } else {
       if(!eth_address) {
@@ -626,8 +615,6 @@ const models = {
       // }
     }
 
-    console.log('TTTTTATDSTASDTASDT');
-
     return true
   },
 
@@ -636,8 +623,6 @@ const models = {
       bnb_address,
       bnb_memo,
     } = data
-
-    console.log('KKLLLLLLLL', result);
 
     models.getClientAccountForBnbAddress(bnb_address, bnb_memo, (err, clientAccount) => {
       if(err) {
@@ -876,31 +861,31 @@ const models = {
             return next(null, req, res, next)
           }
 
-          // let newTransactions = ethTransactions.filter((ethTransaction) => {
-          //   if(!ethTransaction || ethTransaction.amount <= 0) {
-          //     return false
-          //   }
+          let newTransactions = ethTransactions.filter((ethTransaction) => {
+            if(!ethTransaction || ethTransaction.amount <= 0) {
+              return false
+            }
 
-          //   const thisTransaction = swaps.filter((swap) => {
-          //     return swap.deposit_transaction_hash === ethTransaction.transactionHash &&
-          //       swap.transfer_transaction_hash  // for passing through previously failed swaps
-          //   })
+            const thisTransaction = swaps.filter((swap) => {
+              return swap.deposit_transaction_hash === ethTransaction.transactionHash &&
+                swap.transfer_transaction_hash  // for passing through previously failed swaps
+            })
 
-          //   if(thisTransaction.length > 0) {
-          //     return false
-          //   } else {
-          //     return true
-          //   }
-          // })
+            if(thisTransaction.length > 0) {
+              return false
+            } else {
+              return true
+            }
+          })
 
-          // if(newTransactions.length === 0) {
-          //   res.status(400)
-          //   res.body = { 'status': 400, 'success': false, 'result': 'Unable to find any new deposits' }
-          //   return next(null, req, res, next)
-          // }
+          if(newTransactions.length === 0) {
+            res.status(400)
+            res.body = { 'status': 400, 'success': false, 'result': 'Unable to find any new deposits' }
+            return next(null, req, res, next)
+          }
 
           // choose only 1 at a time, because we have seen binance sdk txn failing when multiple txns are sent in parallel
-          newTransactions = ethTransactions.slice(0, 1)
+          newTransactions = newTransactions.slice(0, 1)
 
           models.insertSwaps(newTransactions, clientAccount, token_uuid, direction, (err, newSwaps) => {
             if(err) {

@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS "public"."client_accounts_bnb";
 CREATE TABLE "public"."client_accounts_bnb" (
   "uuid" char(36) NOT NULL,
   "bnb_address" varchar(64),
-  "bnb_memo" char(9),
+  "bnb_memo" char(128),
   "client_eth_account_uuid" char(36),
   "created" timestamp(6)
 )
@@ -95,7 +95,7 @@ CREATE TABLE "public"."swaps" (
   "token_uuid" char(36),
   "eth_address" varchar(64),
   "bnb_address" varchar(64),
-  "bnb_memo" char(9),
+  "bnb_memo" char(128),
   "amount" varchar(32),
   "deposit_transaction_hash" varchar(128),
   "transfer_transaction_hash" varchar(128),
