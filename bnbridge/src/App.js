@@ -1,9 +1,7 @@
 import React from "react";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import {
-  Grid
-} from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 
 import bnbridgeTheme from './theme';
 
@@ -35,17 +33,17 @@ class App extends React.Component{
           style={{
             padding: '5% 20% 5% 10%',
             minWidth: 'fit-content',
-            marginLeft: '7%',
+            marginLeft: '5.5%',
           }}
           container
-          justify="space-evenly"
+          justify="center"
           alignItems="center"
           direction="row"
           >
-          <Grid item style={{ display: 'table', }} align='center' xs={6}>
+          <Grid item style={{ display: 'table' }} align='center'>
             <Instructions swapDir={this.state.swapDir}/>
           </Grid>
-          <Grid item style={{ display: 'table', padding: '5%', }} align="center" xs={6}>
+          <Grid item style={{ display: 'table', padding: '5%' }} align="center">
             <Controller changeSwapDir={this.changeSwapDir}/>
           </Grid>
         </Grid>
